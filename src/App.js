@@ -14,6 +14,9 @@ import Home from './pages/Home';
 import Launchpad from './pages/Launchpad';
 import Create from './pages/Create';
 import PoolDetail from './pages/PoolDetail'; // Verifica que esta importación sea correcta
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 
 // Estilos para el contenedor principal
 const AppContainer = styled.div`
