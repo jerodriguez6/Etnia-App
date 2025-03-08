@@ -37,15 +37,15 @@ const SectionTitle = styled.h2`
 const CarouselCard = styled(motion.div)`
   background: rgba(0, 0, 0, 0.3); /* Fondo transparente */
   border: 1px solid rgba(255, 255, 255, 0.2); /* Borde claro */
-  border-radius: 4px; /* Esquinas menos redondeadas */
-  padding: 0.8rem;
-  margin: 0 1rem; /* Más espacio entre cards */
+  border-radius: 20px; /* Esquinas más rectangulares */
+  padding: 0.6rem;
+  margin: 0 2rem; /* Más espacio entre cards */
   box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   color: #ffffff;
   text-align: center;
-  width: 180px; /* Tamaño más pequeño */
-  min-height: 220px; /* Altura más compacta */
+  width: 160px; /* Tamaño más pequeño */
+  min-height: 150px; /* Altura más compacta */
 
   &:hover {
     transform: translateY(-3px);
@@ -53,29 +53,29 @@ const CarouselCard = styled(motion.div)`
   }
 
   @media (max-width: 768px) {
-    width: 160px;
-    min-height: 200px;
+    width: 140px;
+    min-height: 180px;
   }
 `;
 
 const CardImage = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin: 0 auto 0.5rem;
+  margin: 0 auto 0.4rem;
   border: 2px solid var(--primary-color);
   box-shadow: 0 0 5px rgba(255, 64, 255, 0.3);
 `;
 
 const CardTitle = styled.h3`
-  font-size: 0.9rem;
-  margin-bottom: 0.3rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
   text-shadow: 0 0 5px rgba(255, 64, 255, 0.3);
 `;
 
 const CardDetail = styled.p`
-  font-size: 0.7rem;
-  margin: 0.2rem 0;
+  font-size: 0.6rem;
+  margin: 0.1rem 0;
   color: #e0e0e0;
 `;
 
@@ -83,18 +83,18 @@ const NetworkLabel = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.6rem;
+  font-size: 0.5rem;
   color: #ffffff;
   background: rgba(255, 255, 255, 0.1);
-  padding: 0.2rem 0.5rem;
-  border-radius: 10px;
-  margin-top: 0.5rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 8px;
+  margin-top: 0.4rem;
 `;
 
 const CardButton = styled(Button)`
-  margin-top: 0.6rem;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.7rem;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.6rem;
   background: var(--secondary-color);
   box-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
 
@@ -289,8 +289,17 @@ function CreatePresale() {
   const [showSummary, setShowSummary] = useState(false);
   const { theme } = useTheme();
 
-  // Datos simulados para el carrusel de preventas favoritas, usando imágenes de Launchpads.jsx
+  // Datos simulados para el carrusel de preventas favoritas
   const featuredPresales = [
+    {
+      name: 'SolRise',
+      symbol: 'SRISE',
+      price: '0.02 SOL',
+      progress: '20%',
+      endDate: '2025-03-15',
+      image: pool6Image,
+      network: 'SOL',
+    },
     {
       name: 'ShadowLoom',
       symbol: 'SHL',
@@ -336,26 +345,17 @@ function CreatePresale() {
       image: pool5Image,
       network: 'BSC',
     },
-    {
-      name: 'SolRise',
-      symbol: 'SRISE',
-      price: '0.02 SOL',
-      progress: '20%',
-      endDate: '2025-03-15',
-      image: pool6Image,
-      network: 'SOL',
-    },
   ];
 
   // Configuración del carrusel
   const carouselSettings = {
     dots: true,
     infinite: true,
-    speed: 500,
+    speed: 300, // Transición más rápida (antes era 500ms, ahora 300ms)
     slidesToShow: 4, // Mostrar 4 cards a la vez
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 3000, // Cambia más rápido (antes 3000ms, ahora 2000ms)
     arrows: true,
     responsive: [
       {

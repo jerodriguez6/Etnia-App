@@ -19,6 +19,7 @@
     "react-slick": "^0.30.3",
     "react-tooltip": "^5.28.0",
     "react-transition-group": "^4.4.5",
+    "react-tsparticles": "^2.12.2",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.15",
     "tsparticles": "^2.12.0",

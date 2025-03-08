@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
@@ -18,6 +17,7 @@ import pool3Image from '../assets/images/pool3.jpg';
 import ethLogo from '../assets/images/eth-logo.png';
 import bnbLogo from '../assets/images/bnb-logo.png';
 import solLogo from '../assets/images/sol-logo.png';
+import Button from '../components/common/Button'; // Import the Button component
 
 const HomeContainer = styled(motion.div)`
   padding: 2rem;
@@ -112,6 +112,19 @@ const Subtitle = styled.p`
 
   @media (max-width: 480px) {
     font-size: 0.9rem;
+  }
+`;
+
+const CTAButtons = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 `;
 
@@ -229,6 +242,96 @@ const FeaturedPools = styled.div`
   }
 `;
 
+const ChatbotContainer = styled(motion.div)`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  z-index: 1000;
+  display: ${props => (props.isOpen ? 'block' : 'none')};
+
+  @media (max-width: 480px) {
+    width: 250px;
+    bottom: 10px;
+    right: 10px;
+  }
+`;
+
+const ChatbotHeader = styled.div`
+  background: rgba(255, 64, 255, 0.2);
+  padding: 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 1rem;
+`;
+
+const ChatbotBody = styled.div`
+  padding: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+`;
+
+const ChatbotMessage = styled.div`
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: ${props => (props.isUser ? 'rgba(0, 255, 255, 0.2)' : 'rgba(255, 64, 255, 0.2)')};
+  border-radius: 5px;
+  color: #ffffff;
+  font-size: 0.9rem;
+`;
+
+const ChatbotInput = styled.input`
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 5px;
+  font-size: 0.9rem;
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const ChatbotToggle = styled(motion.button)`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 255, 255, 0.3);
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(0, 255, 255, 0.5);
+  }
+
+  @media (max-width: 480px) {
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+`;
+
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -237,6 +340,11 @@ const containerVariants = {
 const featureVariants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+};
+
+const chatbotVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 };
 
 const calculateTimeLeft = (targetDate) => {
@@ -255,12 +363,12 @@ const calculateTimeLeft = (targetDate) => {
 };
 
 const mockPools = [
-  { 
-    id: 1, 
-    name: 'ShadowLoom', 
-    totalRaised: '0 ETH', 
-    progress: 0, 
-    status: 'Upcoming', 
+  {
+    id: 1,
+    name: 'ShadowLoom',
+    totalRaised: '0 ETH',
+    progress: 0,
+    status: 'Upcoming',
     image: pool1Image,
     blockchainLogo: ethLogo,
     saleStartDate: '2025-03-15T18:00:00',
@@ -268,12 +376,12 @@ const mockPools = [
     softHard: '250 - 1,000 ETH',
     liquidity: '36% - 365 days',
   },
-  { 
-    id: 2, 
-    name: 'Blub', 
-    totalRaised: '$250,000', 
-    progress: 40, 
-    status: 'Live', 
+  {
+    id: 2,
+    name: 'Blub',
+    totalRaised: '$250,000',
+    progress: 40,
+    status: 'Live',
     image: pool2Image,
     blockchainLogo: bnbLogo,
     saleStartDate: '2025-03-06T12:00:00',
@@ -281,12 +389,12 @@ const mockPools = [
     softHard: '0.5 BNB',
     liquidity: '51% - 190 days',
   },
-  { 
-    id: 3, 
-    name: 'SolanaStar', 
-    totalRaised: '0 SOL', 
-    progress: 0, 
-    status: 'Upcoming', 
+  {
+    id: 3,
+    name: 'SolanaStar',
+    totalRaised: '0 SOL',
+    progress: 0,
+    status: 'Upcoming',
     image: pool3Image,
     blockchainLogo: solLogo,
     saleStartDate: '2025-03-20T12:00:00',
@@ -311,6 +419,9 @@ const sliderSettings = {
 function Home() {
   const { theme } = useTheme();
   const [timeLeft, setTimeLeft] = useState({});
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -327,6 +438,33 @@ function Home() {
 
     return () => clearInterval(timer);
   }, []);
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (input.trim()) {
+      setMessages([...messages, { text: input, isUser: true }]);
+      setTimeout(() => {
+        const response = getChatbotResponse(input);
+        setMessages(prev => [...prev, { text: response, isUser: false }]);
+      }, 500);
+      setInput('');
+    }
+  };
+
+  const getChatbotResponse = (message) => {
+    const lowerMessage = message.toLowerCase();
+    if (lowerMessage.includes('help') || lowerMessage.includes('ayuda')) {
+      return '¡Hola! Soy el asistente de ETNIA. Puedo ayudarte a lanzar un proyecto o unirte a una preventa. ¿En qué te ayudo?';
+    } else if (lowerMessage.includes('launch') || lowerMessage.includes('lanzar')) {
+      return 'Para lanzar un proyecto, ve a "Create a Sale". Necesitarás un token y detalles de la preventa. ¿Quieres más detalles?';
+    } else if (lowerMessage.includes('presale') || lowerMessage.includes('preventa')) {
+      return 'Mira nuestras preventas destacadas arriba o visita "Launchpad List" para explorar más.';
+    } else if (lowerMessage.includes('ai') || lowerMessage.includes('inteligencia')) {
+      return 'Nuestra IA analiza mercados en tiempo real para darte insights sobre las mejores preventas. ¡Pregunta por predicciones!';
+    } else {
+      return 'No estoy seguro de cómo ayudarte con eso. ¿Puedes darme más contexto o preguntar algo sobre ETNIA?';
+    }
+  };
 
   return (
     <HomeContainer
@@ -350,8 +488,19 @@ function Home() {
         <VideoOverlay />
         <Title theme={theme}>Welcome to ETNIA Launchpad</Title>
         <Subtitle theme={theme}>
-          Discover the future of blockchain fundraising with our cutting-edge launchpad platform.
+          The future of token launches with blockchain security and AI-powered insights.
         </Subtitle>
+        <CTAButtons>
+          <Button onClick={() => window.location.href = '/launchpad'} style={{ background: '#ff40ff' }}>
+            Explore Launchpads
+          </Button>
+          <Button onClick={() => window.location.href = '/create'} style={{ background: '#ff40ff' }}>
+            Create Presale
+          </Button>
+          <Button style={{ background: '#00ffff' }}>
+            Connect Wallet
+          </Button>
+        </CTAButtons>
       </HeroSection>
 
       <FeaturesSection theme={theme}>
@@ -412,6 +561,34 @@ function Home() {
           ))}
         </Slider>
       </FeaturedPools>
+
+      <ChatbotContainer
+        isOpen={isChatOpen}
+        variants={chatbotVariants}
+        initial="hidden"
+        animate={isChatOpen ? 'visible' : 'hidden'}
+      >
+        <ChatbotHeader onClick={() => setIsChatOpen(!isChatOpen)}>
+          ETNIA AI Assistant
+        </ChatbotHeader>
+        <ChatbotBody>
+          {messages.map((msg, index) => (
+            <ChatbotMessage key={index} isUser={msg.isUser}>
+              {msg.text}
+            </ChatbotMessage>
+          ))}
+        </ChatbotBody>
+        <form onSubmit={handleSendMessage}>
+          <ChatbotInput
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+          />
+        </form>
+      </ChatbotContainer>
+      <ChatbotToggle onClick={() => setIsChatOpen(!isChatOpen)} whileHover={{ scale: 1.1 }}>
+        💬
+      </ChatbotToggle>
     </HomeContainer>
   );
 }
