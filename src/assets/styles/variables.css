@@ -1,0 +1,21 @@
+:root {
+  --primary-color: #ff40ff; /* Neón rosa brillante */
+  --secondary-color: #00ffff; /* Cian neón */
+  --background-dark: #0d0d1a; /* Negro profundo para modo oscuro */
+  --background-light: #1e1e30; /* Gris oscuro metálico para modo claro */
+  --text-dark: #ffffff; /* Blanco brillante */
+  --text-light: #e0e0e0; /* Gris claro para contraste */
+  --gray-light: #2d2d44; /* Gris oscuro futurista */
+  --shadow-light: 0 2px 12px rgba(0, 255, 255, 0.3); /* Sombra con cian neón más intensa */
+  --shadow-hover: 0 8px 20px rgba(255, 64, 255, 0.5); /* Sombra con rosa neón más intensa */
+  --border-radius: 12px; /* Bordes más redondeados */
+  --glow-effect: 0 0 20px rgba(255, 64, 255, 0.7), 0 0 40px rgba(0, 255, 255, 0.5); /* Efecto de brillo más intenso con cian y rosa */
+}
+
+[data-theme="dark"] {
+  --background-dark: #0a0a14; /* Negro más profundo para modo oscuro */
+  --background-light: #1a1a2e; /* Gris oscuro más intenso */
+  --text-dark: #ffffff; /* Blanco brillante */
+  --text-light: #b0b0c0; /* Gris más suave para contraste */
+  --gray-light: #1a1a2e; /* Gris oscuro futurista */
+}
