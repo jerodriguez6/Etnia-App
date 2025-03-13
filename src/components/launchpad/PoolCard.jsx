@@ -6,6 +6,7 @@ import ProgressBar from '../common/ProgressBar';
 
 const Card = styled(motion.div)`
   background: ${props => props.theme.backgroundDark || props.theme.background};
+  border: 1px solid rgba(255, 64, 255, 0.3);
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
   padding: 1rem;
@@ -13,9 +14,11 @@ const Card = styled(motion.div)`
   color: ${props => props.theme.text};
   text-align: center;
   overflow: hidden;
+  transition: all 0.3s ease;
 
   &:hover {
     box-shadow: 0 6px 20px rgba(0, 255, 255, 0.4);
+    transform: translateY(-5px);
   }
 `;
 
@@ -48,6 +51,8 @@ const CardTitle = styled.h3`
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--text-dark);
+  text-shadow: var(--shadow-light);
 
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -60,8 +65,35 @@ const CardTitle = styled.h3`
 
 const CardStatus = styled.div`
   font-size: 0.9rem;
-  color: ${props => (props.status === 'Live' ? '#00ff00' : props.status === 'Ended' ? '#ff0000' : '#ffcc00')};
+  font-weight: bold;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
   margin-bottom: 0.5rem;
+  display: inline-block;
+  background: ${props => {
+    switch (props.status) {
+      case 'Upcoming':
+        return 'rgba(255, 215, 0, 0.2)';
+      case 'Live':
+        return 'rgba(0, 255, 0, 0.2)';
+      case 'Ended':
+        return 'rgba(255, 0, 0, 0.2)';
+      default:
+        return 'rgba(255, 255, 255, 0.2)';
+    }
+  }};
+  color: ${props => {
+    switch (props.status) {
+      case 'Upcoming':
+        return '#ffd700';
+      case 'Live':
+        return '#00ff00';
+      case 'Ended':
+        return '#ff0000';
+      default:
+        return '#ffffff';
+    }
+  }};
 
   @media (max-width: 480px) {
     font-size: 0.8rem;
@@ -70,8 +102,9 @@ const CardStatus = styled.div`
 
 const Timer = styled.div`
   font-size: 0.8rem;
-  color: ${props => props.theme.textLight || props.theme.text};
+  color: var(--primary-color);
   margin-bottom: 0.5rem;
+  font-weight: 500;
 
   @media (max-width: 480px) {
     font-size: 0.7rem;
@@ -80,7 +113,8 @@ const Timer = styled.div`
 
 const Detail = styled.div`
   font-size: 0.9rem;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
+  color: ${props => props.theme.textLight || props.theme.text};
 
   @media (max-width: 480px) {
     font-size: 0.8rem;
@@ -88,16 +122,19 @@ const Detail = styled.div`
 `;
 
 const ViewButton = styled.button`
-  background: #ff40ff;
-  color: #fff;
+  background: var(--primary-color);
+  color: var(--text-dark);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+  font-weight: bold;
 
   &:hover {
-    background: #00ffff;
+    background: var(--secondary-color);
+    box-shadow: var(--shadow-hover);
   }
 
   @media (max-width: 480px) {
@@ -106,7 +143,12 @@ const ViewButton = styled.button`
   }
 `;
 
-function PoolCard({ pool, timeLeft }) {
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+};
+
+function PoolCard({ pool, timeLeft, onView }) {
   const formatTimeLeft = (time) => {
     if (!time) return '';
     const { days, hours, minutes } = time;
@@ -120,6 +162,9 @@ function PoolCard({ pool, timeLeft }) {
 
   return (
     <Card
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >
@@ -144,7 +189,7 @@ function PoolCard({ pool, timeLeft }) {
       <ProgressBar progress={pool.progress} />
       <Detail>Soft/Hard: {pool.softHard}</Detail>
       <Detail>Liquidity: {pool.liquidity}</Detail>
-      <ViewButton>View</ViewButton>
+      <ViewButton onClick={onView}>View</ViewButton>
     </Card>
   );
 }
