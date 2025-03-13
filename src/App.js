@@ -1,22 +1,20 @@
-// src/App.js
-import React, { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { Suspense, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
 import { ThemeProvider } from './context/ThemeContext';
-import { Particles } from 'react-particles';
+import { Particles } from "@tsparticles/react";
 import { loadSlim } from 'tsparticles-slim';
 import styled from 'styled-components';
 import { Tooltip } from 'react-tooltip';
+import { ErrorBoundary } from 'react-error-boundary';
+
+// Componentes
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
 import Home from './pages/Home';
 import Launchpad from './pages/Launchpad';
 import Create from './pages/Create';
-import PoolDetail from './pages/PoolDetail'; // Verifica que esta importación sea correcta
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
+import PoolDetail from './pages/PoolDetail';
 
 // Estilos para el contenedor principal
 const AppContainer = styled.div`
@@ -25,32 +23,13 @@ const AppContainer = styled.div`
   flex-direction: column;
   position: relative;
   overflow: hidden;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.5rem;
-  }
 `;
 
 const MainContent = styled.main`
   flex: 1;
   position: relative;
   z-index: 1;
-  margin-top: 80px; /* Espacio entre el Header y el contenido */
-  padding: 0 rem; /* Relleno horizontal opcional */
-
-  @media (max-width: 768px) {
-    margin-top: 80px; /* Ajusta el espacio en pantallas más pequeñas */
-    padding: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    margin-top: 60px; /* Ajusta el espacio en pantallas móviles */
-    padding: 0.5rem;
-  }
+  margin-top: 80px;
 `;
 
 const ParticlesContainer = styled.div`
@@ -61,14 +40,6 @@ const ParticlesContainer = styled.div`
   height: 100%;
   z-index: -1;
   pointer-events: none;
-
-  @media (max-width: 768px) {
-    height: 80vh;
-  }
-
-  @media (max-width: 480px) {
-    height: 70vh;
-  }
 `;
 
 const PageTransition = styled(CSSTransition)`
@@ -83,7 +54,6 @@ const PageTransition = styled(CSSTransition)`
   }
   &.page-exit {
     opacity: 1;
-    transform: translateY(0);
   }
   &.page-exit-active {
     opacity: 0;
@@ -93,33 +63,24 @@ const PageTransition = styled(CSSTransition)`
 `;
 
 const LoadingFallback = () => (
-  <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-dark)' }}>
-    Loading...
-  </div>
+  <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
 );
 
 function ErrorFallback({ error, resetErrorBoundary }) {
   return (
-    <div role="alert" style={{ background: 'var(--background-light)', padding: '2rem', textAlign: 'center', zIndex: 1000 }}>
+    <div role="alert" style={{ padding: '2rem', textAlign: 'center' }}>
       <p>Something went wrong:</p>
       <pre>{error.message}</pre>
-      <button onClick={resetErrorBoundary} style={{ background: 'var(--primary-color)', color: 'var(--text-light)', padding: '0.8rem 1.5rem', border: 'none', borderRadius: 'var(--border-radius)', cursor: 'pointer' }}>
-        Try again
-      </button>
+      <button onClick={resetErrorBoundary}>Try again</button>
     </div>
   );
 }
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-
   return (
     <TransitionGroup>
-      <PageTransition
-        key={location.pathname}
-        classNames="page"
-        timeout={500}
-      >
+      <PageTransition key={location.pathname} classNames="page" timeout={500}>
         <Suspense fallback={<LoadingFallback />}>
           <Routes location={location}>
             <Route path="/" element={<Home />} />
@@ -134,41 +95,32 @@ const AnimatedRoutes = () => {
 };
 
 function App() {
-  const particlesInit = async (engine) => {
+  const particlesInit = useCallback(async (engine) => {
     await loadSlim(engine);
-  };
-
-  const particlesLoaded = (container) => {
-    console.log(container);
-  };
+  }, []);
 
   return (
     <ThemeProvider>
       <Router>
         <AppContainer>
           <ParticlesContainer>
-            <Particles
-              id="tsparticles"
-              init={particlesInit}
-              loaded={particlesLoaded}
-              options={{
-                background: { color: { value: 'transparent' } },
-                fpsLimit: 120,
-                interactivity: {
-                  events: { onHover: { enable: false, mode: 'repulse' }, onClick: { enable: false, mode: 'push' } },
-                },
-                particles: {
-                  color: { value: ['#ff40ff', '#00ffff'] },
-                  links: { color: '#ffffff', distance: 150, enable: true, opacity: 0.5, width: 1 },
-                  move: { direction: 'none', enable: true, outModes: { default: 'bounce' }, random: false, speed: 2, straight: false },
-                  number: { density: { enable: true, area: 800 }, value: 80 },
-                  opacity: { value: 0.5 },
-                  shape: { type: 'circle' },
-                  size: { value: { min: 1, max: 5 } },
-                },
-                detectRetina: true,
-              }}
-            />
+            <Particles id="tsparticles" init={particlesInit} options={{
+              background: { color: { value: 'transparent' } },
+              fpsLimit: 120,
+              interactivity: {
+                events: { onHover: { enable: false }, onClick: { enable: false } },
+              },
+              particles: {
+                color: { value: ['#ff40ff', '#00ffff'] },
+                links: { color: '#ffffff', distance: 150, enable: true, opacity: 0.5, width: 1 },
+                move: { enable: true, speed: 2 },
+                number: { density: { enable: true, area: 800 }, value: 80 },
+                opacity: { value: 0.5 },
+                shape: { type: 'circle' },
+                size: { value: { min: 1, max: 5 } },
+              },
+              detectRetina: true,
+            }} />
           </ParticlesContainer>
           <Header />
           <MainContent>

@@ -3,18 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@tsparticles/engine": "^3.8.1",
+    "@tsparticles/react": "^3.0.0",
     "ajv": "^8.12.0",
     "ethers": "^6.13.5",
-    "framer-motion": "^12.4.10",
+    "framer-motion": "^12.5.0",
     "howler": "^2.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^5.0.0",
     "react-icons": "^5.5.0",
     "react-modal": "^3.16.3",
-    "react-particles": "^2.12.2",
     "react-player": "^2.16.0",
-    "react-router-dom": "^6.30.0",
+    "react-router-dom": "^7.3.0",
     "react-scripts": "^5.0.1",
     "react-slick": "^0.30.3",
     "react-tooltip": "^5.28.0",
@@ -48,5 +49,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
+    "react-refresh": "^0.16.0"
   }
 }

@@ -1,3 +1,4 @@
+// src/pages/Create.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
@@ -13,6 +14,13 @@ import pool4Image from '../assets/images/pool4.png';
 import pool5Image from '../assets/images/pool5.png';
 import pool6Image from '../assets/images/pool6.png';
 
+// Importamos los logos de las blockchains
+import ethereumLogo from '../assets/images/eth-logo.png';
+import bscLogo from '../assets/images/bnb-logo.png';
+import solanaLogo from '../assets/images/sol-logo.png';
+import polygonLogo from '../assets/images/polygon-logo.png';
+
+
 // Estilos para el carrusel y las cards
 const FeaturedSection = styled.div`
   max-width: 1200px;
@@ -23,8 +31,8 @@ const FeaturedSection = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  color: #ffffff;
-  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  color: var(--text-dark);
+  text-shadow: var(--shadow-light);
   margin-bottom: 1.5rem;
   text-align: center;
   font-size: 1.8rem;
@@ -35,21 +43,21 @@ const SectionTitle = styled.h2`
 `;
 
 const CarouselCard = styled(motion.div)`
-  background: rgba(0, 0, 0, 0.3); /* Fondo transparente */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Borde claro */
-  border-radius: 20px; /* Esquinas más rectangulares */
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius);
   padding: 0.6rem;
-  margin: 0 2rem; /* Más espacio entre cards */
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+  margin: 0 2rem;
+  box-shadow: var(--shadow-light);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  color: #ffffff;
+  color: var(--text-light);
   text-align: center;
-  width: 160px; /* Tamaño más pequeño */
-  min-height: 150px; /* Altura más compacta */
+  width: 160px;
+  min-height: 150px;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+    box-shadow: var(--shadow-hover);
   }
 
   @media (max-width: 768px) {
@@ -64,19 +72,19 @@ const CardImage = styled.img`
   border-radius: 50%;
   margin: 0 auto 0.4rem;
   border: 2px solid var(--primary-color);
-  box-shadow: 0 0 5px rgba(255, 64, 255, 0.3);
+  box-shadow: var(--shadow-light);
 `;
 
 const CardTitle = styled.h3`
   font-size: 0.8rem;
   margin-bottom: 0.2rem;
-  text-shadow: 0 0 5px rgba(255, 64, 255, 0.3);
+  text-shadow: var(--shadow-light);
 `;
 
 const CardDetail = styled.p`
   font-size: 0.6rem;
   margin: 0.1rem 0;
-  color: #e0e0e0;
+  color: var(--text-light);
 `;
 
 const NetworkLabel = styled.div`
@@ -84,7 +92,7 @@ const NetworkLabel = styled.div`
   align-items: center;
   gap: 0.3rem;
   font-size: 0.5rem;
-  color: #ffffff;
+  color: var(--text-dark);
   background: rgba(255, 255, 255, 0.1);
   padding: 0.2rem 0.4rem;
   border-radius: 8px;
@@ -96,12 +104,93 @@ const CardButton = styled(Button)`
   padding: 0.2rem 0.5rem;
   font-size: 0.6rem;
   background: var(--secondary-color);
-  box-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
+  box-shadow: var(--shadow-light);
 
   &:hover {
     background: var(--primary-color);
-    box-shadow: 0 0 10px rgba(255, 64, 255, 0.4);
+    box-shadow: var(--shadow-hover);
   }
+`;
+
+// Estilos para el Modal
+const ModalOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled(motion.div)`
+  background: var(--background-light);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--glow-effect);
+  max-width: 800px;
+  width: 90%;
+  text-align: center;
+`;
+
+const ModalTitle = styled.h2`
+  color: var(--text-dark);
+  text-shadow: var(--shadow-light);
+  margin-bottom: 1.5rem;
+`;
+
+const BlockchainGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const BlockchainCard = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-light);
+  text-align: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
+  }
+`;
+
+const BlockchainLogo = styled.img`
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 0.5rem;
+  border-radius: 50%;
+  box-shadow: var(--shadow-light);
+`;
+
+const BlockchainTitle = styled.h3`
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+`;
+
+const BlockchainDescription = styled.p`
+  font-size: 0.8rem;
+  color: var(--text-light);
 `;
 
 // Estilos para el formulario
@@ -112,7 +201,7 @@ const CreateContainer = styled(motion.div)`
   background: linear-gradient(135deg, rgba(255, 64, 255, 0.2), rgba(0, 255, 255, 0.2));
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  box-shadow: var(--glow-effect);
   position: relative;
   z-index: 3;
   min-height: 400px;
@@ -130,6 +219,12 @@ const CreateContainer = styled(motion.div)`
   }
 `;
 
+const PresaleTitle = styled.h1`
+  color: var(--text-dark);
+  text-shadow: var(--shadow-light);
+  margin-bottom: 1rem;
+`;
+
 const Form = styled.form`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -137,10 +232,6 @@ const Form = styled.form`
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-  }
-
-  @media (max-width: 480px) {
-    gap: 1rem;
   }
 `;
 
@@ -151,13 +242,9 @@ const FormGroup = styled.div`
 `;
 
 const Label = styled.label`
-  color: #ffffff;
+  color: var(--text-dark);
   font-size: 0.9rem;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-
-  @media (max-width: 480px) {
-    font-size: 0.8rem;
-  }
+  text-shadow: var(--shadow-light);
 `;
 
 const Input = styled(motion.input)`
@@ -166,13 +253,13 @@ const Input = styled(motion.input)`
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
   background: rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-  box-shadow: 0 0 8px rgba(255, 64, 255, 0.3);
+  color: var(--text-dark);
+  box-shadow: var(--shadow-light);
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 12px rgba(0, 255, 255, 0.7);
+    box-shadow: var(--shadow-hover);
     border-color: var(--secondary-color);
   }
 
@@ -180,33 +267,20 @@ const Input = styled(motion.input)`
     border-color: #dc3545;
     box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
   }
-
-  @media (max-width: 480px) {
-    padding: 0.8rem;
-    font-size: 0.9rem;
-  }
 `;
 
 const ErrorMessage = styled.p`
-  color: #ff40ff;
+  color: var(--primary-color);
   font-size: 0.9rem;
   margin-top: -0.5rem;
   margin-bottom: 0.5rem;
-
-  @media (max-width: 480px) {
-    font-size: 0.8rem;
-  }
 `;
 
 const Instructions = styled.p`
-  color: #ffffff;
+  color: var(--text-light);
   font-size: 1rem;
   margin-bottom: 1rem;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-
-  @media (max-width: 480px) {
-    font-size: 0.9rem;
-  }
+  text-shadow: var(--shadow-light);
 `;
 
 const Summary = styled(motion.div)`
@@ -214,18 +288,9 @@ const Summary = styled(motion.div)`
   padding: 1.5rem;
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  box-shadow: var(--shadow-light);
   margin-top: 1.5rem;
   display: block;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-  }
 `;
 
 const PreviewButton = styled(Button)`
@@ -235,22 +300,23 @@ const PreviewButton = styled(Button)`
   font-size: 1rem;
   border-radius: var(--border-radius);
   background: var(--primary-color);
-  color: #ffffff;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  color: var(--text-dark);
+  box-shadow: var(--shadow-light);
   transition: all 0.3s ease;
 
   &:hover {
     background: var(--secondary-color);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.8rem 1.5rem;
-    font-size: 0.9rem;
+    box-shadow: var(--shadow-hover);
   }
 `;
 
 // Animaciones
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+  exit: { opacity: 0, scale: 0.8, transition: { duration: 0.3 } },
+};
+
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -271,6 +337,77 @@ const cardVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
 };
 
+// Datos de las Blockchains con logos
+const blockchains = [
+  {
+    name: 'Ethereum',
+    description: 'High security, extensive dApp ecosystem, higher gas fees.',
+    logo: ethereumLogo,
+  },
+  {
+    name: 'Binance Smart Chain',
+    description: 'Low gas fees, fast transactions, EVM compatible.',
+    logo: bscLogo,
+  },
+  {
+    name: 'Solana',
+    description: 'Ultra-fast, low fees, high scalability. Perfect for memecoins.',
+    logo: solanaLogo,
+  },
+  {
+    name: 'Polygon',
+    description: 'Low gas fees, scalable, fast. Ethereum compatible.',
+    logo: polygonLogo,
+  },
+  
+];
+
+// Componente Modal para selección de Blockchain
+function BlockchainModal({ isOpen, onClose, onSelect }) {
+  if (!isOpen) return null;
+
+  return (
+    <ModalOverlay
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <ModalContent
+        variants={modalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ModalTitle>Select Chain</ModalTitle>
+        <BlockchainGrid>
+          {blockchains.map((chain, index) => (
+            <BlockchainCard
+              key={index}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              onClick={() => onSelect(chain.name)}
+            >
+              <BlockchainLogo src={chain.logo} alt={`${chain.name} logo`} />
+              <BlockchainTitle>{chain.name}</BlockchainTitle>
+              <BlockchainDescription>{chain.description}</BlockchainDescription>
+            </BlockchainCard>
+          ))}
+        </BlockchainGrid>
+        <Button
+          onClick={onClose}
+          style={{ background: 'var(--secondary-color)', marginTop: '1rem' }}
+        >
+          Cancel
+        </Button>
+      </ModalContent>
+    </ModalOverlay>
+  );
+}
+
+// Componente Principal
 function CreatePresale() {
   const [formData, setFormData] = useState({
     projectName: '',
@@ -283,13 +420,14 @@ function CreatePresale() {
     startDate: '',
     endDate: '',
     creatorWallet: '',
+    selectedChain: '',
   });
 
   const [errors, setErrors] = useState({});
   const [showSummary, setShowSummary] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { theme } = useTheme();
 
-  // Datos simulados para el carrusel de preventas favoritas
   const featuredPresales = [
     {
       name: 'SolRise',
@@ -347,37 +485,27 @@ function CreatePresale() {
     },
   ];
 
-  // Configuración del carrusel
   const carouselSettings = {
     dots: true,
     infinite: true,
-    speed: 300, // Transición más rápida (antes era 500ms, ahora 300ms)
-    slidesToShow: 4, // Mostrar 4 cards a la vez
+    speed: 300,
+    slidesToShow: 4,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000, // Cambia más rápido (antes 3000ms, ahora 2000ms)
+    autoplaySpeed: 2000,
     arrows: true,
     responsive: [
       {
         breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-        },
+        settings: { slidesToShow: 3, slidesToScroll: 1 },
       },
       {
         breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
+        settings: { slidesToShow: 2, slidesToScroll: 1 },
       },
       {
         breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
+        settings: { slidesToShow: 1, slidesToScroll: 1 },
       },
     ],
   };
@@ -393,7 +521,18 @@ function CreatePresale() {
     if (!formData.maxPurchase.trim()) newErrors.maxPurchase = 'Maximum purchase is required';
     if (!formData.startDate.trim()) newErrors.startDate = 'Start date is required';
     if (!formData.endDate.trim()) newErrors.endDate = 'End date is required';
-    if (!formData.creatorWallet.trim()) newErrors.creatorWallet = 'Creator wallet is required';
+    if (!formData.creatorWallet.trim()) newErrors.creatorWallet = 'Creator wallet address is required';
+    if (!formData.selectedChain) newErrors.selectedChain = 'Please select a blockchain';
+
+    if (formData.selectedChain && formData.creatorWallet) {
+      if (formData.selectedChain === 'Ethereum' && !formData.creatorWallet.startsWith('0x')) {
+        newErrors.creatorWallet = 'Ethereum wallet address must start with 0x';
+      }
+      if (formData.selectedChain === 'Binance Smart Chain' && !formData.creatorWallet.startsWith('0x')) {
+        newErrors.creatorWallet = 'BSC wallet address must start with 0x';
+      }
+    }
+
     return newErrors;
   };
 
@@ -427,14 +566,19 @@ function CreatePresale() {
       startDate: '',
       endDate: '',
       creatorWallet: '',
+      selectedChain: '',
     });
     setErrors({});
     setShowSummary(false);
   };
 
+  const handleSelectChain = (chain) => {
+    setFormData({ ...formData, selectedChain: chain });
+    setIsModalOpen(false);
+  };
+
   return (
     <>
-      {/* Sección del Carrusel de Preventas Favoritas */}
       <FeaturedSection>
         <SectionTitle>Featured Presales</SectionTitle>
         <Slider {...carouselSettings}>
@@ -459,208 +603,233 @@ function CreatePresale() {
         </Slider>
       </FeaturedSection>
 
-      {/* Formulario de Creación de Preventa */}
-      <CreateContainer
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        theme={theme}
-      >
-        <h1 style={{ color: '#ffffff', textShadow: '0 0 10px rgba(0, 255, 255, 0.5)', marginBottom: '1rem' }}>
+      <div style={{ textAlign: 'center', margin: '2rem 0' }}>
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          style={{
+            background: 'var(--primary-color)',
+            padding: '1rem 2rem',
+            fontSize: '1.2rem',
+            boxShadow: 'var(--shadow-light)',
+          }}
+        >
           Create Presale
-        </h1>
-        <Instructions theme={theme}>
-          Fill out the form below to create a new presale. All fields are required.
-        </Instructions>
-        <Form onSubmit={handleSubmit}>
-          <FormGroup>
-            <Label>Project Name</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="text"
-              name="projectName"
-              placeholder="Enter project name"
-              value={formData.projectName}
-              onChange={handleChange}
-              required
-            />
-            {errors.projectName && <ErrorMessage>{errors.projectName}</ErrorMessage>}
-          </FormGroup>
+        </Button>
+      </div>
 
-          <FormGroup>
-            <Label>Token Symbol</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="text"
-              name="tokenSymbol"
-              placeholder="Enter token symbol"
-              value={formData.tokenSymbol}
-              onChange={handleChange}
-              required
-            />
-            {errors.tokenSymbol && <ErrorMessage>{errors.tokenSymbol}</ErrorMessage>}
-          </FormGroup>
+      <BlockchainModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleSelectChain}
+      />
 
-          <FormGroup>
-            <Label>Token Contract Address</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="text"
-              name="tokenAddress"
-              placeholder="Enter token contract address"
-              value={formData.tokenAddress}
-              onChange={handleChange}
-              required
-            />
-            {errors.tokenAddress && <ErrorMessage>{errors.tokenAddress}</ErrorMessage>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Sale Price per Token</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="number"
-              step="0.000001"
-              name="salePrice"
-              placeholder="Enter sale price"
-              value={formData.salePrice}
-              onChange={handleChange}
-              required
-            />
-            {errors.salePrice && <ErrorMessage>{errors.salePrice}</ErrorMessage>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Total Tokens for Sale</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="number"
-              step="0.000001"
-              name="totalTokens"
-              placeholder="Enter total tokens"
-              value={formData.totalTokens}
-              onChange={handleChange}
-              required
-            />
-            {errors.totalTokens && <ErrorMessage>{errors.totalTokens}</ErrorMessage>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Minimum Purchase</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="number"
-              step="0.000001"
-              name="minPurchase"
-              placeholder="Enter minimum purchase"
-              value={formData.minPurchase}
-              onChange={handleChange}
-              required
-            />
-            {errors.minPurchase && <ErrorMessage>{errors.minPurchase}</ErrorMessage>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Maximum Purchase</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="number"
-              step="0.000001"
-              name="maxPurchase"
-              placeholder="Enter maximum purchase"
-              value={formData.maxPurchase}
-              onChange={handleChange}
-              required
-            />
-            {errors.maxPurchase && <ErrorMessage>{errors.maxPurchase}</ErrorMessage>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Start Date</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="datetime-local"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              required
-            />
-            {errors.startDate && <ErrorMessage>{errors.startDate}</ErrorMessage>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>End Date</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="datetime-local"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleChange}
-              required
-            />
-            {errors.endDate && <ErrorMessage>{errors.endDate}</ErrorMessage>}
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Creator Wallet Address</Label>
-            <Input
-              variants={inputVariants}
-              initial="hidden"
-              animate="visible"
-              type="text"
-              name="creatorWallet"
-              placeholder="Enter creator wallet address"
-              value={formData.creatorWallet}
-              onChange={handleChange}
-              required
-            />
-            {errors.creatorWallet && <ErrorMessage>{errors.creatorWallet}</ErrorMessage>}
-          </FormGroup>
-
-          <PreviewButton type="submit">Preview Pool</PreviewButton>
-        </Form>
-
-        <Summary
-          variants={summaryVariants}
+      {formData.selectedChain && (
+        <CreateContainer
+          variants={containerVariants}
           initial="hidden"
-          animate={showSummary ? 'visible' : 'hidden'}
+          animate="visible"
           theme={theme}
         >
-          <h3>Presale Summary</h3>
-          <p><strong>Project Name:</strong> {formData.projectName}</p>
-          <p><strong>Token Symbol:</strong> {formData.tokenSymbol}</p>
-          <p><strong>Token Address:</strong> {formData.tokenAddress}</p>
-          <p><strong>Sale Price:</strong> {formData.salePrice}</p>
-          <p><strong>Total Tokens:</strong> {formData.totalTokens}</p>
-          <p><strong>Min Purchase:</strong> {formData.minPurchase}</p>
-          <p><strong>Max Purchase:</strong> {formData.maxPurchase}</p>
-          <p><strong>Start Date:</strong> {formData.startDate}</p>
-          <p><strong>End Date:</strong> {formData.endDate}</p>
-          <p><strong>Creator Wallet:</strong> {formData.creatorWallet}</p>
-          <Button onClick={handleConfirm}>Confirm Creation</Button>
-          <Button onClick={() => setShowSummary(false)} style={{ background: 'var(--secondary-color)', marginLeft: '1rem' }}>
-            Cancel
-          </Button>
-        </Summary>
-      </CreateContainer>
+          <PresaleTitle>
+            Create Presale on {formData.selectedChain}
+          </PresaleTitle>
+          <Instructions theme={theme}>
+            Fill out the form below to create a new presale. All fields are required.
+          </Instructions>
+          <Form onSubmit={handleSubmit}>
+            <FormGroup>
+              <Label>Project Name</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="text"
+                name="projectName"
+                placeholder="Enter project name"
+                value={formData.projectName}
+                onChange={handleChange}
+                required
+              />
+              {errors.projectName && <ErrorMessage>{errors.projectName}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Token Symbol</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="text"
+                name="tokenSymbol"
+                placeholder="Enter token symbol"
+                value={formData.tokenSymbol}
+                onChange={handleChange}
+                required
+              />
+              {errors.tokenSymbol && <ErrorMessage>{errors.tokenSymbol}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Token Contract Address</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="text"
+                name="tokenAddress"
+                placeholder="Enter token contract address"
+                value={formData.tokenAddress}
+                onChange={handleChange}
+                required
+              />
+              {errors.tokenAddress && <ErrorMessage>{errors.tokenAddress}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Sale Price per Token</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="number"
+                step="0.000001"
+                name="salePrice"
+                placeholder="Enter sale price"
+                value={formData.salePrice}
+                onChange={handleChange}
+                required
+              />
+              {errors.salePrice && <ErrorMessage>{errors.salePrice}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Total Tokens for Sale</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="number"
+                step="0.000001"
+                name="totalTokens"
+                placeholder="Enter total tokens"
+                value={formData.totalTokens}
+                onChange={handleChange}
+                required
+              />
+              {errors.totalTokens && <ErrorMessage>{errors.totalTokens}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Minimum Purchase</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="number"
+                step="0.000001"
+                name="minPurchase"
+                placeholder="Enter minimum purchase"
+                value={formData.minPurchase}
+                onChange={handleChange}
+                required
+              />
+              {errors.minPurchase && <ErrorMessage>{errors.minPurchase}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Maximum Purchase</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="number"
+                step="0.000001"
+                name="maxPurchase"
+                placeholder="Enter maximum purchase"
+                value={formData.maxPurchase}
+                onChange={handleChange}
+                required
+              />
+              {errors.maxPurchase && <ErrorMessage>{errors.maxPurchase}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Start Date</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="datetime-local"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                required
+              />
+              {errors.startDate && <ErrorMessage>{errors.startDate}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>End Date</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="datetime-local"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleChange}
+                required
+              />
+              {errors.endDate && <ErrorMessage>{errors.endDate}</ErrorMessage>}
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Creator Wallet Address</Label>
+              <Input
+                variants={inputVariants}
+                initial="hidden"
+                animate="visible"
+                type="text"
+                name="creatorWallet"
+                placeholder="Enter creator wallet address"
+                value={formData.creatorWallet}
+                onChange={handleChange}
+                required
+              />
+              {errors.creatorWallet && <ErrorMessage>{errors.creatorWallet}</ErrorMessage>}
+            </FormGroup>
+
+            <PreviewButton type="submit">Preview Pool</PreviewButton>
+          </Form>
+
+          <Summary
+            variants={summaryVariants}
+            initial="hidden"
+            animate={showSummary ? 'visible' : 'hidden'}
+            theme={theme}
+          >
+            <h3>Presale Summary</h3>
+            <p><strong>Blockchain:</strong> {formData.selectedChain}</p>
+            <p><strong>Project Name:</strong> {formData.projectName}</p>
+            <p><strong>Token Symbol:</strong> {formData.tokenSymbol}</p>
+            <p><strong>Token Address:</strong> {formData.tokenAddress}</p>
+            <p><strong>Sale Price:</strong> {formData.salePrice}</p>
+            <p><strong>Total Tokens:</strong> {formData.totalTokens}</p>
+            <p><strong>Min Purchase:</strong> {formData.minPurchase}</p>
+            <p><strong>Max Purchase:</strong> {formData.maxPurchase}</p>
+            <p><strong>Start Date:</strong> {formData.startDate}</p>
+            <p><strong>End Date:</strong> {formData.endDate}</p>
+            <p><strong>Creator Wallet:</strong> {formData.creatorWallet}</p>
+            <Button onClick={handleConfirm}>Confirm Creation</Button>
+            <Button
+              onClick={() => setShowSummary(false)}
+              style={{ background: 'var(--secondary-color)', marginLeft: '1rem' }}
+            >
+              Cancel
+            </Button>
+          </Summary>
+        </CreateContainer>
+      )}
     </>
   );
 }
