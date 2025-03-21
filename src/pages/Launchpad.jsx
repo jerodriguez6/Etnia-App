@@ -273,7 +273,7 @@ const mockPools = [
     id: 2,
     name: 'Blub',
     totalRaised: '117.9646 BNB',
-    progress: 235.92,
+    progress: 100,
     status: 'Live',
     image: pool2Image,
     blockchainLogo: bnbLogo,

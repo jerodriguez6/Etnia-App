@@ -14,17 +14,16 @@ const BarContainer = styled.div`
 
 const ProgressFill = styled.div`
   height: 100%;
-  background: var(--primary-color); /* Use theme's primary color (e.g., pink) */
-  width: ${props => Math.min(props.progress, 100)}%; /* Cap at 100% */
+  background: var(--primary-color); /* Pink color to match the screenshot */
+  width: ${props => Math.min(props.progress, 100)}%; /* Cap at 100% to prevent overflow */
   transition: width 0.3s ease;
   border-radius: 5px;
 `;
 
 const ProgressText = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: -20px; /* Position above the bar to avoid overlap */
+  right: 0;
   color: var(--text-dark);
   font-size: 0.8rem;
   font-weight: bold;

@@ -451,7 +451,7 @@ function CreatePresale() {
       name: 'Blub',
       symbol: 'BLB',
       price: '0.02 BNB',
-      progress: '235.92%',
+      progress: '100%',
       endDate: '2025-03-10',
       image: pool2Image,
       network: 'BSC',

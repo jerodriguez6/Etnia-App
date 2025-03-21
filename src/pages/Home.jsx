@@ -17,8 +17,8 @@ import pool3Image from '../assets/images/pool3.jpg';
 import ethLogo from '../assets/images/eth-logo.png';
 import bnbLogo from '../assets/images/bnb-logo.png';
 import solLogo from '../assets/images/sol-logo.png';
-import Button from '../components/common/Button'; // Import the Button component
 
+// Componentes estilizados
 const HomeContainer = styled(motion.div)`
   padding: 2rem;
   background: ${props => props.theme.background};
@@ -125,6 +125,56 @@ const CTAButtons = styled.div`
   @media (max-width: 480px) {
     flex-direction: column;
     gap: 0.5rem;
+  }
+`;
+
+const StyledCTAButton = styled(motion.button)`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px; /* Tamaño ajustado para coincidir con el botón del Header */
+  font-size: 16px;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Fondo con el mismo gradiente que el borde */
+  border: 2px solid transparent; /* Borde inicial transparente */
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1; /* Borde con gradiente */
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), /* Resplandor cian */
+              inset 0 0 5px rgba(0, 255, 255, 0.1); /* Sombra interna */
+  color: white; /* Texto blanco */
+  font-family: 'Roboto', sans-serif; /* Fuente moderna y minimalista */
+  font-weight: 500;
+  text-transform: uppercase; /* Texto en mayúsculas */
+  letter-spacing: 1px;
+  transition: all 0.3s ease; /* Transiciones suaves */
+  cursor: pointer;
+  opacity: 0.9; /* Opacidad inicial */
+
+  /* Cortes diagonales en las esquinas superior izquierda e inferior derecha */
+  clip-path: polygon(
+    10px 0, /* Corte diagonal en la esquina superior izquierda */
+    100% 0, /* Esquina superior derecha */
+    100% calc(100% - 10px), /* Corte diagonal en la esquina inferior derecha */
+    calc(100% - 10px) 100%, /* Punta sobresaliente en la esquina inferior derecha */
+    0 100%, /* Esquina inferior izquierda */
+    0 10px /* Vuelve al inicio del corte diagonal */
+  );
+
+  &:hover {
+    opacity: 1; /* Aumenta la opacidad al hacer hover */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), /* Aumenta el resplandor */
+                0 0 20px rgba(0, 255, 255, 0.3);
+    transform: translateY(-2px); /* Animación sutil al pasar el cursor */
+  }
+
+  &:active {
+    transform: scale(0.98); /* Efecto de pulsación al hacer clic */
+  }
+
+  
+
+  @media (max-width: 480px) {
+    padding: 10px 20px; /* Ajustado para pantallas pequeñas */
+    font-size: 14px;
   }
 `;
 
@@ -332,6 +382,7 @@ const ChatbotToggle = styled(motion.button)`
   }
 `;
 
+// Animaciones
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -491,15 +542,26 @@ function Home() {
           The future of token launches with blockchain security and AI-powered insights.
         </Subtitle>
         <CTAButtons>
-          <Button onClick={() => window.location.href = '/launchpad'} style={{ background: '#ff40ff' }}>
-            Explore Launchpads
-          </Button>
-          <Button onClick={() => window.location.href = '/create'} style={{ background: '#ff40ff' }}>
+          <StyledCTAButton
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => window.location.href = '/launchpad'}
+          >
+            Explore 
+          </StyledCTAButton>
+          <StyledCTAButton
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => window.location.href = '/create'}
+          >
             Create Presale
-          </Button>
-          <Button style={{ background: '#00ffff' }}>
-            Connect Wallet
-          </Button>
+          </StyledCTAButton>
+          <StyledCTAButton
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Agent AI 
+          </StyledCTAButton>
         </CTAButtons>
       </HeroSection>
 

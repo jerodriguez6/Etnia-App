@@ -115,10 +115,27 @@ const Detail = styled.div`
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
   color: ${props => props.theme.textLight || props.theme.text};
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
 
   @media (max-width: 480px) {
     font-size: 0.8rem;
   }
+`;
+
+const DetailLabel = styled.span`
+  font-weight: bold;
+  color: var(--text-dark);
+`;
+
+const DetailValue = styled.span`
+  color: ${props => props.theme.textLight || props.theme.text};
+`;
+
+const ProgressContainer = styled.div`
+  margin: 0.5rem 0;
+  padding: 0 0.5rem; /* Add padding to contain the progress bar */
 `;
 
 const ViewButton = styled.button`
@@ -185,10 +202,21 @@ function PoolCard({ pool, timeLeft, onView }) {
       {pool.status === 'Ended' && pool.saleEndDate && (
         <Timer>Ended: {formatTimeLeft(timeLeft)}</Timer>
       )}
-      <Detail>Total Raised: {pool.totalRaised}</Detail>
-      <ProgressBar progress={pool.progress} />
-      <Detail>Soft/Hard: {pool.softHard}</Detail>
-      <Detail>Liquidity: {pool.liquidity}</Detail>
+      <Detail>
+        <DetailLabel>Total Raised:</DetailLabel>
+        <DetailValue>{pool.totalRaised}</DetailValue>
+      </Detail>
+      <ProgressContainer>
+        <ProgressBar progress={pool.progress} />
+      </ProgressContainer>
+      <Detail>
+        <DetailLabel>Soft/Hard:</DetailLabel>
+        <DetailValue>{pool.softHard}</DetailValue>
+      </Detail>
+      <Detail>
+        <DetailLabel>Liquidity:</DetailLabel>
+        <DetailValue>{pool.liquidity}</DetailValue>
+      </Detail>
       <ViewButton onClick={onView}>View</ViewButton>
     </Card>
   );

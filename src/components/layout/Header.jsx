@@ -91,37 +91,135 @@ const StyledLink = styled(Link)`
 `;
 
 const ConnectButton = styled(motion.button)`
-  background: var(--primary-color);
-  color: ${props => props.theme.text};
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: var(--border-radius);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px; /* Tamaño ajustado para coincidir con el botón de la imagen */
+  font-size: 16px;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Fondo con el mismo gradiente que el borde */
+  border: 2px solid transparent; /* Borde inicial transparente */
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1; /* Borde con gradiente */
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), /* Resplandor cian */
+              inset 0 0 5px rgba(0, 255, 255, 0.1); /* Sombra interna */
+  color: white; /* Texto blanco */
+  font-family: 'Roboto', sans-serif; /* Fuente moderna y minimalista */
+  font-weight: 500;
+  text-transform: uppercase; /* Texto en mayúsculas */
+  letter-spacing: 1px;
+  transition: all 0.3s ease; /* Transiciones suaves */
   cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 0 8px rgba(255, 64, 255, 0.4);
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
+  opacity: 0.9; /* Opacidad inicial */
+
+  /* Cortes diagonales en las esquinas superior izquierda e inferior derecha */
+  clip-path: polygon(
+    10px 0, /* Corte diagonal en la esquina superior izquierda */
+    100% 0, /* Esquina superior derecha */
+    100% calc(100% - 10px), /* Corte diagonal en la esquina inferior derecha */
+    calc(100% - 10px) 100%, /* Punta sobresaliente en la esquina inferior derecha */
+    0 100%, /* Esquina inferior izquierda */
+    0 10px /* Vuelve al inicio del corte diagonal */
+  );
 
   &:hover {
-    background: var(--secondary-color);
-    box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
-    transform: translateY(-2px);
+    opacity: 1; /* Aumenta la opacidad al hacer hover */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), /* Aumenta el resplandor */
+                0 0 20px rgba(0, 255, 255, 0.3);
+    transform: translateY(-2px); /* Animación sutil al pasar el cursor */
+  }
+
+  &:active {
+    transform: scale(0.98); /* Efecto de pulsación al hacer clic */
   }
 
   @media (max-width: 768px) {
     display: none;
+  }
+
+  &:after {
+    content: '✨'; /* Estrella en lugar de flecha, como en la imagen */
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: white;
   }
 `;
 
 const MobileConnectButton = styled(ConnectButton)`
   display: none;
   @media (max-width: 768px) {
-    display: block;
+    display: flex;
     width: 100%;
     text-align: center;
+    padding: 10px 20px; /* Ajustado para móvil */
   }
 `;
 
+const WalletButton = styled(motion.button)`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 12px 24px; /* Mismo tamaño que ConnectButton */
+  font-size: 16px;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Fondo con el mismo gradiente que el borde */
+  border: 2px solid transparent; /* Borde inicial transparente */
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1; /* Borde con gradiente */
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), /* Resplandor cian */
+              inset 0 0 5px rgba(0, 255, 255, 0.1); /* Sombra interna */
+  color: white; /* Texto blanco */
+  font-family: 'Roboto', sans-serif; /* Fuente moderna y minimalista */
+  font-weight: 500;
+  text-transform: uppercase; /* Texto en mayúsculas */
+  letter-spacing: 1px;
+  transition: all 0.3s ease; /* Transiciones suaves */
+  cursor: pointer;
+  opacity: 0.9; /* Opacidad inicial */
+
+  /* Mismos cortes diagonales que ConnectButton */
+  clip-path: polygon(
+    10px 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0 100%,
+    0 10px
+  );
+
+  &:hover {
+    opacity: 1; /* Aumenta la opacidad al hacer hover */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), /* Aumenta el resplandor */
+                0 0 20px rgba(0, 255, 255, 0.3);
+    transform: translateY(-2px); /* Animación sutil al pasar el cursor */
+  }
+
+  &:active {
+    transform: scale(0.98); /* Efecto de pulsación al hacer clic */
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  &:after {
+    content: '✨'; /* Estrella a la derecha */
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: white;
+  }
+`;
+
+const MobileWalletButton = styled(WalletButton)`
+  display: none;
+  @media (max-width: 768px) {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding: 10px 20px; /* Ajustado para móvil */
+  }
+`;
+
+// Resto de los componentes estilizados (sin cambios)
 const ConnectedText = styled(motion.span)`
   color: ${props => props.theme.text};
   font-weight: 600;
@@ -134,32 +232,6 @@ const ConnectedText = styled(motion.span)`
 
 const WalletContainer = styled.div`
   position: relative;
-`;
-
-const WalletButton = styled(motion.button)`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--gray-light);
-  color: ${props => props.theme.text};
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 0 6px rgba(255, 64, 255, 0.3);
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: var(--primary-color);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-    transform: translateY(-1px);
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
 `;
 
 const WalletIcon = styled.span`
@@ -192,15 +264,6 @@ const DisconnectButton = styled.button`
 
   &:hover {
     color: var(--primary-color);
-  }
-`;
-
-const MobileWalletButton = styled(WalletButton)`
-  display: none;
-  @media (max-width: 768px) {
-    display: flex;
-    width: 100%;
-    justify-content: center;
   }
 `;
 
@@ -480,7 +543,7 @@ function Header() {
             <Link to="/">
               <img src={logo} alt="ETNIA Launchpad" style={{ height: '50px', filter: 'drop-shadow(var(--glow-effect)) brightness(1.2)' }} />
             </Link>
-            <LogoText variants={logoVariants}>ETNIA</LogoText>
+            <LogoText variants={logoVariants}>ETN-IA</LogoText>
           </LogoContainer>
           <NavLinks
             variants={navItemVariants}
@@ -562,7 +625,7 @@ function Header() {
                 data-tooltip-content="Connect Your Wallet"
                 theme={theme}
               >
-                Connect Wallet
+                Connect
               </ConnectButton>
             )}
             <ThemeToggle
