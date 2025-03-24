@@ -1,4 +1,3 @@
-// src/pages/Launchpads.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
@@ -221,6 +220,38 @@ const CloseButton = styled.button`
   }
 `;
 
+// Loading Styles
+const LoadingOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+`;
+
+const LoadingRing = styled(motion.div)`
+  width: 100px;
+  height: 100px;
+  border: 4px solid transparent;
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  position: relative;
+`;
+
+const LoadingText = styled(motion.div)`
+  position: absolute;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+`;
+
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -230,6 +261,28 @@ const modalVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
   exit: { opacity: 0, scale: 0.8, transition: { duration: 0.3 } },
+};
+
+const loadingVariants = {
+  animate: {
+    rotate: 360,
+    transition: {
+      duration: 1,
+      repeat: Infinity,
+      ease: "linear"
+    }
+  }
+};
+
+const textVariants = {
+  animate: {
+    opacity: [0.5, 1, 0.5],
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  }
 };
 
 const calculateTimeLeft = (targetDate) => {
@@ -477,8 +530,14 @@ function Launchpads() {
   const [timeLeft, setTimeLeft] = useState({});
   const [selectedPool, setSelectedPool] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Cambiado a true para mostrar loading al inicio
 
   useEffect(() => {
+    // Simular carga inicial
+    const loadingTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // 2 segundos de loading al inicio
+
     const timer = setInterval(() => {
       const newTimeLeft = {};
       mockPools.forEach(pool => {
@@ -491,7 +550,10 @@ function Launchpads() {
       setTimeLeft(newTimeLeft);
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(loadingTimer);
+      clearInterval(timer);
+    };
   }, []);
 
   const handleViewPool = (pool) => {
@@ -503,6 +565,29 @@ function Launchpads() {
     setIsModalOpen(false);
     setSelectedPool(null);
   };
+
+  // Mostrar solo el loading mientras isLoading sea true
+  if (isLoading) {
+    return (
+      <LoadingOverlay
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <LoadingRing
+          variants={loadingVariants}
+          animate="animate"
+        >
+          <LoadingText
+            variants={textVariants}
+            animate="animate"
+          >
+           Loading
+          </LoadingText>
+        </LoadingRing>
+      </LoadingOverlay>
+    );
+  }
 
   return (
     <LaunchpadsContainer
