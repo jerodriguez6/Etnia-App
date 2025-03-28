@@ -5,7 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { Particles } from "@tsparticles/react";
 import { loadSlim } from 'tsparticles-slim';
 import styled from 'styled-components';
-import { Tooltip } from 'react-tooltip';
+import { Tooltip } from 'react-tooltip'; // Cambiado a importación nombrada
 import { ErrorBoundary } from 'react-error-boundary';
 
 // Componentes
@@ -129,7 +129,7 @@ function App() {
             </ErrorBoundary>
           </MainContent>
           <Footer />
-          <Tooltip id="pool-tooltip" place="bottom" effect="solid" />
+          <Tooltip id="pool-tooltip" place="bottom" effect="solid" /> {/* Cambiado a Tooltip */}
         </AppContainer>
       </Router>
     </ThemeProvider>

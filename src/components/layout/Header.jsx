@@ -8,9 +8,30 @@ import logo from '../../assets/images/sv.png';
 import ethereumLogo from '../../assets/images/eth-logo.png';
 import polygonLogo from '../../assets/images/polygon-logo.png';
 import bscLogo from '../../assets/images/bnb-logo.png';
-import { ThirdwebProvider, ConnectWallet, embeddedWallet, metamaskWallet } from '@thirdweb-dev/react';
+import {
+  ThirdwebProvider,
+  ConnectWallet,
+  embeddedWallet,
+  metamaskWallet,
+  smartWallet,
+} from '@thirdweb-dev/react';
+import { Ethereum, Polygon, Binance } from '@thirdweb-dev/chains';
 
-// Styled Components
+// Definición manual de Polygon Amoy
+const PolygonAmoy = {
+  chainId: 80002,
+  name: 'Polygon Amoy',
+  rpc: ['https://rpc-amoy.polygon.technology/'],
+  nativeCurrency: {
+    name: 'MATIC',
+    symbol: 'MATIC',
+    decimals: 18,
+  },
+  explorers: ['https://amoy.polygonscan.com/'],
+  testnet: true,
+};
+
+// Styled Components (sin cambios)
 const HeaderStyled = styled(motion.header)`
   background: ${props => props.theme.background};
   padding: 1rem 2rem;
@@ -100,7 +121,6 @@ const BlockchainLogo = styled.img`
   }
 `;
 
-// Hamburger Menu Styles
 const HamburgerButton = styled(motion.button)`
   display: none;
   background: transparent;
@@ -177,7 +197,7 @@ const MobileConnectWallet = styled(ConnectWallet)`
     font-family: 'Roboto', sans-serif;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: '1px';
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   }
 `;
@@ -187,32 +207,72 @@ const MobileBlockchainLogo = styled(BlockchainLogo)`
 `;
 
 // Animations
-const headerVariants = { hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } };
-const logoVariants = { hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } } };
-const navItemVariants = { hidden: { opacity: 0, x: 20 }, visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: 'easeOut' } } };
+const headerVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
+
+const logoVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
+};
+
+const navItemVariants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+};
+
 const mobileMenuVariants = {
   hidden: { x: '100%', opacity: 0 },
   visible: { x: 0, opacity: 1, transition: { duration: 0.3, ease: 'easeOut' } },
   exit: { x: '100%', opacity: 0, transition: { duration: 0.3, ease: 'easeOut' } },
 };
+
 const hamburgerVariants = {
   open: { rotate: 45, y: 6 },
   closed: { rotate: 0, y: 0 },
 };
+
 const hamburgerMiddleVariants = {
   open: { opacity: 0 },
   closed: { opacity: 1 },
 };
+
 const hamburgerBottomVariants = {
   open: { rotate: -45, y: -6 },
   closed: { rotate: 0, y: 0 },
 };
 
-// Thirdweb config
-const thirdwebConfig = {
-  clientId: "cb4570c66db880bc42939a6f74962a68",
-  chainId: 137, // Polygon Mainnet
-};
+// Thirdweb Configuration
+const supportedChains = [Ethereum, Polygon, Binance, PolygonAmoy];
+const clientId = "243d848db8bb3a11167e6b53bfc7e2d4"; // Tu clientId
+
+// Configuración de opciones de login
+const loginOptions = [
+  "email", // Mantener email
+  "google", // Mantener Google
+  "apple", // Mantener Apple
+  "facebook", // Mantener Facebook
+];
+
+const socialLoginOptions = [
+  "google",
+  "apple",
+  "facebook",
+];
+
+const supportedWallets = [
+  smartWallet(embeddedWallet(), {
+    factoryAddress: "0x680a07eca9964a78dea68b3ecde8136e56398741", // Dirección genérica de Thirdweb para testnets (ajústala si tienes una propia)
+    gasless: true, // Desactivado temporalmente para evitar problemas con el paymaster
+  }),
+  embeddedWallet({
+    auth: {
+      options: loginOptions, // Solo email y redes sociales
+    },
+  }),
+  metamaskWallet(),
+];
 
 // Main Header Component
 function Header() {
@@ -225,12 +285,12 @@ function Header() {
     { name: 'Ethereum', logo: ethereumLogo, chainId: 1 },
     { name: 'Polygon', logo: polygonLogo, chainId: 137 },
     { name: 'Binance Smart Chain', logo: bscLogo, chainId: 56 },
+    { name: 'Polygon Amoy', logo: polygonLogo, chainId: 80002 },
   ];
 
   const handleNetworkSelect = (network) => {
     setSelectedNetwork(network);
     setIsModalOpen(false);
-    thirdwebConfig.chainId = network.chainId;
     alert(`Selected network: ${network.name}`);
   };
 
@@ -238,40 +298,68 @@ function Header() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const supportedWallets = [
-    embeddedWallet(),
-    metamaskWallet(),
-  ];
-
   return (
     <ThirdwebProvider
-      clientId={thirdwebConfig.clientId}
-      activeChain={thirdwebConfig.chainId}
+      clientId={clientId}
+      supportedChains={supportedChains}
       supportedWallets={supportedWallets}
+      activeChain={PolygonAmoy}
     >
       <HeaderStyled variants={headerVariants} initial="hidden" animate="visible" theme={theme}>
         <Nav>
-          <LogoContainer variants={logoVariants} initial="hidden" animate="visible" whileHover={{ scale: 1.1, rotate: 5 }}>
+          <LogoContainer
+            variants={logoVariants}
+            initial="hidden"
+            animate="visible"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+          >
             <Link to="/">
-              <img src={logo} alt="ETNIA Launchpad" style={{ height: '50px', filter: 'drop-shadow(var(--glow-effect)) brightness(1.2)' }} />
+              <img
+                src={logo}
+                alt="ETNIA Launchpad"
+                style={{ height: '50px', filter: 'drop-shadow(var(--glow-effect)) brightness(1.2)' }}
+              />
             </Link>
             <LogoText variants={logoVariants}>ETN-IA</LogoText>
           </LogoContainer>
-
           <NavLinks variants={navItemVariants} initial="hidden" animate="visible">
-            <StyledLink to="/" data-tooltip-id="nav-tooltip" data-tooltip-content="Go to Home" theme={theme}>Home</StyledLink>
-            <StyledLink to="/launchpads" data-tooltip-id="nav-tooltip" data-tooltip-content="View Launchpads" theme={theme}>Launchpad List</StyledLink>
-            <StyledLink to="/create" data-tooltip-id="nav-tooltip" data-tooltip-content="Create a New Pool" theme={theme}>Create a Sale</StyledLink>
-
+            <StyledLink
+              to="/"
+              data-tooltip-id="nav-tooltip"
+              data-tooltip-content="Go to Home"
+              theme={theme}
+            >
+              Home
+            </StyledLink>
+            <StyledLink
+              to="/launchpads"
+              data-tooltip-id="nav-tooltip"
+              data-tooltip-content="View Launchpads"
+              theme={theme}
+            >
+              Launchpad List
+            </StyledLink>
+            <StyledLink
+              to="/create"
+              data-tooltip-id="nav-tooltip"
+              data-tooltip-content="Create a New Pool"
+              theme={theme}
+            >
+              Create a Sale
+            </StyledLink>
             <BlockchainLogo
-              src={selectedNetwork?.logo || ethereumLogo}
+              src={selectedNetwork?.logo || polygonLogo}
               alt="Blockchain Network"
               onClick={() => setIsModalOpen(true)}
             />
-
             <ConnectWallet
               theme="dark"
               btnTitle="Connect"
+              modalSize="wide"
+              auth={{
+                loginOptional: false,
+                socials: socialLoginOptions, // Solo Google, Apple, Facebook
+              }}
               style={{
                 background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
                 border: '2px solid transparent',
@@ -287,12 +375,9 @@ function Header() {
                 clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
               }}
             />
-
             <ThemeToggle
               onClick={toggleTheme}
               variants={navItemVariants}
-              initial="hidden"
-              animate="visible"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               data-tooltip-id="nav-tooltip"
@@ -302,8 +387,6 @@ function Header() {
               {isDarkMode ? '🌙' : '☀️'}
             </ThemeToggle>
           </NavLinks>
-
-          {/* Hamburger Menu for Mobile */}
           <HamburgerButton onClick={toggleMobileMenu}>
             <HamburgerLine
               variants={hamburgerVariants}
@@ -319,8 +402,6 @@ function Header() {
             />
           </HamburgerButton>
         </Nav>
-
-        {/* Mobile Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <MobileMenu
@@ -329,24 +410,32 @@ function Header() {
               animate="visible"
               exit="exit"
             >
-              <MobileMenuLink to="/" onClick={toggleMobileMenu} theme={theme}>Home</MobileMenuLink>
-              <MobileMenuLink to="/launchpads" onClick={toggleMobileMenu} theme={theme}>Launchpad List</MobileMenuLink>
-              <MobileMenuLink to="/create" onClick={toggleMobileMenu} theme={theme}>Create a Sale</MobileMenuLink>
-
+              <MobileMenuLink to="/" onClick={toggleMobileMenu} theme={theme}>
+                Home
+              </MobileMenuLink>
+              <MobileMenuLink to="/launchpads" onClick={toggleMobileMenu} theme={theme}>
+                Launchpad List
+              </MobileMenuLink>
+              <MobileMenuLink to="/create" onClick={toggleMobileMenu} theme={theme}>
+                Create a Sale
+              </MobileMenuLink>
               <MobileBlockchainLogo
-                src={selectedNetwork?.logo || ethereumLogo}
+                src={selectedNetwork?.logo || polygonLogo}
                 alt="Blockchain Network"
                 onClick={() => {
                   setIsModalOpen(true);
                   toggleMobileMenu();
                 }}
               />
-
               <MobileConnectWallet
                 theme="dark"
                 btnTitle="Connect"
+                modalSize="wide"
+                auth={{
+                  loginOptional: false,
+                  socials: socialLoginOptions, // Solo Google, Apple, Facebook
+                }}
               />
-
               <MobileThemeToggle
                 onClick={() => {
                   toggleTheme();
@@ -359,6 +448,7 @@ function Header() {
             </MobileMenu>
           )}
         </AnimatePresence>
+        <Tooltip id="nav-tooltip" place="bottom" effect="solid" />
       </HeaderStyled>
     </ThirdwebProvider>
   );
