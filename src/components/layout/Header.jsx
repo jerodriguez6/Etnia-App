@@ -31,7 +31,7 @@ const PolygonAmoy = {
   testnet: true,
 };
 
-// Styled Components (sin cambios)
+// Styled Components
 const HeaderStyled = styled(motion.header)`
   background: ${props => props.theme.background};
   padding: 1rem 2rem;
@@ -42,6 +42,7 @@ const HeaderStyled = styled(motion.header)`
   left: 0;
   width: 100%;
   z-index: 1000;
+  box-sizing: border-box;
 `;
 
 const Nav = styled.nav`
@@ -50,6 +51,7 @@ const Nav = styled.nav`
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 `;
 
 const LogoContainer = styled(motion.div)`
@@ -63,6 +65,9 @@ const LogoText = styled(motion.span)`
   font-weight: 700;
   color: ${props => props.theme.text};
   text-shadow: 0 0 10px rgba(255, 64, 255, 0.4);
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const NavLinks = styled(motion.div)`
@@ -184,24 +189,6 @@ const MobileThemeToggle = styled(ThemeToggle)`
   }
 `;
 
-const MobileConnectWallet = styled(ConnectWallet)`
-  @media (max-width: 768px) {
-    margin: 1rem 0;
-    padding: 12px 24px;
-    font-size: 16px;
-    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-    border: 2px solid transparent;
-    border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 5px rgba(0, 255, 255, 0.1);
-    color: white;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: '1px';
-    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  }
-`;
-
 const MobileBlockchainLogo = styled(BlockchainLogo)`
   margin: 1rem 0;
 `;
@@ -245,14 +232,13 @@ const hamburgerBottomVariants = {
 
 // Thirdweb Configuration
 const supportedChains = [Ethereum, Polygon, Binance, PolygonAmoy];
-const clientId = "243d848db8bb3a11167e6b53bfc7e2d4"; // Tu clientId
+const clientId = "243d848db8bb3a11167e6b53bfc7e2d4";
 
-// Configuración de opciones de login
 const loginOptions = [
-  "email", // Mantener email
-  "google", // Mantener Google
-  "apple", // Mantener Apple
-  "facebook", // Mantener Facebook
+  "email",
+  "google",
+  "apple",
+  "facebook",
 ];
 
 const socialLoginOptions = [
@@ -263,12 +249,12 @@ const socialLoginOptions = [
 
 const supportedWallets = [
   smartWallet(embeddedWallet(), {
-    factoryAddress: "0x680a07eca9964a78dea68b3ecde8136e56398741", // Dirección genérica de Thirdweb para testnets (ajústala si tienes una propia)
-    gasless: true, // Desactivado temporalmente para evitar problemas con el paymaster
+    factoryAddress: "0x680a07eca9964a78dea68b3ecde8136e56398741",
+    gasless: true,
   }),
   embeddedWallet({
     auth: {
-      options: loginOptions, // Solo email y redes sociales
+      options: loginOptions,
     },
   }),
   metamaskWallet(),
@@ -296,6 +282,22 @@ function Header() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Estilo unificado para el botón ConnectWallet
+  const connectWalletStyle = {
+    background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
+    border: '2px solid transparent',
+    borderImage: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1',
+    boxShadow: '0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 5px rgba(0, 255, 255, 0.1)',
+    color: 'white',
+    fontFamily: "'Roboto', sans-serif",
+    fontWeight: 500,
+    textTransform: 'uppercase',
+    letterSpacing: '1px',
+    padding: '12px 24px',
+    fontSize: '16px',
+    clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
   };
 
   return (
@@ -358,22 +360,9 @@ function Header() {
               modalSize="wide"
               auth={{
                 loginOptional: false,
-                socials: socialLoginOptions, // Solo Google, Apple, Facebook
+                socials: socialLoginOptions,
               }}
-              style={{
-                background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
-                border: '2px solid transparent',
-                borderImage: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1',
-                boxShadow: '0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 5px rgba(0, 255, 255, 0.1)',
-                color: 'white',
-                fontFamily: "'Roboto', sans-serif",
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: '1px',
-                padding: '12px 24px',
-                fontSize: '16px',
-                clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
-              }}
+              style={connectWalletStyle} // Estilo unificado
             />
             <ThemeToggle
               onClick={toggleTheme}
@@ -427,14 +416,15 @@ function Header() {
                   toggleMobileMenu();
                 }}
               />
-              <MobileConnectWallet
+              <ConnectWallet
                 theme="dark"
                 btnTitle="Connect"
                 modalSize="wide"
                 auth={{
                   loginOptional: false,
-                  socials: socialLoginOptions, // Solo Google, Apple, Facebook
+                  socials: socialLoginOptions,
                 }}
+                style={connectWalletStyle} // Estilo unificado
               />
               <MobileThemeToggle
                 onClick={() => {
