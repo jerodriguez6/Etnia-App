@@ -1,3 +1,4 @@
+// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
@@ -11,6 +12,7 @@ import analyticsImage from '../assets/images/analytics.jpg';
 import secureImage from '../assets/images/secure.jpg';
 import communityImage from '../assets/images/community.jpg';
 import launchpadIntroVideo from '../assets/videos/home.mp4';
+import img7 from '../assets/images/img7.png'; // Nueva imagen para la vista móvil
 import pool1Image from '../assets/images/pool1.jpg';
 import pool2Image from '../assets/images/pool2.jpg';
 import pool3Image from '../assets/images/pool3.jpg';
@@ -58,7 +60,7 @@ const HeroSection = styled.div`
   }
 `;
 
-const VideoBackground = styled.div`
+const HeroBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;
@@ -66,6 +68,33 @@ const VideoBackground = styled.div`
   height: 200%;
   z-index: 0;
   overflow: hidden;
+
+  /* Mostrar el video en pantallas grandes */
+  @media (min-width: 481px) {
+    .react-player {
+      display: block;
+    }
+    .background-image {
+      display: none;
+    }
+  }
+
+  /* Mostrar la imagen estática en pantallas móviles */
+  @media (max-width: 480px) {
+    background-image: url(${img7}); /* Usamos img7.png para la vista móvil */
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+    .react-player {
+      display: none;
+    }
+    .background-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
 `;
 
 const VideoOverlay = styled.div`
@@ -169,8 +198,6 @@ const StyledCTAButton = styled(motion.button)`
   &:active {
     transform: scale(0.98); /* Efecto de pulsación al hacer clic */
   }
-
-  
 
   @media (max-width: 480px) {
     padding: 10px 20px; /* Ajustado para pantallas pequeñas */
@@ -525,8 +552,9 @@ function Home() {
       theme={theme}
     >
       <HeroSection>
-        <VideoBackground>
+        <HeroBackground>
           <ReactPlayer
+            className="react-player"
             url={launchpadIntroVideo}
             playing
             loop
@@ -535,7 +563,8 @@ function Home() {
             height="100%"
             style={{ position: 'absolute', top: 0, left: 0, objectFit: 'cover' }}
           />
-        </VideoBackground>
+          <div className="background-image" />
+        </HeroBackground>
         <VideoOverlay />
         <Title theme={theme}>Welcome to ETNIA Launchpad</Title>
         <Subtitle theme={theme}>
