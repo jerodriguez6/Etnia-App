@@ -269,7 +269,7 @@ function Footer() {
               href="#"
               theme={theme}
             >
-              Projects
+              EtniaCon
             </FooterLink>
             <FooterLink
               variants={linkVariants}
@@ -279,7 +279,7 @@ function Footer() {
               href="#"
               theme={theme}
             >
-              Portfolio
+              Agent IA
             </FooterLink>
             <FooterLink
               variants={linkVariants}
