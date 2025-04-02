@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
@@ -17,7 +17,7 @@ import {
 } from '@thirdweb-dev/react';
 import { Ethereum, Polygon, Binance } from '@thirdweb-dev/chains';
 
-// Definición manual de Polygon Amoy
+// Definición manual de Polygon Amoy (sin cambios)
 const PolygonAmoy = {
   chainId: 80002,
   name: 'Polygon Amoy',
@@ -33,7 +33,9 @@ const PolygonAmoy = {
 
 // Styled Components
 const HeaderStyled = styled(motion.header)`
-  background: ${props => props.theme.background};
+  background: ${props => props.isScrolled 
+    ? `rgba(${props.theme.background.replace('rgb(', '').replace(')', '')}, 0.9)` 
+    : props.theme.background}; // Restauramos el color original del tema
   padding: 1rem 2rem;
   color: ${props => props.theme.text};
   box-shadow: var(--shadow-light);
@@ -43,8 +45,11 @@ const HeaderStyled = styled(motion.header)`
   width: 100%;
   z-index: 1000;
   box-sizing: border-box;
+  backdrop-filter: blur(${props => props.blur}px); // Efecto borroso detrás del header
+  transition: background 0.3s ease, backdrop-filter 0.3s ease; // Transición suave
 `;
 
+// Resto de los styled components sin cambios
 const Nav = styled.nav`
   display: flex;
   justify-content: space-between;
@@ -193,7 +198,7 @@ const MobileBlockchainLogo = styled(BlockchainLogo)`
   margin: 1rem 0;
 `;
 
-// Animations
+// Animaciones (sin cambios)
 const headerVariants = {
   hidden: { opacity: 0, y: -20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -230,7 +235,7 @@ const hamburgerBottomVariants = {
   closed: { rotate: 0, y: 0 },
 };
 
-// Thirdweb Configuration
+// Configuración de Thirdweb (sin cambios)
 const supportedChains = [Ethereum, Polygon, Binance, PolygonAmoy];
 const clientId = "243d848db8bb3a11167e6b53bfc7e2d4";
 
@@ -260,11 +265,13 @@ const supportedWallets = [
   metamaskWallet(),
 ];
 
-// Main Header Component
+// Componente principal del Header
 function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false); // Estado para detectar scroll
+  const [blur, setBlur] = useState(0); // Estado para el efecto borroso
   const { theme, isDarkMode, toggleTheme } = useTheme();
 
   const networks = [
@@ -273,6 +280,23 @@ function Header() {
     { name: 'Binance Smart Chain', logo: bscLogo, chainId: 56 },
     { name: 'Polygon Amoy', logo: polygonLogo, chainId: 80002 },
   ];
+
+  // Efecto para detectar el scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      if (scrollPosition > 50) { // Activa el efecto después de 50px de scroll
+        setIsScrolled(true);
+        setBlur(8); // Aplica un desenfoque de 8px
+      } else {
+        setIsScrolled(false);
+        setBlur(0); // Sin desenfoque cuando está arriba
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll); // Limpiar el evento
+  }, []);
 
   const handleNetworkSelect = (network) => {
     setSelectedNetwork(network);
@@ -284,7 +308,6 @@ function Header() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Estilo unificado para el botón ConnectWallet
   const connectWalletStyle = {
     background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
     border: '2px solid transparent',
@@ -307,7 +330,14 @@ function Header() {
       supportedWallets={supportedWallets}
       activeChain={PolygonAmoy}
     >
-      <HeaderStyled variants={headerVariants} initial="hidden" animate="visible" theme={theme}>
+      <HeaderStyled
+        variants={headerVariants}
+        initial="hidden"
+        animate="visible"
+        theme={theme}
+        isScrolled={isScrolled} // Pasamos el estado de scroll
+        blur={blur} // Pasamos el valor de blur
+      >
         <Nav>
           <LogoContainer
             variants={logoVariants}
@@ -362,7 +392,7 @@ function Header() {
                 loginOptional: false,
                 socials: socialLoginOptions,
               }}
-              style={connectWalletStyle} // Estilo unificado
+              style={connectWalletStyle}
             />
             <ThemeToggle
               onClick={toggleTheme}
@@ -424,7 +454,7 @@ function Header() {
                   loginOptional: false,
                   socials: socialLoginOptions,
                 }}
-                style={connectWalletStyle} // Estilo unificado
+                style={connectWalletStyle}
               />
               <MobileThemeToggle
                 onClick={() => {
