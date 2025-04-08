@@ -3,8 +3,22 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
     <title>ETNIA</title>
+    <link rel="stylesheet" href="./global.css" /> <!-- Añadido -->
+    <style>
+      /* Puedes dejar esto si quieres estilos inline, pero ya no es necesario si usas global.css */
+      @font-face {
+          font-family: 'violet_sansregular';
+          src: url('./fnt/violet_sansregular.woff') format('woff');
+          font-weight: normal;
+          font-style: normal;
+      }
+
+      body {
+          font-family: 'violet_sansregular', sans-serif;
+          font-size: 14px;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

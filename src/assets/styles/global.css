@@ -1,14 +1,23 @@
 @import './variables.css';
 
+@font-face {
+    font-family: 'violet_sansregular';
+    src: url('./VioletSans-Regular.woff') format('woff'); /* Ruta relativa */
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  line-height: 1.6;
-  color: var(--text-dark);
-  background: var(--gray-light);
+    font-family: 'violet_sansregular', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: var(--gray-light);
 }
