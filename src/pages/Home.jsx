@@ -210,10 +210,7 @@ const StyledCTAButton = styled(motion.button)`
 // Sección "Backed by" modificada
 const BackedBySection = styled.div`
   text-align: center;
-  padding: 2rem;
-  background: ${props => props.theme.background};
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-light);
+  padding: 2rem 0; /* Reducimos el padding y eliminamos el fondo y sombra */
   margin-bottom: 2rem;
 
   h3 {
@@ -228,11 +225,11 @@ const BackedBySection = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding: 1rem;
+    padding: 1rem 0;
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem;
+    padding: 0.5rem 0;
   }
 `;
 
@@ -252,7 +249,7 @@ const BackedByLogos = styled.div`
   /* Duplicamos los logos para un efecto infinito */
   .logos-slide > div {
     display: flex;
-    gap: 2rem;
+    gap: 4rem; /* Aumentamos el espaciado entre logos */
   }
 
   @keyframes slide {
@@ -266,13 +263,13 @@ const BackedByLogos = styled.div`
 
   @media (max-width: 768px) {
     .logos-slide > div {
-      gap: 1rem;
+      gap: 2rem; /* Espaciado reducido para pantallas medianas */
     }
   }
 
   @media (max-width: 480px) {
     .logos-slide > div {
-      gap: 0.5rem;
+      gap: 1rem; /* Espaciado aún más reducido para pantallas pequeñas */
     }
   }
 `;
