@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
@@ -12,13 +11,21 @@ import analyticsImage from '../assets/images/analytics.jpg';
 import secureImage from '../assets/images/secure.jpg';
 import communityImage from '../assets/images/community.jpg';
 import launchpadIntroVideo from '../assets/videos/home.mp4';
-import img7 from '../assets/images/img7.png'; // Nueva imagen para la vista móvil
+import img7 from '../assets/images/img7.png';
 import pool1Image from '../assets/images/pool1.jpg';
 import pool2Image from '../assets/images/pool2.jpg';
 import pool3Image from '../assets/images/pool3.jpg';
 import ethLogo from '../assets/images/eth-logo.png';
 import bnbLogo from '../assets/images/bnb-logo.png';
 import solLogo from '../assets/images/sol-logo.png';
+
+// Logos para la sección "Backed by"
+import microsoftLogo from '../assets/images/microsoft-logo.svg';
+import awsLogo from '../assets/images/aws-logo.png';
+import sharkLogo from '../assets/images/shark-logo.png';
+import googleLogo from '../assets/images/google-logo.svg';
+import bnbChainLogo from '../assets/images/bnb-chain-logo.svg';
+import tonLogo from '../assets/images/ton-logo.svg';
 
 // Componentes estilizados
 const HomeContainer = styled(motion.div)`
@@ -69,7 +76,6 @@ const HeroBackground = styled.div`
   z-index: 0;
   overflow: hidden;
 
-  /* Mostrar el video en pantallas grandes */
   @media (min-width: 481px) {
     .react-player {
       display: block;
@@ -79,9 +85,8 @@ const HeroBackground = styled.div`
     }
   }
 
-  /* Mostrar la imagen estática en pantallas móviles */
   @media (max-width: 480px) {
-    background-image: url(${img7}); /* Usamos img7.png para la vista móvil */
+    background-image: url(${img7});
     background-size: cover;
     background-position: center;
     width: 100%;
@@ -162,46 +167,133 @@ const StyledCTAButton = styled(motion.button)`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 24px; /* Tamaño ajustado para coincidir con el botón del Header */
+  padding: 12px 24px;
   font-size: 16px;
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Fondo con el mismo gradiente que el borde */
-  border: 2px solid transparent; /* Borde inicial transparente */
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1; /* Borde con gradiente */
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), /* Resplandor cian */
-              inset 0 0 5px rgba(0, 255, 255, 0.1); /* Sombra interna */
-  color: white; /* Texto blanco */
-  font-family: 'Roboto', sans-serif; /* Fuente moderna y minimalista */
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 5px rgba(0, 255, 255, 0.1);
+  color: white;
+  font-family: 'Roboto', sans-serif;
   font-weight: 500;
-  text-transform: uppercase; /* Texto en mayúsculas */
+  text-transform: uppercase;
   letter-spacing: 1px;
-  transition: all 0.3s ease; /* Transiciones suaves */
+  transition: all 0.3s ease;
   cursor: pointer;
-  opacity: 0.9; /* Opacidad inicial */
+  opacity: 0.9;
 
-  /* Cortes diagonales en las esquinas superior izquierda e inferior derecha */
   clip-path: polygon(
-    10px 0, /* Corte diagonal en la esquina superior izquierda */
-    100% 0, /* Esquina superior derecha */
-    100% calc(100% - 10px), /* Corte diagonal en la esquina inferior derecha */
-    calc(100% - 10px) 100%, /* Punta sobresaliente en la esquina inferior derecha */
-    0 100%, /* Esquina inferior izquierda */
-    0 10px /* Vuelve al inicio del corte diagonal */
+    10px 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0 100%,
+    0 10px
   );
 
   &:hover {
-    opacity: 1; /* Aumenta la opacidad al hacer hover */
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), /* Aumenta el resplandor */
-                0 0 20px rgba(0, 255, 255, 0.3);
-    transform: translateY(-2px); /* Animación sutil al pasar el cursor */
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
+    transform: translateY(-2px);
   }
 
   &:active {
-    transform: scale(0.98); /* Efecto de pulsación al hacer clic */
+    transform: scale(0.98);
   }
 
   @media (max-width: 480px) {
-    padding: 10px 20px; /* Ajustado para pantallas pequeñas */
+    padding: 10px 20px;
     font-size: 14px;
+  }
+`;
+
+// Sección "Backed by" modificada
+const BackedBySection = styled.div`
+  text-align: center;
+  padding: 2rem;
+  background: ${props => props.theme.background};
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  margin-bottom: 2rem;
+
+  h3 {
+    color: ${props => props.theme.text};
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+  }
+`;
+
+const BackedByLogos = styled.div`
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  position: relative;
+
+  /* Contenedor para la animación */
+  .logos-slide {
+    display: flex;
+    animation: slide 20s linear infinite;
+  }
+
+  /* Duplicamos los logos para un efecto infinito */
+  .logos-slide > div {
+    display: flex;
+    gap: 2rem;
+  }
+
+  @keyframes slide {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%); /* Desplaza la mitad del contenedor para un bucle infinito */
+    }
+  }
+
+  @media (max-width: 768px) {
+    .logos-slide > div {
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logos-slide > div {
+      gap: 0.5rem;
+    }
+  }
+`;
+
+const LogoImage = styled.img`
+  height: 40px; /* Tamaño uniforme para todos los logos */
+  width: auto; /* Mantiene la proporción */
+  object-fit: contain;
+  filter: grayscale(0%);
+  transition: filter 0.3s ease;
+
+  &:hover {
+    filter: grayscale(0%) brightness(1.2);
+  }
+
+  @media (max-width: 768px) {
+    height: 30px;
+  }
+
+  @media (max-width: 480px) {
+    height: 25px;
   }
 `;
 
@@ -420,6 +512,16 @@ const featureVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
 };
 
+const backedByVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.2 } },
+};
+
+const logoVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+};
+
 const chatbotVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
@@ -480,6 +582,16 @@ const mockPools = [
     softHard: '500 - 2,000 SOL',
     liquidity: '40% - 300 days',
   },
+];
+
+// Arreglo dinámico de logos para la sección "Backed by"
+const backedByLogos = [
+  { src: microsoftLogo, alt: 'Microsoft' },
+  { src: awsLogo, alt: 'AWS' },
+  { src: sharkLogo, alt: 'shark' },
+  { src: googleLogo, alt: 'Google for Startups' },
+  { src: bnbChainLogo, alt: 'BNB Chain' },
+  { src: tonLogo, alt: 'TON' },
 ];
 
 const sliderSettings = {
@@ -576,7 +688,7 @@ function Home() {
             whileTap={{ scale: 0.95 }}
             onClick={() => window.location.href = '/launchpad'}
           >
-            Explore 
+            Explore
           </StyledCTAButton>
           <StyledCTAButton
             whileHover={{ scale: 1.05 }}
@@ -589,10 +701,47 @@ function Home() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Agent AI 
+            Agent AI
           </StyledCTAButton>
         </CTAButtons>
       </HeroSection>
+
+      {/* Sección "Backed by" */}
+      <BackedBySection
+        theme={theme}
+        variants={backedByVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <h3>Backed by</h3>
+        <BackedByLogos>
+          <div className="logos-slide">
+            {/* Duplicamos los logos para el efecto infinito */}
+            <div>
+              {backedByLogos.map((logo, index) => (
+                <motion.div
+                  key={`first-${index}`}
+                  variants={logoVariants}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <LogoImage src={logo.src} alt={logo.alt} />
+                </motion.div>
+              ))}
+            </div>
+            <div>
+              {backedByLogos.map((logo, index) => (
+                <motion.div
+                  key={`second-${index}`}
+                  variants={logoVariants}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <LogoImage src={logo.src} alt={logo.alt} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </BackedByLogos>
+      </BackedBySection>
 
       <FeaturesSection theme={theme}>
         <FeatureCard
