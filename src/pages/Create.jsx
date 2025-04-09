@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import Slider from 'react-slick';
@@ -18,14 +18,14 @@ import bscLogo from '../assets/images/bnb-logo.png';
 import solanaLogo from '../assets/images/sol-logo.png';
 import polygonLogo from '../assets/images/polygon-logo.png';
 
-// Estilo del Botón Reutilizable (sin cortes, cuadrado)
+// Estilo del Botón Reutilizable (cuadrado, sin cortes)
 const StyledButton = styled(motion.button)`
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
   background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  border-radius: 0; /* Cuadrado */
+  border-radius: 0;
   color: white;
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
@@ -51,7 +51,7 @@ const StyledButton = styled(motion.button)`
   }
 `;
 
-// Variante para botones "Cancel" (sin cortes, cuadrado)
+// Variante para botones "Cancel"
 const StyledCancelButton = styled(StyledButton)`
   background: linear-gradient(45deg, #444, #666);
   border-image: linear-gradient(45deg, #444, #666) 1;
@@ -61,12 +61,12 @@ const StyledCancelButton = styled(StyledButton)`
   }
 `;
 
-// Variante para botones "Join Now" (sin cortes, sin relleno, solo borde)
+// Variante para botones "Join Now"
 const JoinNowButton = styled(StyledButton)`
-  background: transparent; /* Sin color de relleno */
+  background: transparent;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); /* Sombra para legibilidad del texto */
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
   
   &:hover {
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
@@ -74,7 +74,7 @@ const JoinNowButton = styled(StyledButton)`
   }
 `;
 
-// Estilos para el carrusel y las cards (sin cambios, ya están perfectas)
+// Estilos para el carrusel y las cards
 const FeaturedSection = styled.div`
   max-width: 1200px;
   margin: 2rem auto;
@@ -154,7 +154,7 @@ const CarouselCard = styled(motion.div)`
   color: var(--text-light);
   text-align: center;
   min-height: 220px;
-  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%); /* Mantenemos el clip-path, ya está perfecto */
+  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
 
   &:hover {
     transform: translateY(-5px);
@@ -244,6 +244,92 @@ const NetworkLabel = styled.div`
   @media (max-width: 480px) {
     font-size: 0.5rem;
     padding: 0.2rem 0.4rem;
+  }
+`;
+
+// Estilos para el Agente de IA
+const AIAssistantContainer = styled(motion.div)`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 64, 255, 0.2));
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  border-radius: 10px;
+  padding: 1rem;
+  max-width: 300px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  z-index: 1000;
+  color: var(--text-light);
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    max-width: 250px;
+    padding: 0.8rem;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  @media (max-width: 480px) {
+    max-width: 200px;
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+`;
+
+const AIAssistantHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+`;
+
+const AIAssistantTitle = styled.h4`
+  margin: 0;
+  font-size: 1rem;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+`;
+
+const MinimizeButton = styled.button`
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 1rem;
+  cursor: pointer;
+  text-shadow: 0 0 5px rgba(255, 64, 255, 0.5);
+
+  &:hover {
+    color: var(--primary-color);
+  }
+`;
+
+const AIAssistantMessage = styled.div`
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const SuggestionList = styled.ul`
+  margin: 0;
+  padding-left: 1rem;
+  list-style-type: disc;
+`;
+
+const SuggestionItem = styled.li`
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
   }
 `;
 
@@ -455,6 +541,12 @@ const cardVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
 };
 
+const aiAssistantVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
+};
+
 // Datos de las Blockchains con logos
 const blockchains = [
   {
@@ -478,6 +570,126 @@ const blockchains = [
     logo: polygonLogo,
   },
 ];
+
+// Componente del Agente de IA
+function AIAssistant({ formData, errors, activeField, showSummary }) {
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // Si estamos en el resumen, mostramos las sugerencias para el éxito del presale
+    if (showSummary) {
+      setMessage(
+        <div>
+          <p>¡Tu presale está listo para ser creado! Aquí tienes algunas sugerencias para que sea más exitoso:</p>
+          <SuggestionList>
+            <SuggestionItem>
+              <strong>Auditoría del Contrato:</strong> Asegúrate de que tu contrato esté auditado por una empresa de confianza. Esto genera confianza en los inversores.
+            </SuggestionItem>
+            <SuggestionItem>
+              <strong>Redes Sociales Visibles:</strong> Publica tu proyecto en redes sociales como Twitter y Telegram para atraer más inversores. Asegúrate de que los enlaces sean visibles.
+            </SuggestionItem>
+            <SuggestionItem>
+              <strong>Comunidad Activa:</strong> Crea y mantén una comunidad activa en plataformas como Discord o Telegram. Una comunidad comprometida puede impulsar tu presale.
+            </SuggestionItem>
+            <SuggestionItem>
+              <strong>Precio Competitivo:</strong> Revisa que el precio de venta sea competitivo para {formData.selectedChain}. Un precio atractivo puede aumentar la participación.
+            </SuggestionItem>
+            <SuggestionItem>
+              <strong>Documentación Clara:</strong> Proporciona un whitepaper claro y detallado. Esto ayuda a los inversores a entender tu proyecto y su valor.
+            </SuggestionItem>
+          </SuggestionList>
+        </div>
+      );
+      return;
+    }
+
+    // Mensajes iniciales y guías según el campo activo
+    if (!formData.selectedChain) {
+      setMessage('Por favor, selecciona una blockchain para comenzar.');
+      return;
+    }
+
+    // Guías según el campo activo
+    switch (activeField) {
+      case 'projectName':
+        setMessage('Ingresa el nombre de tu proyecto. Este será el nombre visible para tu presale.');
+        break;
+      case 'tokenSymbol':
+        setMessage('Ingresa el símbolo de tu token (por ejemplo, SSTAR).');
+        break;
+      case 'tokenAddress':
+        setMessage(`Ingresa la dirección del contrato de tu token. Para ${formData.selectedChain}, debería comenzar con 0x.`);
+        break;
+      case 'salePrice':
+        setMessage(
+          formData.selectedChain === 'Ethereum'
+            ? 'Define el precio de venta por token. En Ethereum, te sugiero un precio competitivo debido a las tarifas de gas.'
+            : `Define el precio de venta por token. En ${formData.selectedChain}, las tarifas son más bajas, así que puedes ser más flexible.`
+        );
+        break;
+      case 'totalTokens':
+        setMessage('Ingresa la cantidad total de tokens que estarán a la venta.');
+        break;
+      case 'minPurchase':
+        setMessage('Define la compra mínima por usuario (en tokens).');
+        break;
+      case 'maxPurchase':
+        setMessage('Define la compra máxima por usuario (en tokens).');
+        break;
+      case 'startDate':
+        setMessage('Selecciona la fecha y hora de inicio del presale. Te sugiero comenzar en al menos 24 horas para dar tiempo a los usuarios.');
+        break;
+      case 'endDate':
+        setMessage('Selecciona la fecha y hora de finalización del presale. Asegúrate de que sea después de la fecha de inicio.');
+        break;
+      case 'creatorWallet':
+        setMessage(`Ingresa la dirección de tu billetera donde recibirás los fondos. Para ${formData.selectedChain}, debería comenzar con 0x.`);
+        break;
+      default:
+        setMessage(`¡Hola! Estoy aquí para ayudarte a crear tu presale en ${formData.selectedChain}. Completa cada campo y te guiaré en el proceso.`);
+    }
+
+    // Validaciones en tiempo real
+    if (errors[activeField]) {
+      setMessage(errors[activeField]);
+    }
+  }, [activeField, formData, errors, showSummary]);
+
+  if (isMinimized) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 1000,
+        }}
+      >
+        <StyledButton onClick={() => setIsMinimized(false)}>
+          🧠 IA Asistente
+        </StyledButton>
+      </motion.div>
+    );
+  }
+
+  return (
+    <AIAssistantContainer
+      variants={aiAssistantVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <AIAssistantHeader>
+        <AIAssistantTitle>🧠 IA Asistente</AIAssistantTitle>
+        <MinimizeButton onClick={() => setIsMinimized(true)}>−</MinimizeButton>
+      </AIAssistantHeader>
+      <AIAssistantMessage>{message}</AIAssistantMessage>
+    </AIAssistantContainer>
+  );
+}
 
 // Componente Modal para selección de Blockchain
 function BlockchainModal({ isOpen, onClose, onSelect }) {
@@ -544,6 +756,7 @@ function CreatePresale() {
   const [errors, setErrors] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeField, setActiveField] = useState(null);
   const { theme } = useTheme();
 
   const featuredPresales = [
@@ -641,6 +854,10 @@ function CreatePresale() {
     setErrors({ ...errors, [e.target.name]: '' });
   };
 
+  const handleFocus = (fieldName) => {
+    setActiveField(fieldName);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = validateForm();
@@ -670,6 +887,7 @@ function CreatePresale() {
     });
     setErrors({});
     setShowSummary(false);
+    setActiveField(null);
   };
 
   const handleSelectChain = (chain) => {
@@ -726,226 +944,246 @@ function CreatePresale() {
       />
 
       {formData.selectedChain && (
-        <CreateContainer
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          theme={theme}
-        >
-          <PresaleTitle>
-            Create Presale on {formData.selectedChain}
-          </PresaleTitle>
-          <Instructions theme={theme}>
-            Fill out the form below to create a new presale. All fields are required.
-          </Instructions>
-          <Form onSubmit={handleSubmit}>
-            <FormGroup>
-              <Label>Project Name</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="text"
-                name="projectName"
-                placeholder="Enter project name"
-                value={formData.projectName}
-                onChange={handleChange}
-                required
-              />
-              {errors.projectName && <ErrorMessage>{errors.projectName}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Token Symbol</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="text"
-                name="tokenSymbol"
-                placeholder="Enter token symbol"
-                value={formData.tokenSymbol}
-                onChange={handleChange}
-                required
-              />
-              {errors.tokenSymbol && <ErrorMessage>{errors.tokenSymbol}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Token Contract Address</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="text"
-                name="tokenAddress"
-                placeholder="Enter token contract address"
-                value={formData.tokenAddress}
-                onChange={handleChange}
-                required
-              />
-              {errors.tokenAddress && <ErrorMessage>{errors.tokenAddress}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Sale Price per Token</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="number"
-                step="0.000001"
-                name="salePrice"
-                placeholder="Enter sale price"
-                value={formData.salePrice}
-                onChange={handleChange}
-                required
-              />
-              {errors.salePrice && <ErrorMessage>{errors.salePrice}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Total Tokens for Sale</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="number"
-                step="0.000001"
-                name="totalTokens"
-                placeholder="Enter total tokens"
-                value={formData.totalTokens}
-                onChange={handleChange}
-                required
-              />
-              {errors.totalTokens && <ErrorMessage>{errors.totalTokens}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Minimum Purchase</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="number"
-                step="0.000001"
-                name="minPurchase"
-                placeholder="Enter minimum purchase"
-                value={formData.minPurchase}
-                onChange={handleChange}
-                required
-              />
-              {errors.minPurchase && <ErrorMessage>{errors.minPurchase}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Maximum Purchase</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="number"
-                step="0.000001"
-                name="maxPurchase"
-                placeholder="Enter maximum purchase"
-                value={formData.maxPurchase}
-                onChange={handleChange}
-                required
-              />
-              {errors.maxPurchase && <ErrorMessage>{errors.maxPurchase}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Start Date</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="datetime-local"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                required
-              />
-              {errors.startDate && <ErrorMessage>{errors.startDate}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>End Date</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="datetime-local"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                required
-              />
-              {errors.endDate && <ErrorMessage>{errors.endDate}</ErrorMessage>}
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Creator Wallet Address</Label>
-              <Input
-                variants={inputVariants}
-                initial="hidden"
-                animate="visible"
-                type="text"
-                name="creatorWallet"
-                placeholder="Enter creator wallet address"
-                value={formData.creatorWallet}
-                onChange={handleChange}
-                required
-              />
-              {errors.creatorWallet && <ErrorMessage>{errors.creatorWallet}</ErrorMessage>}
-            </FormGroup>
-
-            <StyledButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              style={{ display: 'block', margin: '1.5rem auto 0', padding: '1rem 2rem', fontSize: '1rem' }}
-            >
-              Preview Pool
-            </StyledButton>
-          </Form>
-
-          <Summary
-            variants={summaryVariants}
+        <>
+          <CreateContainer
+            variants={containerVariants}
             initial="hidden"
-            animate={showSummary ? 'visible' : 'hidden'}
+            animate="visible"
             theme={theme}
           >
-            <h3>Presale Summary</h3>
-            <p><strong>Blockchain:</strong> {formData.selectedChain}</p>
-            <p><strong>Project Name:</strong> {formData.projectName}</p>
-            <p><strong>Token Symbol:</strong> {formData.tokenSymbol}</p>
-            <p><strong>Token Address:</strong> {formData.tokenAddress}</p>
-            <p><strong>Sale Price:</strong> {formData.salePrice}</p>
-            <p><strong>Total Tokens:</strong> {formData.totalTokens}</p>
-            <p><strong>Min Purchase:</strong> {formData.minPurchase}</p>
-            <p><strong>Max Purchase:</strong> {formData.maxPurchase}</p>
-            <p><strong>Start Date:</strong> {formData.startDate}</p>
-            <p><strong>End Date:</strong> {formData.endDate}</p>
-            <p><strong>Creator Wallet:</strong> {formData.creatorWallet}</p>
-            <StyledButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleConfirm}
+            <PresaleTitle>
+              Create Presale on {formData.selectedChain}
+            </PresaleTitle>
+            <Instructions theme={theme}>
+              Fill out the form below to create a new presale. All fields are required.
+            </Instructions>
+            <Form onSubmit={handleSubmit}>
+              <FormGroup>
+                <Label>Project Name</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="text"
+                  name="projectName"
+                  placeholder="Enter project name"
+                  value={formData.projectName}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('projectName')}
+                  required
+                />
+                {errors.projectName && <ErrorMessage>{errors.projectName}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Token Symbol</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="text"
+                  name="tokenSymbol"
+                  placeholder="Enter token symbol"
+                  value={formData.tokenSymbol}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('tokenSymbol')}
+                  required
+                />
+                {errors.tokenSymbol && <ErrorMessage>{errors.tokenSymbol}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Token Contract Address</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="text"
+                  name="tokenAddress"
+                  placeholder="Enter token contract address"
+                  value={formData.tokenAddress}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('tokenAddress')}
+                  required
+                />
+                {errors.tokenAddress && <ErrorMessage>{errors.tokenAddress}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Sale Price per Token</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="number"
+                  step="0.000001"
+                  name="salePrice"
+                  placeholder="Enter sale price"
+                  value={formData.salePrice}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('salePrice')}
+                  required
+                />
+                {errors.salePrice && <ErrorMessage>{errors.salePrice}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Total Tokens for Sale</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="number"
+                  step="0.000001"
+                  name="totalTokens"
+                  placeholder="Enter total tokens"
+                  value={formData.totalTokens}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('totalTokens')}
+                  required
+                />
+                {errors.totalTokens && <ErrorMessage>{errors.totalTokens}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Minimum Purchase</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="number"
+                  step="0.000001"
+                  name="minPurchase"
+                  placeholder="Enter minimum purchase"
+                  value={formData.minPurchase}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('minPurchase')}
+                  required
+                />
+                {errors.minPurchase && <ErrorMessage>{errors.minPurchase}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Maximum Purchase</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="number"
+                  step="0.000001"
+                  name="maxPurchase"
+                  placeholder="Enter maximum purchase"
+                  value={formData.maxPurchase}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('maxPurchase')}
+                  required
+                />
+                {errors.maxPurchase && <ErrorMessage>{errors.maxPurchase}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Start Date</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="datetime-local"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('startDate')}
+                  required
+                />
+                {errors.startDate && <ErrorMessage>{errors.startDate}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>End Date</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="datetime-local"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('endDate')}
+                  required
+                />
+                {errors.endDate && <ErrorMessage>{errors.endDate}</ErrorMessage>}
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Creator Wallet Address</Label>
+                <Input
+                  variants={inputVariants}
+                  initial="hidden"
+                  animate="visible"
+                  type="text"
+                  name="creatorWallet"
+                  placeholder="Enter creator wallet address"
+                  value={formData.creatorWallet}
+                  onChange={handleChange}
+                  onFocus={() => handleFocus('creatorWallet')}
+                  required
+                />
+                {errors.creatorWallet && <ErrorMessage>{errors.creatorWallet}</ErrorMessage>}
+              </FormGroup>
+
+              <StyledButton
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                style={{ display: 'block', margin: '1.5rem auto 0', padding: '1rem 2rem', fontSize: '1rem' }}
+              >
+                Preview Pool
+              </StyledButton>
+            </Form>
+
+            <Summary
+              variants={summaryVariants}
+              initial="hidden"
+              animate={showSummary ? 'visible' : 'hidden'}
+              theme={theme}
             >
-              Confirm Creation
-            </StyledButton>
-            <StyledCancelButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowSummary(false)}
-              style={{ marginLeft: '1rem' }}
-            >
-              Cancel
-            </StyledCancelButton>
-          </Summary>
-        </CreateContainer>
+              <h3>Presale Summary</h3>
+              <p><strong>Blockchain:</strong> {formData.selectedChain}</p>
+              <p><strong>Project Name:</strong> {formData.projectName}</p>
+              <p><strong>Token Symbol:</strong> {formData.tokenSymbol}</p>
+              <p><strong>Token Address:</strong> {formData.tokenAddress}</p>
+              <p><strong>Sale Price:</strong> {formData.salePrice}</p>
+              <p><strong>Total Tokens:</strong> {formData.totalTokens}</p>
+              <p><strong>Min Purchase:</strong> {formData.minPurchase}</p>
+              <p><strong>Max Purchase:</strong> {formData.maxPurchase}</p>
+              <p><strong>Start Date:</strong> {formData.startDate}</p>
+              <p><strong>End Date:</strong> {formData.endDate}</p>
+              <p><strong>Creator Wallet:</strong> {formData.creatorWallet}</p>
+              <StyledButton
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleConfirm}
+              >
+                Confirm Creation
+              </StyledButton>
+              <StyledCancelButton
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowSummary(false)}
+                style={{ marginLeft: '1rem' }}
+              >
+                Cancel
+              </StyledCancelButton>
+            </Summary>
+          </CreateContainer>
+
+          {/* Agente de IA */}
+          <AIAssistant
+            formData={formData}
+            errors={errors}
+            activeField={activeField}
+            showSummary={showSummary}
+          />
+        </>
       )}
     </>
   );
