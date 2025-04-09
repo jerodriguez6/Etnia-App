@@ -18,8 +18,6 @@ import pool3Image from '../assets/images/pool3.jpg';
 import ethLogo from '../assets/images/eth-logo.png';
 import bnbLogo from '../assets/images/bnb-logo.png';
 import solLogo from '../assets/images/sol-logo.png';
-
-// Logos para la sección "Backed by"
 import microsoftLogo from '../assets/images/microsoft-logo.svg';
 import awsLogo from '../assets/images/aws-logo.png';
 import sharkLogo from '../assets/images/shark-logo.png';
@@ -27,7 +25,7 @@ import googleLogo from '../assets/images/google-logo.svg';
 import bnbChainLogo from '../assets/images/bnb-chain-logo.svg';
 import tonLogo from '../assets/images/ton-logo.svg';
 
-// Componentes estilizados
+// Componentes estilizados (sin cambios en las secciones no relacionadas)
 const HomeContainer = styled(motion.div)`
   padding: 2rem;
   background: ${props => props.theme.background};
@@ -384,7 +382,6 @@ const FeatureImage = styled.img`
   }
 `;
 
-// Sección "Featured Launchpads" mejorada
 const FeaturedPools = styled.div`
   padding: 2rem;
   background: ${props => props.theme.background};
@@ -394,7 +391,7 @@ const FeaturedPools = styled.div`
 
   h2 {
     color: ${props => props.theme.text};
-    font-size: 2rem; /* Aumentamos el tamaño del título para un look más profesional */
+    font-size: 2rem;
     margin-bottom: 2rem;
     text-align: center;
     font-weight: 700;
@@ -402,13 +399,12 @@ const FeaturedPools = styled.div`
     text-transform: uppercase;
   }
 
-  /* Ajustamos el contenedor del slider para un diseño más limpio */
   .slick-slider {
     padding: 0 1rem;
   }
 
   .slick-slide {
-    padding: 0 0.5rem; /* Espaciado entre las tarjetas */
+    padding: 0 0.5rem;
   }
 
   .slick-dots {
@@ -435,6 +431,12 @@ const FeaturedPools = styled.div`
     padding: 0.5rem;
     h2 {
       font-size: 1.2rem;
+    }
+    .slick-slider {
+      padding: 0 0.2rem; /* Reducimos el padding lateral para que las tarjetas ocupen más espacio */
+    }
+    .slick-slide {
+      padding: 0 0.2rem; /* Reducimos el padding entre tarjetas */
     }
   }
 `;
@@ -529,7 +531,7 @@ const ChatbotToggle = styled(motion.button)`
   }
 `;
 
-// Animaciones
+// Animaciones (sin cambios)
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -612,17 +614,16 @@ const mockPools = [
   },
 ];
 
-// Arreglo dinámico de logos para la sección "Backed by"
 const backedByLogos = [
   { src: microsoftLogo, alt: 'Microsoft' },
   { src: awsLogo, alt: 'AWS' },
-  { src: sharkLogo, alt: 'Shark' },
+  { src: sharkLogo, alt: 'SHARK' },
   { src: googleLogo, alt: 'Google for Startups' },
   { src: bnbChainLogo, alt: 'BNB Chain' },
   { src: tonLogo, alt: 'TON' },
 ];
 
-// Ajustamos las configuraciones del slider para tarjetas más pequeñas
+// Ajustamos las configuraciones del slider para que las tarjetas ocupen más espacio en móvil
 const sliderSettings = {
   dots: true,
   infinite: true,
@@ -631,7 +632,15 @@ const sliderSettings = {
   slidesToScroll: 1,
   responsive: [
     { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1 } },
-    { breakpoint: 600, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+    {
+      breakpoint: 600,
+      settings: {
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        centerMode: true, // Centramos la tarjeta en la vista móvil
+        centerPadding: '10px', // Reducimos el padding para que la tarjeta ocupe más espacio
+      },
+    },
   ],
 };
 
@@ -821,7 +830,7 @@ function Home() {
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.2, duration: 0.5 }}
-              whileHover={{ scale: 1.02 }} // Reducimos el efecto de escala para un look más profesional
+              whileHover={{ scale: 1.02 }}
             >
               <PoolCard pool={pool} timeLeft={timeLeft[pool.id]} />
             </motion.div>
