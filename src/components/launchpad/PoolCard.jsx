@@ -1,4 +1,3 @@
-// src/components/launchpad/PoolCard.jsx
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -7,37 +6,36 @@ import ProgressBar from '../common/ProgressBar';
 const CardWrapper = styled(motion.div)`
   position: relative;
   border: 2px solid transparent;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1; /* Borde con gradiente */
-  border-radius: 10px; /* Mantenemos un borde redondeado base */
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  border-radius: 10px;
   transition: all 0.3s ease;
-
-  /* Cortes diagonales más grandes en las esquinas superior izquierda e inferior derecha */
   clip-path: polygon(
-    40px 0, /* Corte más grande en la esquina superior izquierda */
-    100% 0, /* Esquina superior derecha */
-    100% calc(100% - 40px), /* Corte más grande en la esquina inferior derecha */
-    calc(100% - 40px) 100%, /* Punta sobresaliente en la esquina inferior derecha */
-    0 100%, /* Esquina inferior izquierda */
-    0 40px /* Vuelve al inicio del corte diagonal */
+    40px 0,
+    100% 0,
+    100% calc(100% - 40px),
+    calc(100% - 40px) 100%,
+    0 100%,
+    0 40px
   );
 
   &:hover {
-    transform: translateY(-5px); /* Elevación al hacer hover */
+    transform: translateY(-5px);
   }
 `;
 
 const Card = styled.div`
   position: relative;
   background: ${props => props.theme.backgroundDark || props.theme.background};
-  box-shadow: var(--shadow-light); /* Sombra inicial con cian neón */
-  padding: 1rem;
+  box-shadow: var(--shadow-light);
   width: 100%;
   color: ${props => props.theme.text};
   text-align: center;
   overflow: hidden;
-  opacity: 0.9; /* Opacidad inicial para efecto de hover */
+  opacity: 0.9;
+  display: flex;
+  flex-direction: column;
+  height: 400px; /* Altura fija para mantener proporciones consistentes */
 
-  /* Efecto de fondo dinámico con gradiente radial */
   &:before {
     content: '';
     position: absolute;
@@ -51,13 +49,44 @@ const Card = styled.div`
   }
 
   &:hover {
-    opacity: 1; /* Aumenta la opacidad al hacer hover */
-    box-shadow: var(--shadow-hover); /* Sombra más intensa con rosa neón */
+    opacity: 1;
+    box-shadow: var(--shadow-hover);
   }
 
   &:hover:before {
     transform: translate(25%, 25%);
   }
+
+  @media (max-width: 768px) {
+    height: 350px; /* Ajustamos la altura para tablet */
+  }
+
+  @media (max-width: 480px) {
+    height: 320px; /* Ajustamos la altura para móvil */
+  }
+`;
+
+const CardImageContainer = styled.div`
+  width: 100%;
+  height: 50%; /* La imagen ocupa exactamente la mitad superior de la tarjeta */
+  overflow: hidden;
+  position: relative;
+`;
+
+const CardImage = styled.img`
+  width: 100%;
+  height: 100%; /* La imagen ocupa todo el contenedor */
+  object-fit: cover; /* Ajusta la imagen para cubrir el contenedor sin distorsionarse */
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 0 10px rgba(255, 64, 255, 0.3);
+`;
+
+const CardContent = styled.div`
+  flex: 1; /* El contenido ocupa la mitad inferior de la tarjeta */
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   @media (max-width: 768px) {
     padding: 0.8rem;
@@ -68,29 +97,12 @@ const Card = styled.div`
   }
 `;
 
-const CardImage = styled.img`
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px 8px 0 0;
-  margin-bottom: 1rem;
-  box-shadow: 0 0 10px rgba(255, 64, 255, 0.3); /* Sombra rosa neón en la imagen */
-
-  @media (max-width: 768px) {
-    height: 120px;
-  }
-
-  @media (max-width: 480px) {
-    height: 100px;
-  }
-`;
-
 const BlockchainLogo = styled.img`
   width: 24px;
   height: 24px;
   margin-right: 0.5rem;
   vertical-align: middle;
-  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5)); /* Resplandor cian en el logo */
+  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
 `;
 
 const CardTitle = styled.h3`
@@ -187,10 +199,10 @@ const ProgressContainer = styled.div`
 `;
 
 const ViewButton = styled.button`
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradiente igual que el borde */
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
   color: var(--text-dark);
   border: 2px solid transparent;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1; /* Borde con gradiente */
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
@@ -201,8 +213,6 @@ const ViewButton = styled.button`
   text-transform: uppercase;
   letter-spacing: 1px;
   opacity: 0.9;
-
-  /* Cortes diagonales en las esquinas superior izquierda e inferior derecha */
   clip-path: polygon(
     5px 0,
     100% 0,
@@ -214,7 +224,7 @@ const ViewButton = styled.button`
 
   &:hover {
     opacity: 1;
-    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color)); /* Invierte el gradiente al hacer hover */
+    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
     box-shadow: var(--shadow-hover);
     transform: translateY(-2px);
   }
@@ -251,39 +261,47 @@ function PoolCard({ pool, timeLeft, onView }) {
       whileTap={{ scale: 0.95 }}
     >
       <Card>
-        {pool.image && <CardImage src={pool.image} alt={pool.name} />}
-        <CardTitle>
-          {pool.blockchainLogo && <BlockchainLogo src={pool.blockchainLogo} alt={`${pool.name} blockchain`} />}
-          {pool.name}
-        </CardTitle>
-        <CardStatus status={pool.status}>
-          {pool.status === 'Upcoming' ? 'Upcoming' : pool.status === 'Live' ? 'Sale Live' : 'Ended'}
-        </CardStatus>
-        {pool.status === 'Upcoming' && pool.saleStartDate && (
-          <Timer>Sale Starts In: {formatTimeLeft(timeLeft)}</Timer>
+        {pool.image && (
+          <CardImageContainer>
+            <CardImage src={pool.image} alt={pool.name} />
+          </CardImageContainer>
         )}
-        {pool.status === 'Live' && pool.saleEndDate && (
-          <Timer>Sale Ends In: {formatTimeLeft(timeLeft)}</Timer>
-        )}
-        {pool.status === 'Ended' && pool.saleEndDate && (
-          <Timer>Ended: {formatTimeLeft(timeLeft)}</Timer>
-        )}
-        <Detail>
-          <DetailLabel>Total Raised:</DetailLabel>
-          <DetailValue>{pool.totalRaised}</DetailValue>
-        </Detail>
-        <ProgressContainer>
-          <ProgressBar progress={pool.progress} />
-        </ProgressContainer>
-        <Detail>
-          <DetailLabel>Soft/Hard:</DetailLabel>
-          <DetailValue>{pool.softHard}</DetailValue>
-        </Detail>
-        <Detail>
-          <DetailLabel>Liquidity:</DetailLabel>
-          <DetailValue>{pool.liquidity}</DetailValue>
-        </Detail>
-        <ViewButton onClick={onView}>View</ViewButton>
+        <CardContent>
+          <div>
+            <CardTitle>
+              {pool.blockchainLogo && <BlockchainLogo src={pool.blockchainLogo} alt={`${pool.name} blockchain`} />}
+              {pool.name}
+            </CardTitle>
+            <CardStatus status={pool.status}>
+              {pool.status === 'Upcoming' ? 'Upcoming' : pool.status === 'Live' ? 'Sale Live' : 'Ended'}
+            </CardStatus>
+            {pool.status === 'Upcoming' && pool.saleStartDate && (
+              <Timer>Sale Starts In: {formatTimeLeft(timeLeft)}</Timer>
+            )}
+            {pool.status === 'Live' && pool.saleEndDate && (
+              <Timer>Sale Ends In: {formatTimeLeft(timeLeft)}</Timer>
+            )}
+            {pool.status === 'Ended' && pool.saleEndDate && (
+              <Timer>Ended: {formatTimeLeft(timeLeft)}</Timer>
+            )}
+            <Detail>
+              <DetailLabel>Total Raised:</DetailLabel>
+              <DetailValue>{pool.totalRaised}</DetailValue>
+            </Detail>
+            <ProgressContainer>
+              <ProgressBar progress={pool.progress} />
+            </ProgressContainer>
+            <Detail>
+              <DetailLabel>Soft/Hard:</DetailLabel>
+              <DetailValue>{pool.softHard}</DetailValue>
+            </Detail>
+            <Detail>
+              <DetailLabel>Liquidity:</DetailLabel>
+              <DetailValue>{pool.liquidity}</DetailValue>
+            </Detail>
+          </div>
+          <ViewButton onClick={onView}>View</ViewButton>
+        </CardContent>
       </Card>
     </CardWrapper>
   );

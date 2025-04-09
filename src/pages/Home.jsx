@@ -7,9 +7,9 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import ReactPlayer from 'react-player';
-import analyticsImage from '../assets/images/analytics.jpg';
-import secureImage from '../assets/images/secure.jpg';
-import communityImage from '../assets/images/community.jpg';
+import analyticsImage from '../assets/images/analytics.png';
+import secureImage from '../assets/images/secure.png';
+import communityImage from '../assets/images/community1.png';
 import launchpadIntroVideo from '../assets/videos/home.mp4';
 import img7 from '../assets/images/img7.png';
 import pool1Image from '../assets/images/pool1.jpg';
@@ -24,6 +24,8 @@ import sharkLogo from '../assets/images/shark-logo.png';
 import googleLogo from '../assets/images/google-logo.svg';
 import bnbChainLogo from '../assets/images/bnb-chain-logo.svg';
 import tonLogo from '../assets/images/ton-logo.svg';
+import bitpandaLogo from '../assets/images/bitpanda-logo.svg';
+import mexcLogo from '../assets/images/mexc-logo.svg';
 
 // Componentes estilizados (sin cambios en las secciones no relacionadas)
 const HomeContainer = styled(motion.div)`
@@ -245,6 +247,7 @@ const BackedByLogos = styled.div`
   .logos-slide > div {
     display: flex;
     gap: 4rem;
+    padding-right: 4rem;
   }
 
   @keyframes slide {
@@ -259,12 +262,14 @@ const BackedByLogos = styled.div`
   @media (max-width: 768px) {
     .logos-slide > div {
       gap: 2rem;
+      padding-right: 2rem;
     }
   }
 
   @media (max-width: 480px) {
     .logos-slide > div {
       gap: 1rem;
+      padding-right: 1rem;
     }
   }
 `;
@@ -291,7 +296,7 @@ const LogoImage = styled.img`
 
 const FeaturesSection = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   padding: 2rem;
   background: ${props => props.theme.background};
@@ -300,7 +305,7 @@ const FeaturesSection = styled.div`
   margin-bottom: 2rem;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1rem;
     padding: 1rem;
   }
@@ -313,19 +318,15 @@ const FeaturesSection = styled.div`
 `;
 
 const FeatureCard = styled(motion.div)`
-  background: rgba(255, 64, 255, 0.05);
-  padding: 1.5rem;
+  position: relative;
   border-radius: var(--border-radius);
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-  text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
+  min-height: 350px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
   &:hover {
     transform: translateY(-5px);
@@ -335,50 +336,100 @@ const FeatureCard = styled(motion.div)`
   &:before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 64, 255, 0.3) 0%, transparent 70%);
-    z-index: 0;
-    transition: transform 0.5s ease;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Overlay oscuro para mejorar la legibilidad del texto */
+    z-index: 1;
+    transition: background 0.3s ease;
   }
 
   &:hover:before {
-    transform: translate(25%, 25%);
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  @media (max-width: 768px) {
+    min-height: 300px;
+  }
+
+  @media (max-width: 480px) {
+    min-height: 250px;
+  }
+`;
+
+const FeatureContent = styled.div`
+  position: relative;
+  z-index: 2;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #ffffff;
+  text-align: left;
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 5px rgba(255, 64, 255, 0.5);
+  }
+
+  p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
   }
 
   @media (max-width: 768px) {
     padding: 1rem;
-    min-height: 250px;
+
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+    }
   }
 
   @media (max-width: 480px) {
     padding: 0.8rem;
-    min-height: 200px;
+
+    h2 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
   }
 `;
 
-const FeatureImageContainer = styled.div`
-  width: 100%;
-  max-width: 200px;
-  margin-bottom: 1rem;
-  overflow: hidden;
-`;
+const FeatureButton = styled(motion.button)`
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  align-self: flex-start;
 
-const FeatureImage = styled.img`
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 64, 255, 0.5);
-
-  @media (max-width: 768px) {
-    max-width: 150px;
+  &:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    transform: translateY(-2px);
   }
 
   @media (max-width: 480px) {
-    max-width: 120px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
 `;
 
@@ -433,10 +484,10 @@ const FeaturedPools = styled.div`
       font-size: 1.2rem;
     }
     .slick-slider {
-      padding: 0 0.2rem; /* Reducimos el padding lateral para que las tarjetas ocupen más espacio */
+      padding: 0 0.2rem;
     }
     .slick-slide {
-      padding: 0 0.2rem; /* Reducimos el padding entre tarjetas */
+      padding: 0 0.2rem;
     }
   }
 `;
@@ -616,11 +667,13 @@ const mockPools = [
 
 const backedByLogos = [
   { src: microsoftLogo, alt: 'Microsoft' },
-  { src: awsLogo, alt: 'AWS' },
   { src: sharkLogo, alt: 'SHARK' },
+  { src: bitpandaLogo, alt: 'BITPANDA' },
   { src: googleLogo, alt: 'Google for Startups' },
   { src: bnbChainLogo, alt: 'BNB Chain' },
   { src: tonLogo, alt: 'TON' },
+  { src: mexcLogo, alt: 'MEXC' },
+  { src: awsLogo, alt: 'AWS' },
 ];
 
 // Ajustamos las configuraciones del slider para que las tarjetas ocupen más espacio en móvil
@@ -637,8 +690,8 @@ const sliderSettings = {
       settings: {
         slidesToShow: 1,
         slidesToScroll: 1,
-        centerMode: true, // Centramos la tarjeta en la vista móvil
-        centerPadding: '10px', // Reducimos el padding para que la tarjeta ocupe más espacio
+        centerMode: true,
+        centerPadding: '10px',
       },
     },
   ],
@@ -716,9 +769,9 @@ function Home() {
           <div className="background-image" />
         </HeroBackground>
         <VideoOverlay />
-        <Title theme={theme}>Welcome to ETNIA Launchpad</Title>
+        <Title theme={theme}>Launch Smarter with ETNIA: Blockchain Meets AI Innovation</Title>
         <Subtitle theme={theme}>
-          The future of token launches with blockchain security and AI-powered insights.
+        Empower your token launches with cutting-edge blockchain security and AI-driven insights for maximum success
         </Subtitle>
         <CTAButtons>
           <StyledCTAButton
@@ -786,12 +839,18 @@ function Home() {
           animate="visible"
           whileHover={{ scale: 1.05 }}
           theme={theme}
+          style={{ backgroundImage: `url(${secureImage})` }}
         >
-          <FeatureImageContainer>
-            <FeatureImage src={secureImage} alt="Secure Transactions" />
-          </FeatureImageContainer>
-          <h2>Secure Transactions</h2>
-          <p>Ensure your investments are safe with our advanced security protocols.</p>
+          <FeatureContent>
+            <h2>Secure Transactions</h2>
+            <p>Ensure your investments are safe with our advanced security protocols.</p>
+            <FeatureButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Learn More
+            </FeatureButton>
+          </FeatureContent>
         </FeatureCard>
         <FeatureCard
           variants={featureVariants}
@@ -799,12 +858,18 @@ function Home() {
           animate="visible"
           whileHover={{ scale: 1.05 }}
           theme={theme}
+          style={{ backgroundImage: `url(${analyticsImage})` }}
         >
-          <FeatureImageContainer>
-            <FeatureImage src={analyticsImage} alt="Real-Time Analytics" />
-          </FeatureImageContainer>
-          <h2>Real-Time Analytics</h2>
-          <p>Track pool performance with live data and insights.</p>
+          <FeatureContent>
+            <h2>Real-Time Analytics</h2>
+            <p>Track pool performance with live data and insights.</p>
+            <FeatureButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Explore Analytics
+            </FeatureButton>
+          </FeatureContent>
         </FeatureCard>
         <FeatureCard
           variants={featureVariants}
@@ -812,12 +877,18 @@ function Home() {
           animate="visible"
           whileHover={{ scale: 1.05 }}
           theme={theme}
+          style={{ backgroundImage: `url(${communityImage})` }}
         >
-          <FeatureImageContainer>
-            <FeatureImage src={communityImage} alt="Community-Driven" />
-          </FeatureImageContainer>
-          <h2>Community-Driven</h2>
-          <p>Join a vibrant community of innovators and investors.</p>
+          <FeatureContent>
+            <h2>Community-Driven</h2>
+            <p>Join a vibrant community of innovators and investors.</p>
+            <FeatureButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Join Now
+            </FeatureButton>
+          </FeatureContent>
         </FeatureCard>
       </FeaturesSection>
 
