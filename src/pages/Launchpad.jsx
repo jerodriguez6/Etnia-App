@@ -597,7 +597,7 @@ function Launchpads() {
       theme={theme}
     >
       <HeaderSection theme={theme}>
-        <h1>Launchpads</h1>
+        <h1>LAUNCHPADS</h1>
         <Stats>
           <span>Total Pools: 15</span>
           <span>Total Raised: $2,500,000</span>

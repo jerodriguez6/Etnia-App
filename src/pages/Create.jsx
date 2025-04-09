@@ -1,9 +1,7 @@
-// src/pages/Create.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import Slider from 'react-slick';
-import Button from '../components/common/Button';
 import { useTheme } from '../context/ThemeContext';
 
 // Importamos las imágenes de Launchpads.jsx
@@ -20,95 +18,232 @@ import bscLogo from '../assets/images/bnb-logo.png';
 import solanaLogo from '../assets/images/sol-logo.png';
 import polygonLogo from '../assets/images/polygon-logo.png';
 
+// Estilo del Botón Reutilizable (sin cortes, cuadrado)
+const StyledButton = styled(motion.button)`
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  border-radius: 0; /* Cuadrado */
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  transition: all 0.3s ease;
 
-// Estilos para el carrusel y las cards
+  &:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+  }
+`;
+
+// Variante para botones "Cancel" (sin cortes, cuadrado)
+const StyledCancelButton = styled(StyledButton)`
+  background: linear-gradient(45deg, #444, #666);
+  border-image: linear-gradient(45deg, #444, #666) 1;
+
+  &:hover {
+    box-shadow: 0 0 15px rgba(255, 64, 255, 0.5);
+  }
+`;
+
+// Variante para botones "Join Now" (sin cortes, sin relleno, solo borde)
+const JoinNowButton = styled(StyledButton)`
+  background: transparent; /* Sin color de relleno */
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); /* Sombra para legibilidad del texto */
+  
+  &:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    transform: translateY(-2px);
+  }
+`;
+
+// Estilos para el carrusel y las cards (sin cambios, ya están perfectas)
 const FeaturedSection = styled.div`
   max-width: 1200px;
   margin: 2rem auto;
   padding: 1rem;
   position: relative;
   z-index: 2;
+
+  .slick-slider {
+    padding: 0 1rem;
+  }
+
+  .slick-slide {
+    padding: 0 0.5rem;
+  }
+
+  .slick-dots {
+    margin-top: 1rem;
+    li button:before {
+      color: var(--text-light);
+      font-size: 12px;
+      opacity: 0.5;
+    }
+    li.slick-active button:before {
+      opacity: 1;
+      color: var(--primary-color);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    .slick-slider {
+      padding: 0 0.5rem;
+    }
+    .slick-slide {
+      padding: 0 0.3rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.2rem;
+    .slick-slider {
+      padding: 0 0.2rem;
+    }
+    .slick-slide {
+      padding: 0 0.1rem;
+    }
+  }
 `;
 
 const SectionTitle = styled.h2`
-  color: var(--text-dark);
-  text-shadow: var(--shadow-light);
+  color: var(--text-light);
+  text-shadow: 0 0 10px rgba(255, 64, 255, 0.6);
   margin-bottom: 1.5rem;
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
   }
+
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const CarouselCard = styled(motion.div)`
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--border-radius);
-  padding: 0.6rem;
-  margin: 0 2rem;
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 50, 50, 0.8));
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  border-radius: 0;
+  padding: 1rem;
+  margin: 0 0.5rem;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   color: var(--text-light);
   text-align: center;
-  width: 160px;
-  min-height: 150px;
+  min-height: 220px;
+  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%); /* Mantenemos el clip-path, ya está perfecto */
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
   }
 
   @media (max-width: 768px) {
-    width: 140px;
+    min-height: 200px;
+    padding: 0.8rem;
+    margin: 0 0.3rem;
+  }
+
+  @media (max-width: 480px) {
     min-height: 180px;
+    padding: 0.6rem;
+    margin: 0 0.1rem;
   }
 `;
 
 const CardImage = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  margin: 0 auto 0.4rem;
-  border: 2px solid var(--primary-color);
-  box-shadow: var(--shadow-light);
+  margin: 0 auto 0.5rem;
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+
+  @media (max-width: 768px) {
+    width: 45px;
+    height: 45px;
+  }
+
+  @media (max-width: 480px) {
+    width: 40px;
+    height: 40px;
+  }
 `;
 
 const CardTitle = styled.h3`
-  font-size: 0.8rem;
-  margin-bottom: 0.2rem;
-  text-shadow: var(--shadow-light);
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 5px rgba(255, 64, 255, 0.5);
+  color: #ffffff;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const CardDetail = styled.p`
-  font-size: 0.6rem;
-  margin: 0.1rem 0;
-  color: var(--text-light);
+  font-size: 0.9rem;
+  margin: 0.2rem 0;
+  color: #ffffff;
+  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+  }
 `;
 
 const NetworkLabel = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.5rem;
-  color: var(--text-dark);
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.2rem 0.4rem;
+  font-size: 0.7rem;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.3rem 0.6rem;
   border-radius: 8px;
-  margin-top: 0.4rem;
-`;
-
-const CardButton = styled(Button)`
   margin-top: 0.5rem;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.6rem;
-  background: var(--secondary-color);
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
 
-  &:hover {
-    background: var(--primary-color);
-    box-shadow: var(--shadow-hover);
+  @media (max-width: 768px) {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.5rem;
+    padding: 0.2rem 0.4rem;
   }
 `;
 
@@ -293,23 +428,6 @@ const Summary = styled(motion.div)`
   display: block;
 `;
 
-const PreviewButton = styled(Button)`
-  display: block;
-  margin: 1.5rem auto 0;
-  padding: 1rem 2rem;
-  font-size: 1rem;
-  border-radius: var(--border-radius);
-  background: var(--primary-color);
-  color: var(--text-dark);
-  box-shadow: var(--shadow-light);
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: var(--secondary-color);
-    box-shadow: var(--shadow-hover);
-  }
-`;
-
 // Animaciones
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.8 },
@@ -359,7 +477,6 @@ const blockchains = [
     description: 'Low gas fees, scalable, fast. Ethereum compatible.',
     logo: polygonLogo,
   },
-  
 ];
 
 // Componente Modal para selección de Blockchain
@@ -396,12 +513,13 @@ function BlockchainModal({ isOpen, onClose, onSelect }) {
             </BlockchainCard>
           ))}
         </BlockchainGrid>
-        <Button
+        <StyledCancelButton
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={onClose}
-          style={{ background: 'var(--secondary-color)', marginTop: '1rem' }}
         >
           Cancel
-        </Button>
+        </StyledCancelButton>
       </ModalContent>
     </ModalOverlay>
   );
@@ -430,33 +548,6 @@ function CreatePresale() {
 
   const featuredPresales = [
     {
-      name: 'SolRise',
-      symbol: 'SRISE',
-      price: '0.02 SOL',
-      progress: '20%',
-      endDate: '2025-03-15',
-      image: pool6Image,
-      network: 'SOL',
-    },
-    {
-      name: 'ShadowLoom',
-      symbol: 'SHL',
-      price: '0.05 ETH',
-      progress: '0%',
-      endDate: '2025-03-15',
-      image: pool1Image,
-      network: 'ETH',
-    },
-    {
-      name: 'Blub',
-      symbol: 'BLB',
-      price: '0.02 BNB',
-      progress: '100%',
-      endDate: '2025-03-10',
-      image: pool2Image,
-      network: 'BSC',
-    },
-    {
       name: 'SolanaStar',
       symbol: 'SSTAR',
       price: '0.03 SOL',
@@ -483,6 +574,15 @@ function CreatePresale() {
       image: pool5Image,
       network: 'BSC',
     },
+    {
+      name: 'SolRise',
+      symbol: 'SRISE',
+      price: '0.02 SOL',
+      progress: '20%',
+      endDate: '2025-03-15',
+      image: pool6Image,
+      network: 'SOL',
+    },
   ];
 
   const carouselSettings = {
@@ -505,7 +605,7 @@ function CreatePresale() {
       },
       {
         breakpoint: 480,
-        settings: { slidesToShow: 1, slidesToScroll: 1 },
+        settings: { slidesToShow: 1, slidesToScroll: 1, centerMode: true, centerPadding: '10px' },
       },
     ],
   };
@@ -597,24 +697,26 @@ function CreatePresale() {
               <NetworkLabel>
                 <span>{presale.network}</span>
               </NetworkLabel>
-              <CardButton>Join Now</CardButton>
+              <JoinNowButton
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Join Now
+              </JoinNowButton>
             </CarouselCard>
           ))}
         </Slider>
       </FeaturedSection>
 
       <div style={{ textAlign: 'center', margin: '2rem 0' }}>
-        <Button
+        <StyledButton
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setIsModalOpen(true)}
-          style={{
-            background: 'var(--primary-color)',
-            padding: '1rem 2rem',
-            fontSize: '1.2rem',
-            boxShadow: 'var(--shadow-light)',
-          }}
+          style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}
         >
           Create Presale
-        </Button>
+        </StyledButton>
       </div>
 
       <BlockchainModal
@@ -799,7 +901,14 @@ function CreatePresale() {
               {errors.creatorWallet && <ErrorMessage>{errors.creatorWallet}</ErrorMessage>}
             </FormGroup>
 
-            <PreviewButton type="submit">Preview Pool</PreviewButton>
+            <StyledButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              style={{ display: 'block', margin: '1.5rem auto 0', padding: '1rem 2rem', fontSize: '1rem' }}
+            >
+              Preview Pool
+            </StyledButton>
           </Form>
 
           <Summary
@@ -820,13 +929,21 @@ function CreatePresale() {
             <p><strong>Start Date:</strong> {formData.startDate}</p>
             <p><strong>End Date:</strong> {formData.endDate}</p>
             <p><strong>Creator Wallet:</strong> {formData.creatorWallet}</p>
-            <Button onClick={handleConfirm}>Confirm Creation</Button>
-            <Button
+            <StyledButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleConfirm}
+            >
+              Confirm Creation
+            </StyledButton>
+            <StyledCancelButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setShowSummary(false)}
-              style={{ background: 'var(--secondary-color)', marginLeft: '1rem' }}
+              style={{ marginLeft: '1rem' }}
             >
               Cancel
-            </Button>
+            </StyledCancelButton>
           </Summary>
         </CreateContainer>
       )}
