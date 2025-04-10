@@ -18,6 +18,9 @@ import bscLogo from '../assets/images/bnb-logo.png';
 import solanaLogo from '../assets/images/sol-logo.png';
 import polygonLogo from '../assets/images/polygon-logo.png';
 
+// Importamos la imagen del asistente IA
+import botImage from '../assets/images/bot1.png';
+
 // Animación para los puntos
 const dotAnimation = keyframes`
   0%, 20% { opacity: 0.4; transform: translateY(0); }
@@ -63,19 +66,19 @@ const StyledButton = styled(motion.button)`
   font-size: 0.9rem;
   background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
   border: 2px solid transparent;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  border-radius: 0;
+  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1; /* Gradiente más suave */
+  border-radius: 4px; /* Bordes más suaves */
   color: white;
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2); /* Sombra más sutil */
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
     transform: translateY(-2px);
   }
 
@@ -95,7 +98,58 @@ const StyledCancelButton = styled(StyledButton)`
   border-image: linear-gradient(45deg, #444, #666) 1;
 
   &:hover {
-    box-shadow: 0 0 15px rgba(255, 64, 255, 0.5);
+    box-shadow: 0 0 10px rgba(255, 64, 255, 0.4);
+  }
+`;
+
+const CreatePresaleButton = styled(StyledButton)`
+  padding: 0.8rem 1.5rem; /* Reducido para un tamaño más pequeño */
+  font-size: 1rem; /* Texto más pequeño */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0;
+
+  &.form-open {
+    background: transparent;
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+    &:hover {
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+`;
+
+const CreatePresaleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  margin: 1rem 0; /* Reducido */
+  background: #1a1a1a;
+  padding: 0.5rem; /* Reducido */
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    margin: 0.8rem 0;
+    padding: 0.4rem;
+  }
+
+  @media (max-width: 480px) {
+    margin: 0.5rem 0;
+    padding: 0.3rem;
   }
 `;
 
@@ -107,7 +161,7 @@ const JoinNowButton = styled(StyledButton)`
   clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
 
   &:hover {
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
     transform: translateY(-5px);
   }
 
@@ -120,7 +174,7 @@ const JoinNowButton = styled(StyledButton)`
 const FeaturedSection = styled.div`
   max-width: 1200px;
   margin: 3rem auto 0;
-  padding: 1rem 0; /* Ajustamos el padding para que el título tenga espacio */
+  padding: 1rem 0;
   position: relative;
   z-index: 2;
   background: #1a1a1a;
@@ -148,7 +202,7 @@ const FeaturedSection = styled.div`
     display: flex !important;
     justify-content: center;
     align-items: center;
-    min-height: 150px; /* Aseguramos que las slides tengan altura mínima */
+    min-height: 150px;
   }
 
   .slick-dots {
@@ -223,17 +277,17 @@ const CarouselCard = styled(motion.div)`
   border-radius: 0;
   padding: 0.6rem;
   margin: 0 auto;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   color: var(--text-light);
   text-align: center;
   min-height: 150px;
-  width: 200px; /* Ancho fijo para desktop */
+  width: 200px;
   clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
   }
 
   @media (max-width: 1024px) {
@@ -249,7 +303,7 @@ const CarouselCard = styled(motion.div)`
   }
 
   @media (max-width: 480px) {
-    width: 140px; /* Ajustamos el ancho para que 2 cards quepan en ~320px */
+    width: 140px;
     min-height: 100px;
     padding: 0.3rem;
     clip-path: polygon(5% 0, 100% 0, 100% 85%, 95% 100%, 0 100%, 0 5%);
@@ -344,10 +398,10 @@ const AIAssistantContainer = styled(motion.div)`
   background: #1a1a1a;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 1rem;
   max-width: 300px;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   z-index: 1000;
   color: var(--text-light);
   font-family: 'Roboto', sans-serif;
@@ -382,9 +436,23 @@ const AIAssistantTitle = styled.h4`
   margin: 0;
   font-size: 1rem;
   text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
   @media (max-width: 480px) {
     font-size: 0.9rem;
+  }
+`;
+
+const BotIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+
+  @media (max-width: 480px) {
+    width: 20px;
+    height: 20px;
   }
 `;
 
@@ -453,8 +521,8 @@ const ModalOverlay = styled(motion.div)`
 const ModalContent = styled(motion.div)`
   background: #1a1a1a;
   padding: 1.5rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--glow-effect);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   max-width: 800px;
   width: 90%;
   text-align: center;
@@ -471,7 +539,7 @@ const ModalContent = styled(motion.div)`
 
 const ModalTitle = styled.h2`
   color: var(--text-dark);
-  text-shadow: var(--shadow-light);
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
 
@@ -501,7 +569,7 @@ const BlockchainGrid = styled.div`
 const BlockchainCard = styled(motion.div)`
   background: #2a2a2a;
   border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
+  border-radius: 8px;
   padding: 0.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -510,7 +578,7 @@ const BlockchainCard = styled(motion.div)`
 
   &:hover {
     background: #3a3a3a;
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
     transform: translateY(-5px);
   }
 
@@ -528,7 +596,7 @@ const BlockchainLogo = styled.img`
   height: 40px;
   margin: 0 auto 0.4rem;
   border-radius: 50%;
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
 
   @media (max-width: 768px) {
     width: 35px;
@@ -571,53 +639,60 @@ const BlockchainDescription = styled.p`
 `;
 
 const CreateContainer = styled(motion.div)`
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 2rem;
+  max-width: 800px; /* Reducido para un tamaño más proporcional */
+  margin: 1rem auto; /* Reducido */
+  padding: 1.5rem; /* Reducido */
   background: #1a1a1a;
-  border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--glow-effect);
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1; /* Gradiente más suave */
+  border-radius: 8px; /* Bordes más suaves */
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); /* Sombra más sutil */
   position: relative;
   z-index: 3;
 
   @media (max-width: 768px) {
     max-width: 98%;
-    margin: 1rem auto;
-    padding: 1.5rem;
+    margin: 0.8rem auto;
+    padding: 1rem;
   }
 
   @media (max-width: 480px) {
     max-width: 100%;
     margin: 0.5rem auto;
-    padding: 1rem;
+    padding: 0.8rem;
   }
 `;
 
 const PresaleTitle = styled.h1`
   color: var(--text-dark);
-  text-shadow: var(--shadow-light);
-  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+  margin-bottom: 1rem; /* Reducido */
   text-align: center;
+  font-size: 1.8rem; /* Reducido */
+  font-weight: bold;
+  text-transform: uppercase;
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
+    margin-bottom: 0.8rem;
   }
 
   @media (max-width: 480px) {
     font-size: 1.2rem;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
   }
 `;
 
 const StepContainer = styled.div`
-  margin-bottom: 1rem;
-  border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
+  margin-bottom: 1rem; /* Reducido */
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
+  border-radius: 8px;
   background: #1a1a1a;
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
 
   @media (max-width: 480px) {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
   }
 `;
 
@@ -625,15 +700,16 @@ const StepHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  background: #2a2a2a;
+  padding: 1rem; /* Reducido */
+  background: #333; /* Fondo más oscuro para un look profesional */
   cursor: pointer;
   color: var(--text-light);
-  font-size: 1.2rem;
-  text-shadow: var(--shadow-light);
+  font-size: 1.2rem; /* Reducido */
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  border-radius: 6px 6px 0 0;
 
   &:hover {
-    background: #3a3a3a;
+    background: #444;
   }
 
   @media (max-width: 768px) {
@@ -642,7 +718,7 @@ const StepHeader = styled.div`
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem;
+    padding: 0.6rem;
     font-size: 0.9rem;
   }
 `;
@@ -651,26 +727,29 @@ const StepNumber = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 24px; /* Reducido */
+  height: 24px; /* Reducido */
   border-radius: 50%;
   background: var(--primary-color);
   color: white;
-  margin-right: 0.5rem;
+  margin-right: 0.6rem;
+  font-size: 0.9rem; /* Reducido */
 
   @media (max-width: 480px) {
     width: 20px;
     height: 20px;
     font-size: 0.8rem;
+    margin-right: 0.4rem;
   }
 `;
 
 const StepContent = styled(motion.div)`
-  padding: 1rem;
+  padding: 1rem; /* Reducido */
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 1rem; /* Reducido */
   background: #1a1a1a;
+  border-radius: 0 0 6px 6px;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -679,21 +758,26 @@ const StepContent = styled(motion.div)`
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem;
-    gap: 0.5rem;
+    padding: 0.6rem;
+    gap: 0.6rem;
   }
 `;
 
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.5rem; /* Reducido */
 `;
 
 const Label = styled.label`
   color: var(--text-dark);
-  font-size: 0.9rem;
-  text-shadow: var(--shadow-light);
+  font-size: 0.9rem; /* Reducido */
+  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+  font-weight: 500;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
 
   @media (max-width: 480px) {
     font-size: 0.8rem;
@@ -701,18 +785,18 @@ const Label = styled.label`
 `;
 
 const Input = styled(motion.input)`
-  padding: 0.8rem;
-  font-size: 0.9rem;
+  padding: 0.6rem; /* Reducido */
+  font-size: 0.9rem; /* Reducido */
   border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
+  border-radius: 4px;
   background: #2a2a2a;
   color: var(--text-dark);
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
     border-color: var(--secondary-color);
   }
 
@@ -722,73 +806,103 @@ const Input = styled(motion.input)`
   }
 
   @media (max-width: 768px) {
-    padding: 0.6rem;
-    font-size: 0.8rem;
+    padding: 0.5rem;
+    font-size: 0.85rem;
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem;
-    font-size: 0.7rem;
+    padding: 0.4rem;
+    font-size: 0.8rem;
   }
 `;
 
 const Select = styled(motion.select)`
-  padding: 0.8rem;
-  font-size: 0.9rem;
+  padding: 0.6rem; /* Reducido */
+  font-size: 0.9rem; /* Reducido */
   border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
+  border-radius: 4px;
   background: #2a2a2a;
   color: var(--text-dark);
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
     border-color: var(--secondary-color);
   }
 
   @media (max-width: 768px) {
-    padding: 0.6rem;
-    font-size: 0.8rem;
+    padding: 0.5rem;
+    font-size: 0.85rem;
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem;
-    font-size: 0.7rem;
+    padding: 0.4rem;
+    font-size: 0.8rem;
   }
 `;
 
 const ErrorMessage = styled.p`
   color: var(--primary-color);
-  font-size: 0.9rem;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.8rem; /* Reducido */
+  margin-top: -0.3rem;
+  margin-bottom: 0.3rem;
 
   @media (max-width: 480px) {
-    font-size: 0.8rem;
-    margin-top: -0.3rem;
-    margin-bottom: 0.3rem;
+    font-size: 0.7rem;
+    margin-top: -0.2rem;
+    margin-bottom: 0.2rem;
   }
 `;
 
 const Summary = styled(motion.div)`
   background: #1a1a1a;
-  padding: 1.5rem;
-  border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-light);
-  margin-top: 1.5rem;
+  padding: 1.5rem; /* Reducido */
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+  margin-top: 1rem; /* Reducido */
   display: block;
+
+  h3 {
+    font-size: 1.5rem; /* Reducido */
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--text-dark);
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  }
+
+  p {
+    font-size: 0.9rem; /* Reducido */
+    margin: 0.3rem 0;
+  }
 
   @media (max-width: 768px) {
     padding: 1rem;
-    margin-top: 1rem;
+    margin-top: 0.8rem;
+
+    h3 {
+      font-size: 1.3rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+    }
   }
 
   @media (max-width: 480px) {
     padding: 0.8rem;
-    margin-top: 0.8rem;
+    margin-top: 0.5rem;
+
+    h3 {
+      font-size: 1.1rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
   }
 `;
 
@@ -797,15 +911,26 @@ const ContractDisplay = styled.div`
   padding: 1rem;
   background: #2a2a2a;
   border: 1px solid var(--primary-color);
-  border-radius: var(--border-radius);
+  border-radius: 4px;
   color: var(--text-light);
+
+  h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
 
   @media (max-width: 768px) {
     padding: 0.8rem;
+    h4 {
+      font-size: 0.9rem;
+    }
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem;
+    padding: 0.6rem;
+    h4 {
+      font-size: 0.8rem;
+    }
   }
 `;
 
@@ -968,7 +1093,9 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
         animate={{ opacity: 1, scale: 1 }}
         style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}
       >
-        <StyledButton onClick={() => setIsMinimized(false)}>🧠 IA Asistente</StyledButton>
+        <StyledButton onClick={() => setIsMinimized(false)}>
+          <BotIcon src={botImage} alt="IA Assistant" /> IA Asistente
+        </StyledButton>
       </motion.div>
     );
   }
@@ -981,7 +1108,9 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
       exit="exit"
     >
       <AIAssistantHeader>
-        <AIAssistantTitle>🧠 IA Asistente</AIAssistantTitle>
+        <AIAssistantTitle>
+          <BotIcon src={botImage} alt="IA Assistant" /> IA Asistente
+        </AIAssistantTitle>
         <MinimizeButton onClick={() => setIsMinimized(true)}>−</MinimizeButton>
       </AIAssistantHeader>
       <AIAssistantMessage>{message}</AIAssistantMessage>
@@ -1165,7 +1294,7 @@ function CreatePresale() {
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: 2, // Mostrar 2 cards a la vez en móvil
+          slidesToShow: 2,
           slidesToScroll: 1,
           arrows: false,
           dots: true,
@@ -1263,6 +1392,20 @@ function CreatePresale() {
     setIsModalOpen(false);
   };
 
+  const handleCreatePresaleClick = () => {
+    if (formData.selectedChain) {
+      // Si el formulario está abierto, cerrarlo
+      setFormData({ ...formData, selectedChain: '' });
+      setShowSummary(false);
+      setErrors({});
+      setActiveField(null);
+      setContractAddress('');
+    } else {
+      // Si el formulario está cerrado, abrir el modal
+      setIsModalOpen(true);
+    }
+  };
+
   const toggleStep = (step) => {
     setExpandedSteps((prev) => ({
       ...prev,
@@ -1301,15 +1444,21 @@ function CreatePresale() {
         </Slider>
       </FeaturedSection>
 
-      <div style={{ textAlign: 'center', margin: '2rem 0', background: '#1a1a1a', padding: '1rem' }}>
-        <StyledButton
+      <CreatePresaleContainer>
+        <CreatePresaleButton
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setIsModalOpen(true)}
-          style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}
+          onClick={handleCreatePresaleClick}
+          className={formData.selectedChain ? 'form-open' : ''}
         >
-          Create Presale
-        </StyledButton>
+          {formData.selectedChain ? (
+            <>
+              <span>✖</span> Cancel Creation
+            </>
+          ) : (
+            'Create Presale'
+          )}
+        </CreatePresaleButton>
         {!formData.selectedChain && (
           <LoadingDots>
             <Dot delay={0} />
@@ -1317,7 +1466,7 @@ function CreatePresale() {
             <Dot delay={0.4} />
           </LoadingDots>
         )}
-      </div>
+      </CreatePresaleContainer>
 
       <BlockchainModal
         isOpen={isModalOpen}
@@ -1716,7 +1865,7 @@ function CreatePresale() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="submit"
-                style={{ display: 'block', margin: '1.5rem auto 0', padding: '1rem 2rem', fontSize: '1rem' }}
+                style={{ display: 'block', margin: '1rem auto 0', padding: '0.6rem 1.2rem', fontSize: '1rem' }}
               >
                 Preview Pool
               </StyledButton>
