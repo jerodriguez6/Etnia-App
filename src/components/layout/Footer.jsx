@@ -8,6 +8,8 @@ import { useTheme } from '../../context/ThemeContext';
 import ethLogo from '../../assets/images/eth-logo.png';
 import bnbLogo from '../../assets/images/bnb-logo.png';
 import solLogo from '../../assets/images/sol-logo.png';
+import polLogo from '../../assets/images/polygon-logo.png';
+
 
 // Importamos el logo blanc.png
 import blancLogo from '../../assets/images/blanc.png';
@@ -236,6 +238,7 @@ function Footer() {
               <ChainIcon src={ethLogo} alt="Ethereum" />
               <ChainIcon src={bnbLogo} alt="BNB Chain" />
               <ChainIcon src={solLogo} alt="Solana" />
+              <ChainIcon src={polLogo} alt="Polygon" />
             </ChainIcons>
           </FooterSection>
           <FooterSection>

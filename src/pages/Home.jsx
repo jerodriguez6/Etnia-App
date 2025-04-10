@@ -747,6 +747,11 @@ function Home() {
     }
   };
 
+  // Función para redirigir al canal de Telegram
+  const handleJoinNowClick = () => {
+    window.open('https://t.me/EtniaLaunchpadCrypto', '_blank');
+  };
+
   return (
     <HomeContainer
       variants={containerVariants}
@@ -771,7 +776,7 @@ function Home() {
         <VideoOverlay />
         <Title theme={theme}>Launch Smarter with ETNIA: Blockchain Meets AI Innovation</Title>
         <Subtitle theme={theme}>
-        Empower your token launches with cutting-edge blockchain security and AI-driven insights for maximum success
+          Empower your token launches with cutting-edge blockchain security and AI-driven insights for maximum success
         </Subtitle>
         <CTAButtons>
           <StyledCTAButton
@@ -885,6 +890,7 @@ function Home() {
             <FeatureButton
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleJoinNowClick} // Añadimos el evento onClick para redirigir a Telegram
             >
               Join Now
             </FeatureButton>
