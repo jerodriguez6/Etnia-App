@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import Slider from 'react-slick';
 import { useTheme } from '../context/ThemeContext';
 
@@ -18,7 +18,46 @@ import bscLogo from '../assets/images/bnb-logo.png';
 import solanaLogo from '../assets/images/sol-logo.png';
 import polygonLogo from '../assets/images/polygon-logo.png';
 
-// Estilo del Botón Reutilizable (cuadrado, sin cortes)
+// Animación para los puntos
+const dotAnimation = keyframes`
+  0%, 20% { opacity: 0.4; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+  60% { opacity: 0.4; transform: translateY(0); }
+  100% { opacity: 0.4; transform: translateY(0); }
+`;
+
+const LoadingDots = styled.div`
+  display: none;
+  margin-top: 0.5rem;
+  text-align: center;
+
+  @media (max-width: 480px) {
+    display: flex;
+    justify-content: center;
+    gap: 0.3rem;
+  }
+`;
+
+const Dot = styled.span`
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  animation: ${dotAnimation} 1.5s infinite;
+  animation-delay: ${(props) => props.delay}s;
+`;
+
+const PageContainer = styled.div`
+  background: #1a1a1a;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+`;
+
 const StyledButton = styled(motion.button)`
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
@@ -51,7 +90,6 @@ const StyledButton = styled(motion.button)`
   }
 `;
 
-// Variante para botones "Cancel"
 const StyledCancelButton = styled(StyledButton)`
   background: linear-gradient(45deg, #444, #666);
   border-image: linear-gradient(45deg, #444, #666) 1;
@@ -61,33 +99,56 @@ const StyledCancelButton = styled(StyledButton)`
   }
 `;
 
-// Variante para botones "Join Now"
 const JoinNowButton = styled(StyledButton)`
   background: transparent;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
   text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-  
+  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+
   &:hover {
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.5rem;
   }
 `;
 
-// Estilos para el carrusel y las cards
 const FeaturedSection = styled.div`
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 1rem;
+  margin: 3rem auto 0;
+  padding: 1rem 0; /* Ajustamos el padding para que el título tenga espacio */
   position: relative;
   z-index: 2;
+  background: #1a1a1a;
+  width: 100%;
+  box-sizing: border-box;
 
   .slick-slider {
-    padding: 0 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .slick-list {
+    overflow: hidden;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .slick-track {
+    display: flex;
+    align-items: center;
   }
 
   .slick-slide {
     padding: 0 0.5rem;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* Aseguramos que las slides tengan altura mínima */
   }
 
   .slick-dots {
@@ -104,22 +165,26 @@ const FeaturedSection = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding: 0.5rem;
-    .slick-slider {
-      padding: 0 0.5rem;
-    }
+    margin: 2rem auto 0;
+    padding: 0.5rem 0;
     .slick-slide {
       padding: 0 0.3rem;
+      min-height: 130px;
     }
   }
 
   @media (max-width: 480px) {
-    padding: 0.2rem;
+    margin: 1rem auto 0;
+    padding: 0.5rem 0;
     .slick-slider {
-      padding: 0 0.2rem;
+      padding: 0;
     }
     .slick-slide {
       padding: 0 0.1rem;
+      min-height: 100px;
+    }
+    .slick-list {
+      overflow: hidden;
     }
   }
 `;
@@ -127,132 +192,156 @@ const FeaturedSection = styled.div`
 const SectionTitle = styled.h2`
   color: var(--text-light);
   text-shadow: 0 0 10px rgba(255, 64, 255, 0.6);
-  margin-bottom: 1.5rem;
+  margin: 0 auto 1.5rem;
   text-align: center;
   font-size: 2rem;
   font-weight: bold;
   text-transform: uppercase;
+  display: block;
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   @media (max-width: 480px) {
     font-size: 1.2rem;
+    margin: 0.5rem auto;
+    padding: 0 0.5rem;
   }
 `;
 
 const CarouselCard = styled(motion.div)`
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 50, 50, 0.8));
+  background: #1a1a1a;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
   border-radius: 0;
-  padding: 1rem;
-  margin: 0 0.5rem;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  padding: 0.6rem;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   color: var(--text-light);
   text-align: center;
-  min-height: 220px;
+  min-height: 150px;
+  width: 200px; /* Ancho fijo para desktop */
   clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  }
+
+  @media (max-width: 1024px) {
+    width: 180px;
+    min-height: 140px;
+    padding: 0.5rem;
   }
 
   @media (max-width: 768px) {
-    min-height: 200px;
-    padding: 0.8rem;
-    margin: 0 0.3rem;
+    width: 160px;
+    min-height: 130px;
+    padding: 0.4rem;
   }
 
   @media (max-width: 480px) {
-    min-height: 180px;
-    padding: 0.6rem;
-    margin: 0 0.1rem;
+    width: 140px; /* Ajustamos el ancho para que 2 cards quepan en ~320px */
+    min-height: 100px;
+    padding: 0.3rem;
+    clip-path: polygon(5% 0, 100% 0, 100% 85%, 95% 100%, 0 100%, 0 5%);
   }
 `;
 
 const CardImage = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  margin: 0 auto 0.5rem;
+  margin: 0 auto 0.4rem;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
 
   @media (max-width: 768px) {
-    width: 45px;
-    height: 45px;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 0.3rem;
   }
 
   @media (max-width: 480px) {
-    width: 40px;
-    height: 40px;
+    width: 20px;
+    height: 20px;
+    margin-bottom: 0.2rem;
   }
 `;
 
 const CardTitle = styled.h3`
-  font-size: 1.2rem;
-  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
   text-shadow: 0 0 5px rgba(255, 64, 255, 0.5);
   color: #ffffff;
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.9rem;
-  }
-`;
-
-const CardDetail = styled.p`
-  font-size: 0.9rem;
-  margin: 0.2rem 0;
-  color: #ffffff;
-  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
 
   @media (max-width: 768px) {
     font-size: 0.8rem;
   }
 
   @media (max-width: 480px) {
-    font-size: 0.7rem;
+    font-size: 0.55rem;
+    margin-bottom: 0.1rem;
+    line-height: 1;
+  }
+`;
+
+const CardDetail = styled.p`
+  font-size: 0.65rem;
+  margin: 0.1rem 0;
+  color: #ffffff;
+  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+
+  @media (max-width: 768px) {
+    font-size: 0.6rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.45rem;
+    margin: 0.05rem 0;
+    line-height: 1;
   }
 `;
 
 const NetworkLabel = styled.div`
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.7rem;
+  gap: 0.2rem;
+  font-size: 0.55rem;
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.3rem 0.6rem;
-  border-radius: 8px;
-  margin-top: 0.5rem;
+  background: #2a2a2a;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  margin-top: 0.3rem;
   box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
 
   @media (max-width: 768px) {
-    font-size: 0.6rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.5rem;
+    padding: 0.15rem 0.4rem;
+    margin-top: 0.2rem;
   }
 
   @media (max-width: 480px) {
-    font-size: 0.5rem;
-    padding: 0.2rem 0.4rem;
+    font-size: 0.4rem;
+    padding: 0.1rem 0.3rem;
+    margin-top: 0.1rem;
   }
 `;
 
-// Estilos para el Agente de IA
 const AIAssistantContainer = styled(motion.div)`
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 64, 255, 0.2));
+  background: #1a1a1a;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
   border-radius: 10px;
@@ -277,6 +366,8 @@ const AIAssistantContainer = styled(motion.div)`
     max-width: 200px;
     padding: 0.6rem;
     font-size: 0.8rem;
+    bottom: 5px;
+    right: 5px;
   }
 `;
 
@@ -291,6 +382,10 @@ const AIAssistantTitle = styled.h4`
   margin: 0;
   font-size: 1rem;
   text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const MinimizeButton = styled.button`
@@ -303,6 +398,10 @@ const MinimizeButton = styled.button`
 
   &:hover {
     color: var(--primary-color);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
   }
 `;
 
@@ -333,7 +432,6 @@ const SuggestionItem = styled.li`
   }
 `;
 
-// Estilos para el Modal
 const ModalOverlay = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -344,99 +442,155 @@ const ModalOverlay = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 10001;
+  overflow-y: auto;
+
+  @media (max-width: 480px) {
+    padding: 1rem 0;
+  }
 `;
 
 const ModalContent = styled(motion.div)`
-  background: var(--background-light);
-  padding: 2rem;
+  background: #1a1a1a;
+  padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: var(--glow-effect);
   max-width: 800px;
   width: 90%;
   text-align: center;
+  z-index: 10002;
+  position: relative;
+
+  @media (max-width: 480px) {
+    width: 95%;
+    padding: 1rem;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
 `;
 
 const ModalTitle = styled.h2`
   color: var(--text-dark);
   text-shadow: var(--shadow-light);
   margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
 `;
 
 const BlockchainGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  gap: 0.8rem;
   margin-bottom: 1.5rem;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
   }
 
   @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
   }
 `;
 
 const BlockchainCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.1);
+  background: #2a2a2a;
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
-  padding: 1rem;
+  padding: 0.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
   color: var(--text-light);
   text-align: center;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: #3a3a3a;
     box-shadow: var(--shadow-hover);
     transform: translateY(-5px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
   }
 `;
 
 const BlockchainLogo = styled.img`
-  width: 50px;
-  height: 50px;
-  margin: 0 auto 0.5rem;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 0.4rem;
   border-radius: 50%;
   box-shadow: var(--shadow-light);
+
+  @media (max-width: 768px) {
+    width: 35px;
+    height: 35px;
+  }
+
+  @media (max-width: 480px) {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 0.3rem;
+  }
 `;
 
 const BlockchainTitle = styled.h3`
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
   color: var(--text-dark);
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
+  }
 `;
 
 const BlockchainDescription = styled.p`
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: var(--text-light);
+
+  @media (max-width: 768px) {
+    font-size: 0.65rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.6rem;
+  }
 `;
 
-// Estilos para el formulario
 const CreateContainer = styled(motion.div)`
   max-width: 1200px;
   margin: 2rem auto;
   padding: 2rem;
-  background: linear-gradient(135deg, rgba(255, 64, 255, 0.2), rgba(0, 255, 255, 0.2));
+  background: #1a1a1a;
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
   box-shadow: var(--glow-effect);
   position: relative;
   z-index: 3;
-  min-height: 400px;
 
   @media (max-width: 768px) {
     max-width: 98%;
+    margin: 1rem auto;
     padding: 1.5rem;
-    min-height: 300px;
   }
 
   @media (max-width: 480px) {
     max-width: 100%;
+    margin: 0.5rem auto;
     padding: 1rem;
-    min-height: 200px;
   }
 `;
 
@@ -444,15 +598,89 @@ const PresaleTitle = styled.h1`
   color: var(--text-dark);
   text-shadow: var(--shadow-light);
   margin-bottom: 1rem;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+  }
 `;
 
-const Form = styled.form`
+const StepContainer = styled.div`
+  margin-bottom: 1rem;
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  background: #1a1a1a;
+
+  @media (max-width: 480px) {
+    margin-bottom: 0.5rem;
+  }
+`;
+
+const StepHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #2a2a2a;
+  cursor: pointer;
+  color: var(--text-light);
+  font-size: 1.2rem;
+  text-shadow: var(--shadow-light);
+
+  &:hover {
+    background: #3a3a3a;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+`;
+
+const StepNumber = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  margin-right: 0.5rem;
+
+  @media (max-width: 480px) {
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+  }
+`;
+
+const StepContent = styled(motion.div)`
+  padding: 1rem;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  gap: 1rem;
+  background: #1a1a1a;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    gap: 0.5rem;
   }
 `;
 
@@ -466,14 +694,18 @@ const Label = styled.label`
   color: var(--text-dark);
   font-size: 0.9rem;
   text-shadow: var(--shadow-light);
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const Input = styled(motion.input)`
-  padding: 1rem;
-  font-size: 1rem;
+  padding: 0.8rem;
+  font-size: 0.9rem;
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
-  background: rgba(0, 0, 0, 0.5);
+  background: #2a2a2a;
   color: var(--text-dark);
   box-shadow: var(--shadow-light);
   transition: all 0.3s ease;
@@ -488,6 +720,43 @@ const Input = styled(motion.input)`
     border-color: #dc3545;
     box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
   }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+`;
+
+const Select = styled(motion.select)`
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  background: #2a2a2a;
+  color: var(--text-dark);
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: var(--shadow-hover);
+    border-color: var(--secondary-color);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
 `;
 
 const ErrorMessage = styled.p`
@@ -495,26 +764,51 @@ const ErrorMessage = styled.p`
   font-size: 0.9rem;
   margin-top: -0.5rem;
   margin-bottom: 0.5rem;
-`;
 
-const Instructions = styled.p`
-  color: var(--text-light);
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  text-shadow: var(--shadow-light);
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+    margin-top: -0.3rem;
+    margin-bottom: 0.3rem;
+  }
 `;
 
 const Summary = styled(motion.div)`
-  background: rgba(255, 64, 255, 0.1);
+  background: #1a1a1a;
   padding: 1.5rem;
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-light);
   margin-top: 1.5rem;
   display: block;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.8rem;
+    margin-top: 0.8rem;
+  }
 `;
 
-// Animaciones
+const ContractDisplay = styled.div`
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #2a2a2a;
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  color: var(--text-light);
+
+  @media (max-width: 768px) {
+    padding: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+  }
+`;
+
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
@@ -547,110 +841,121 @@ const aiAssistantVariants = {
   exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
 };
 
-// Datos de las Blockchains con logos
+const stepContentVariants = {
+  hidden: { opacity: 0, height: 0 },
+  visible: { opacity: 1, height: 'auto', transition: { duration: 0.3 } },
+};
+
 const blockchains = [
   {
     name: 'Ethereum',
     description: 'High security, extensive dApp ecosystem, higher gas fees.',
     logo: ethereumLogo,
+    nativeToken: 'ETH',
+    stableToken: 'USDT',
   },
   {
     name: 'Binance Smart Chain',
     description: 'Low gas fees, fast transactions, EVM compatible.',
     logo: bscLogo,
+    nativeToken: 'BNB',
+    stableToken: 'USDT',
   },
   {
     name: 'Solana',
     description: 'Ultra-fast, low fees, high scalability. Perfect for memecoins.',
     logo: solanaLogo,
+    nativeToken: 'SOL',
+    stableToken: 'USDT',
   },
   {
     name: 'Polygon',
     description: 'Low gas fees, scalable, fast. Ethereum compatible.',
     logo: polygonLogo,
+    nativeToken: 'MATIC',
+    stableToken: 'USDT',
   },
 ];
 
-// Componente del Agente de IA
 function AIAssistant({ formData, errors, activeField, showSummary }) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    // Si estamos en el resumen, mostramos las sugerencias para el éxito del presale
     if (showSummary) {
       setMessage(
         <div>
           <p>¡Tu presale está listo para ser creado! Aquí tienes algunas sugerencias para que sea más exitoso:</p>
           <SuggestionList>
-            <SuggestionItem>
-              <strong>Auditoría del Contrato:</strong> Asegúrate de que tu contrato esté auditado por una empresa de confianza. Esto genera confianza en los inversores.
-            </SuggestionItem>
-            <SuggestionItem>
-              <strong>Redes Sociales Visibles:</strong> Publica tu proyecto en redes sociales como Twitter y Telegram para atraer más inversores. Asegúrate de que los enlaces sean visibles.
-            </SuggestionItem>
-            <SuggestionItem>
-              <strong>Comunidad Activa:</strong> Crea y mantén una comunidad activa en plataformas como Discord o Telegram. Una comunidad comprometida puede impulsar tu presale.
-            </SuggestionItem>
-            <SuggestionItem>
-              <strong>Precio Competitivo:</strong> Revisa que el precio de venta sea competitivo para {formData.selectedChain}. Un precio atractivo puede aumentar la participación.
-            </SuggestionItem>
-            <SuggestionItem>
-              <strong>Documentación Clara:</strong> Proporciona un whitepaper claro y detallado. Esto ayuda a los inversores a entender tu proyecto y su valor.
-            </SuggestionItem>
+            <SuggestionItem><strong>Auditoría del Contrato:</strong> Asegúrate de que tu contrato esté auditado.</SuggestionItem>
+            <SuggestionItem><strong>Redes Sociales:</strong> Publica tu proyecto en Twitter y Telegram.</SuggestionItem>
+            <SuggestionItem><strong>Comunidad:</strong> Crea una comunidad activa en Discord o Telegram.</SuggestionItem>
+            <SuggestionItem><strong>Precio:</strong> Revisa que el precio sea competitivo para {formData.selectedChain}.</SuggestionItem>
+            <SuggestionItem><strong>Documentación:</strong> Proporciona un whitepaper claro.</SuggestionItem>
           </SuggestionList>
         </div>
       );
       return;
     }
 
-    // Mensajes iniciales y guías según el campo activo
     if (!formData.selectedChain) {
       setMessage('Por favor, selecciona una blockchain para comenzar.');
       return;
     }
 
-    // Guías según el campo activo
     switch (activeField) {
       case 'projectName':
-        setMessage('Ingresa el nombre de tu proyecto. Este será el nombre visible para tu presale.');
+        setMessage('Ingresa el nombre de tu proyecto.');
         break;
       case 'tokenSymbol':
-        setMessage('Ingresa el símbolo de tu token (por ejemplo, SSTAR).');
+        setMessage('Ingresa el símbolo de tu token (ejemplo: SSTAR).');
         break;
       case 'tokenAddress':
-        setMessage(`Ingresa la dirección del contrato de tu token. Para ${formData.selectedChain}, debería comenzar con 0x.`);
+        setMessage(`Ingresa la dirección del contrato para ${formData.selectedChain}.`);
         break;
       case 'salePrice':
-        setMessage(
-          formData.selectedChain === 'Ethereum'
-            ? 'Define el precio de venta por token. En Ethereum, te sugiero un precio competitivo debido a las tarifas de gas.'
-            : `Define el precio de venta por token. En ${formData.selectedChain}, las tarifas son más bajas, así que puedes ser más flexible.`
-        );
+        setMessage(`Define el precio de venta por token en ${formData.selectedChain}.`);
         break;
       case 'totalTokens':
-        setMessage('Ingresa la cantidad total de tokens que estarán a la venta.');
+        setMessage('Ingresa la cantidad total de tokens para la venta.');
         break;
       case 'minPurchase':
-        setMessage('Define la compra mínima por usuario (en tokens).');
+        setMessage('Define la compra mínima por usuario.');
         break;
       case 'maxPurchase':
-        setMessage('Define la compra máxima por usuario (en tokens).');
+        setMessage('Define la compra máxima por usuario.');
         break;
       case 'startDate':
-        setMessage('Selecciona la fecha y hora de inicio del presale. Te sugiero comenzar en al menos 24 horas para dar tiempo a los usuarios.');
+        setMessage('Selecciona la fecha y hora de inicio del presale.');
         break;
       case 'endDate':
-        setMessage('Selecciona la fecha y hora de finalización del presale. Asegúrate de que sea después de la fecha de inicio.');
+        setMessage('Selecciona la fecha y hora de finalización.');
+        break;
+      case 'liquidityUnlockTime':
+        setMessage('Selecciona la fecha de desbloqueo de liquidez.');
         break;
       case 'creatorWallet':
-        setMessage(`Ingresa la dirección de tu billetera donde recibirás los fondos. Para ${formData.selectedChain}, debería comenzar con 0x.`);
+        setMessage(`Ingresa la dirección de tu billetera para ${formData.selectedChain}.`);
+        break;
+      case 'logoUrl':
+        setMessage('Ingresa la URL del logo de tu proyecto.');
+        break;
+      case 'website':
+        setMessage('Ingresa la URL de la página web.');
+        break;
+      case 'twitter':
+        setMessage('Ingresa la URL de Twitter.');
+        break;
+      case 'telegram':
+        setMessage('Ingresa la URL de Telegram.');
+        break;
+      case 'purchaseToken':
+        setMessage('Selecciona el token de compra.');
         break;
       default:
-        setMessage(`¡Hola! Estoy aquí para ayudarte a crear tu presale en ${formData.selectedChain}. Completa cada campo y te guiaré en el proceso.`);
+        setMessage(`¡Hola! Estoy aquí para ayudarte a crear tu presale en ${formData.selectedChain}.`);
     }
 
-    // Validaciones en tiempo real
     if (errors[activeField]) {
       setMessage(errors[activeField]);
     }
@@ -661,16 +966,9 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 1000,
-        }}
+        style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}
       >
-        <StyledButton onClick={() => setIsMinimized(false)}>
-          🧠 IA Asistente
-        </StyledButton>
+        <StyledButton onClick={() => setIsMinimized(false)}>🧠 IA Asistente</StyledButton>
       </motion.div>
     );
   }
@@ -691,8 +989,27 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
   );
 }
 
-// Componente Modal para selección de Blockchain
 function BlockchainModal({ isOpen, onClose, onSelect }) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -737,9 +1054,9 @@ function BlockchainModal({ isOpen, onClose, onSelect }) {
   );
 }
 
-// Componente Principal
 function CreatePresale() {
   const [formData, setFormData] = useState({
+    launchType: '',
     projectName: '',
     tokenSymbol: '',
     tokenAddress: '',
@@ -749,15 +1066,31 @@ function CreatePresale() {
     maxPurchase: '',
     startDate: '',
     endDate: '',
+    liquidityUnlockTime: '',
     creatorWallet: '',
     selectedChain: '',
+    logoUrl: '',
+    website: '',
+    twitter: '',
+    telegram: '',
+    purchaseToken: '',
   });
 
   const [errors, setErrors] = useState({});
   const [showSummary, setShowSummary] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeField, setActiveField] = useState(null);
+  const [expandedSteps, setExpandedSteps] = useState({
+    launchType: true,
+    tokenInfo: false,
+    presaleInfo: false,
+    tokenDistribution: false,
+    presaleTimings: false,
+    projectInfo: false,
+    purchaseToken: false,
+  });
   const { theme } = useTheme();
+  const [contractAddress, setContractAddress] = useState('');
 
   const featuredPresales = [
     {
@@ -801,30 +1134,52 @@ function CreatePresale() {
   const carouselSettings = {
     dots: true,
     infinite: true,
-    speed: 300,
-    slidesToShow: 4,
+    speed: 500,
+    slidesToShow: 5,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 2000,
+    autoplaySpeed: 3000,
+    cssEase: 'ease',
+    pauseOnHover: false,
     arrows: true,
+    centerMode: false,
+    variableWidth: false,
+    centerPadding: '0px',
     responsive: [
       {
         breakpoint: 1024,
-        settings: { slidesToShow: 3, slidesToScroll: 1 },
+        settings: {
+          slidesToShow: 4,
+          slidesToScroll: 1,
+          arrows: true,
+        },
       },
       {
         breakpoint: 768,
-        settings: { slidesToShow: 2, slidesToScroll: 1 },
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          arrows: false,
+        },
       },
       {
         breakpoint: 480,
-        settings: { slidesToShow: 1, slidesToScroll: 1, centerMode: true, centerPadding: '10px' },
+        settings: {
+          slidesToShow: 2, // Mostrar 2 cards a la vez en móvil
+          slidesToScroll: 1,
+          arrows: false,
+          dots: true,
+          centerMode: false,
+          variableWidth: false,
+          centerPadding: '0px',
+        },
       },
     ],
   };
 
   const validateForm = () => {
     const newErrors = {};
+    if (!formData.launchType) newErrors.launchType = 'Launch type is required';
     if (!formData.projectName.trim()) newErrors.projectName = 'Project name is required';
     if (!formData.tokenSymbol.trim()) newErrors.tokenSymbol = 'Token symbol is required';
     if (!formData.tokenAddress.trim()) newErrors.tokenAddress = 'Token address is required';
@@ -834,8 +1189,12 @@ function CreatePresale() {
     if (!formData.maxPurchase.trim()) newErrors.maxPurchase = 'Maximum purchase is required';
     if (!formData.startDate.trim()) newErrors.startDate = 'Start date is required';
     if (!formData.endDate.trim()) newErrors.endDate = 'End date is required';
+    if (!formData.liquidityUnlockTime.trim()) newErrors.liquidityUnlockTime = 'Liquidity unlock time is required';
     if (!formData.creatorWallet.trim()) newErrors.creatorWallet = 'Creator wallet address is required';
     if (!formData.selectedChain) newErrors.selectedChain = 'Please select a blockchain';
+    if (!formData.logoUrl.trim()) newErrors.logoUrl = 'Logo URL is required';
+    if (!formData.website.trim()) newErrors.website = 'Website URL is required';
+    if (!formData.purchaseToken) newErrors.purchaseToken = 'Please select a purchase token';
 
     if (formData.selectedChain && formData.creatorWallet) {
       if (formData.selectedChain === 'Ethereum' && !formData.creatorWallet.startsWith('0x')) {
@@ -863,6 +1222,7 @@ function CreatePresale() {
     const newErrors = validateForm();
     if (Object.keys(newErrors).length === 0) {
       setShowSummary(true);
+      setContractAddress(`0x${Math.random().toString(16).slice(2, 42)}`);
     } else {
       setErrors(newErrors);
       setShowSummary(false);
@@ -873,6 +1233,7 @@ function CreatePresale() {
     console.log('Presale Created:', formData);
     alert('Presale created successfully!');
     setFormData({
+      launchType: '',
       projectName: '',
       tokenSymbol: '',
       tokenAddress: '',
@@ -882,12 +1243,19 @@ function CreatePresale() {
       maxPurchase: '',
       startDate: '',
       endDate: '',
+      liquidityUnlockTime: '',
       creatorWallet: '',
       selectedChain: '',
+      logoUrl: '',
+      website: '',
+      twitter: '',
+      telegram: '',
+      purchaseToken: '',
     });
     setErrors({});
     setShowSummary(false);
     setActiveField(null);
+    setContractAddress('');
   };
 
   const handleSelectChain = (chain) => {
@@ -895,8 +1263,15 @@ function CreatePresale() {
     setIsModalOpen(false);
   };
 
+  const toggleStep = (step) => {
+    setExpandedSteps((prev) => ({
+      ...prev,
+      [step]: !prev[step],
+    }));
+  };
+
   return (
-    <>
+    <PageContainer>
       <FeaturedSection>
         <SectionTitle>Featured Presales</SectionTitle>
         <Slider {...carouselSettings}>
@@ -926,7 +1301,7 @@ function CreatePresale() {
         </Slider>
       </FeaturedSection>
 
-      <div style={{ textAlign: 'center', margin: '2rem 0' }}>
+      <div style={{ textAlign: 'center', margin: '2rem 0', background: '#1a1a1a', padding: '1rem' }}>
         <StyledButton
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -935,6 +1310,13 @@ function CreatePresale() {
         >
           Create Presale
         </StyledButton>
+        {!formData.selectedChain && (
+          <LoadingDots>
+            <Dot delay={0} />
+            <Dot delay={0.2} />
+            <Dot delay={0.4} />
+          </LoadingDots>
+        )}
       </div>
 
       <BlockchainModal
@@ -951,184 +1333,384 @@ function CreatePresale() {
             animate="visible"
             theme={theme}
           >
-            <PresaleTitle>
-              Create Presale on {formData.selectedChain}
-            </PresaleTitle>
-            <Instructions theme={theme}>
-              Fill out the form below to create a new presale. All fields are required.
-            </Instructions>
-            <Form onSubmit={handleSubmit}>
-              <FormGroup>
-                <Label>Project Name</Label>
-                <Input
-                  variants={inputVariants}
-                  initial="hidden"
-                  animate="visible"
-                  type="text"
-                  name="projectName"
-                  placeholder="Enter project name"
-                  value={formData.projectName}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('projectName')}
-                  required
-                />
-                {errors.projectName && <ErrorMessage>{errors.projectName}</ErrorMessage>}
-              </FormGroup>
+            <PresaleTitle>Create a Sale on {formData.selectedChain}</PresaleTitle>
 
-              <FormGroup>
-                <Label>Token Symbol</Label>
-                <Input
-                  variants={inputVariants}
+            <form onSubmit={handleSubmit}>
+              <StepContainer>
+                <StepHeader onClick={() => toggleStep('launchType')}>
+                  <div>
+                    <StepNumber>1</StepNumber> Select Launch Type
+                  </div>
+                  <span>{expandedSteps.launchType ? '▼' : '▶'}</span>
+                </StepHeader>
+                <StepContent
+                  variants={stepContentVariants}
                   initial="hidden"
-                  animate="visible"
-                  type="text"
-                  name="tokenSymbol"
-                  placeholder="Enter token symbol"
-                  value={formData.tokenSymbol}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('tokenSymbol')}
-                  required
-                />
-                {errors.tokenSymbol && <ErrorMessage>{errors.tokenSymbol}</ErrorMessage>}
-              </FormGroup>
+                  animate={expandedSteps.launchType ? 'visible' : 'hidden'}
+                >
+                  <FormGroup>
+                    <Label>Launch Type</Label>
+                    <Select
+                      name="launchType"
+                      value={formData.launchType}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('launchType')}
+                      required
+                    >
+                      <option value="">Select Launch Type</option>
+                      <option value="presale">Presale</option>
+                      <option value="fairlaunch">Fair Launch</option>
+                    </Select>
+                    {errors.launchType && <ErrorMessage>{errors.launchType}</ErrorMessage>}
+                  </FormGroup>
+                </StepContent>
+              </StepContainer>
 
-              <FormGroup>
-                <Label>Token Contract Address</Label>
-                <Input
-                  variants={inputVariants}
+              <StepContainer>
+                <StepHeader onClick={() => toggleStep('tokenInfo')}>
+                  <div>
+                    <StepNumber>2</StepNumber> Token Information
+                  </div>
+                  <span>{expandedSteps.tokenInfo ? '▼' : '▶'}</span>
+                </StepHeader>
+                <StepContent
+                  variants={stepContentVariants}
                   initial="hidden"
-                  animate="visible"
-                  type="text"
-                  name="tokenAddress"
-                  placeholder="Enter token contract address"
-                  value={formData.tokenAddress}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('tokenAddress')}
-                  required
-                />
-                {errors.tokenAddress && <ErrorMessage>{errors.tokenAddress}</ErrorMessage>}
-              </FormGroup>
+                  animate={expandedSteps.tokenInfo ? 'visible' : 'hidden'}
+                >
+                  <FormGroup>
+                    <Label>Project Name</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="text"
+                      name="projectName"
+                      placeholder="Enter project name"
+                      value={formData.projectName}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('projectName')}
+                      required
+                    />
+                    {errors.projectName && <ErrorMessage>{errors.projectName}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Token Symbol</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="text"
+                      name="tokenSymbol"
+                      placeholder="Enter token symbol"
+                      value={formData.tokenSymbol}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('tokenSymbol')}
+                      required
+                    />
+                    {errors.tokenSymbol && <ErrorMessage>{errors.tokenSymbol}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Token Contract Address</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="text"
+                      name="tokenAddress"
+                      placeholder="Enter token contract address"
+                      value={formData.tokenAddress}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('tokenAddress')}
+                      required
+                    />
+                    {errors.tokenAddress && <ErrorMessage>{errors.tokenAddress}</ErrorMessage>}
+                  </FormGroup>
+                </StepContent>
+              </StepContainer>
 
-              <FormGroup>
-                <Label>Sale Price per Token</Label>
-                <Input
-                  variants={inputVariants}
+              <StepContainer>
+                <StepHeader onClick={() => toggleStep('presaleInfo')}>
+                  <div>
+                    <StepNumber>3</StepNumber> Presale Information
+                  </div>
+                  <span>{expandedSteps.presaleInfo ? '▼' : '▶'}</span>
+                </StepHeader>
+                <StepContent
+                  variants={stepContentVariants}
                   initial="hidden"
-                  animate="visible"
-                  type="number"
-                  step="0.000001"
-                  name="salePrice"
-                  placeholder="Enter sale price"
-                  value={formData.salePrice}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('salePrice')}
-                  required
-                />
-                {errors.salePrice && <ErrorMessage>{errors.salePrice}</ErrorMessage>}
-              </FormGroup>
+                  animate={expandedSteps.presaleInfo ? 'visible' : 'hidden'}
+                >
+                  <FormGroup>
+                    <Label>Sale Price per Token</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="number"
+                      step="0.000001"
+                      name="salePrice"
+                      placeholder="Enter sale price"
+                      value={formData.salePrice}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('salePrice')}
+                      required
+                    />
+                    {errors.salePrice && <ErrorMessage>{errors.salePrice}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Total Tokens for Sale</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="number"
+                      step="0.000001"
+                      name="totalTokens"
+                      placeholder="Enter total tokens"
+                      value={formData.totalTokens}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('totalTokens')}
+                      required
+                    />
+                    {errors.totalTokens && <ErrorMessage>{errors.totalTokens}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Minimum Purchase</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="number"
+                      step="0.000001"
+                      name="minPurchase"
+                      placeholder="Enter minimum purchase"
+                      value={formData.minPurchase}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('minPurchase')}
+                      required
+                    />
+                    {errors.minPurchase && <ErrorMessage>{errors.minPurchase}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Maximum Purchase</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="number"
+                      step="0.000001"
+                      name="maxPurchase"
+                      placeholder="Enter maximum purchase"
+                      value={formData.maxPurchase}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('maxPurchase')}
+                      required
+                    />
+                    {errors.maxPurchase && <ErrorMessage>{errors.maxPurchase}</ErrorMessage>}
+                  </FormGroup>
+                </StepContent>
+              </StepContainer>
 
-              <FormGroup>
-                <Label>Total Tokens for Sale</Label>
-                <Input
-                  variants={inputVariants}
+              <StepContainer>
+                <StepHeader onClick={() => toggleStep('tokenDistribution')}>
+                  <div>
+                    <StepNumber>4</StepNumber> Token Distribution
+                  </div>
+                  <span>{expandedSteps.tokenDistribution ? '▼' : '▶'}</span>
+                </StepHeader>
+                <StepContent
+                  variants={stepContentVariants}
                   initial="hidden"
-                  animate="visible"
-                  type="number"
-                  step="0.000001"
-                  name="totalTokens"
-                  placeholder="Enter total tokens"
-                  value={formData.totalTokens}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('totalTokens')}
-                  required
-                />
-                {errors.totalTokens && <ErrorMessage>{errors.totalTokens}</ErrorMessage>}
-              </FormGroup>
+                  animate={expandedSteps.tokenDistribution ? 'visible' : 'hidden'}
+                >
+                  <FormGroup>
+                    <Label>Creator Wallet Address</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="text"
+                      name="creatorWallet"
+                      placeholder="Enter creator wallet address"
+                      value={formData.creatorWallet}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('creatorWallet')}
+                      required
+                    />
+                    {errors.creatorWallet && <ErrorMessage>{errors.creatorWallet}</ErrorMessage>}
+                  </FormGroup>
+                </StepContent>
+              </StepContainer>
 
-              <FormGroup>
-                <Label>Minimum Purchase</Label>
-                <Input
-                  variants={inputVariants}
+              <StepContainer>
+                <StepHeader onClick={() => toggleStep('presaleTimings')}>
+                  <div>
+                    <StepNumber>5</StepNumber> Presale Timings
+                  </div>
+                  <span>{expandedSteps.presaleTimings ? '▼' : '▶'}</span>
+                </StepHeader>
+                <StepContent
+                  variants={stepContentVariants}
                   initial="hidden"
-                  animate="visible"
-                  type="number"
-                  step="0.000001"
-                  name="minPurchase"
-                  placeholder="Enter minimum purchase"
-                  value={formData.minPurchase}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('minPurchase')}
-                  required
-                />
-                {errors.minPurchase && <ErrorMessage>{errors.minPurchase}</ErrorMessage>}
-              </FormGroup>
+                  animate={expandedSteps.presaleTimings ? 'visible' : 'hidden'}
+                >
+                  <FormGroup>
+                    <Label>Presale Start Time</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="datetime-local"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('startDate')}
+                      required
+                    />
+                    {errors.startDate && <ErrorMessage>{errors.startDate}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Presale End Time</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="datetime-local"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('endDate')}
+                      required
+                    />
+                    {errors.endDate && <ErrorMessage>{errors.endDate}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Liquidity Unlock Time</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="datetime-local"
+                      name="liquidityUnlockTime"
+                      value={formData.liquidityUnlockTime}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('liquidityUnlockTime')}
+                      required
+                    />
+                    {errors.liquidityUnlockTime && <ErrorMessage>{errors.liquidityUnlockTime}</ErrorMessage>}
+                  </FormGroup>
+                </StepContent>
+              </StepContainer>
 
-              <FormGroup>
-                <Label>Maximum Purchase</Label>
-                <Input
-                  variants={inputVariants}
+              <StepContainer>
+                <StepHeader onClick={() => toggleStep('projectInfo')}>
+                  <div>
+                    <StepNumber>6</StepNumber> Project Information
+                  </div>
+                  <span>{expandedSteps.projectInfo ? '▼' : '▶'}</span>
+                </StepHeader>
+                <StepContent
+                  variants={stepContentVariants}
                   initial="hidden"
-                  animate="visible"
-                  type="number"
-                  step="0.000001"
-                  name="maxPurchase"
-                  placeholder="Enter maximum purchase"
-                  value={formData.maxPurchase}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('maxPurchase')}
-                  required
-                />
-                {errors.maxPurchase && <ErrorMessage>{errors.maxPurchase}</ErrorMessage>}
-              </FormGroup>
+                  animate={expandedSteps.projectInfo ? 'visible' : 'hidden'}
+                >
+                  <FormGroup>
+                    <Label>Logo URL</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="url"
+                      name="logoUrl"
+                      placeholder="Enter logo URL"
+                      value={formData.logoUrl}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('logoUrl')}
+                      required
+                    />
+                    {errors.logoUrl && <ErrorMessage>{errors.logoUrl}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Website URL</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="url"
+                      name="website"
+                      placeholder="Enter website URL"
+                      value={formData.website}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('website')}
+                      required
+                    />
+                    {errors.website && <ErrorMessage>{errors.website}</ErrorMessage>}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Twitter URL (Optional)</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="url"
+                      name="twitter"
+                      placeholder="Enter Twitter URL"
+                      value={formData.twitter}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('twitter')}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Telegram URL (Optional)</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="url"
+                      name="telegram"
+                      placeholder="Enter Telegram URL"
+                      value={formData.telegram}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('telegram')}
+                    />
+                  </FormGroup>
+                </StepContent>
+              </StepContainer>
 
-              <FormGroup>
-                <Label>Start Date</Label>
-                <Input
-                  variants={inputVariants}
+              <StepContainer>
+                <StepHeader onClick={() => toggleStep('purchaseToken')}>
+                  <div>
+                    <StepNumber>7</StepNumber> Purchase Token Selection
+                  </div>
+                  <span>{expandedSteps.purchaseToken ? '▼' : '▶'}</span>
+                </StepHeader>
+                <StepContent
+                  variants={stepContentVariants}
                   initial="hidden"
-                  animate="visible"
-                  type="datetime-local"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('startDate')}
-                  required
-                />
-                {errors.startDate && <ErrorMessage>{errors.startDate}</ErrorMessage>}
-              </FormGroup>
-
-              <FormGroup>
-                <Label>End Date</Label>
-                <Input
-                  variants={inputVariants}
-                  initial="hidden"
-                  animate="visible"
-                  type="datetime-local"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('endDate')}
-                  required
-                />
-                {errors.endDate && <ErrorMessage>{errors.endDate}</ErrorMessage>}
-              </FormGroup>
-
-              <FormGroup>
-                <Label>Creator Wallet Address</Label>
-                <Input
-                  variants={inputVariants}
-                  initial="hidden"
-                  animate="visible"
-                  type="text"
-                  name="creatorWallet"
-                  placeholder="Enter creator wallet address"
-                  value={formData.creatorWallet}
-                  onChange={handleChange}
-                  onFocus={() => handleFocus('creatorWallet')}
-                  required
-                />
-                {errors.creatorWallet && <ErrorMessage>{errors.creatorWallet}</ErrorMessage>}
-              </FormGroup>
+                  animate={expandedSteps.purchaseToken ? 'visible' : 'hidden'}
+                >
+                  <FormGroup>
+                    <Label>Purchase Token</Label>
+                    <Select
+                      name="purchaseToken"
+                      value={formData.purchaseToken}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('purchaseToken')}
+                      required
+                    >
+                      <option value="">Select Purchase Token</option>
+                      <option value={blockchains.find(chain => chain.name === formData.selectedChain)?.nativeToken}>
+                        {blockchains.find(chain => chain.name === formData.selectedChain)?.nativeToken} (Native Token)
+                      </option>
+                      <option value={blockchains.find(chain => chain.name === formData.selectedChain)?.stableToken}>
+                        {blockchains.find(chain => chain.name === formData.selectedChain)?.stableToken} (Stablecoin)
+                      </option>
+                    </Select>
+                    {errors.purchaseToken && <ErrorMessage>{errors.purchaseToken}</ErrorMessage>}
+                  </FormGroup>
+                </StepContent>
+              </StepContainer>
 
               <StyledButton
                 whileHover={{ scale: 1.05 }}
@@ -1138,7 +1720,7 @@ function CreatePresale() {
               >
                 Preview Pool
               </StyledButton>
-            </Form>
+            </form>
 
             <Summary
               variants={summaryVariants}
@@ -1148,6 +1730,7 @@ function CreatePresale() {
             >
               <h3>Presale Summary</h3>
               <p><strong>Blockchain:</strong> {formData.selectedChain}</p>
+              <p><strong>Launch Type:</strong> {formData.launchType}</p>
               <p><strong>Project Name:</strong> {formData.projectName}</p>
               <p><strong>Token Symbol:</strong> {formData.tokenSymbol}</p>
               <p><strong>Token Address:</strong> {formData.tokenAddress}</p>
@@ -1157,7 +1740,19 @@ function CreatePresale() {
               <p><strong>Max Purchase:</strong> {formData.maxPurchase}</p>
               <p><strong>Start Date:</strong> {formData.startDate}</p>
               <p><strong>End Date:</strong> {formData.endDate}</p>
+              <p><strong>Liquidity Unlock Time:</strong> {formData.liquidityUnlockTime}</p>
               <p><strong>Creator Wallet:</strong> {formData.creatorWallet}</p>
+              <p><strong>Logo URL:</strong> {formData.logoUrl}</p>
+              <p><strong>Website:</strong> {formData.website}</p>
+              {formData.twitter && <p><strong>Twitter:</strong> {formData.twitter}</p>}
+              {formData.telegram && <p><strong>Telegram:</strong> {formData.telegram}</p>}
+              <p><strong>Purchase Token:</strong> {formData.purchaseToken}</p>
+              {contractAddress && (
+                <ContractDisplay>
+                  <h4>Presale Contract Address</h4>
+                  <p>{contractAddress}</p>
+                </ContractDisplay>
+              )}
               <StyledButton
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -1176,7 +1771,6 @@ function CreatePresale() {
             </Summary>
           </CreateContainer>
 
-          {/* Agente de IA */}
           <AIAssistant
             formData={formData}
             errors={errors}
@@ -1185,7 +1779,7 @@ function CreatePresale() {
           />
         </>
       )}
-    </>
+    </PageContainer>
   );
 }
 
