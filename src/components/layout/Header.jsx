@@ -6,8 +6,8 @@ import { Tooltip } from 'react-tooltip';
 import { useTheme } from '../../context/ThemeContext';
 import logo from '../../assets/images/sv.png';
 import ethereumLogo from '../../assets/images/eth-logo.png';
-import polygonLogo from '../../assets/images/polygon-logo.png';
 import bscLogo from '../../assets/images/bnb-logo.png';
+import dexviewLogo from '../../assets/images/dexview-logo.png';
 import {
   ThirdwebProvider,
   ConnectWallet,
@@ -31,11 +31,37 @@ const PolygonAmoy = {
   testnet: true,
 };
 
+// Datos de ejemplo para la búsqueda (puedes reemplazarlos con tus propios datos o una API)
+const mockPools = [
+  {
+    id: 1,
+    name: 'ShadowLoom',
+    totalRaised: '0 ETH',
+    progress: 0,
+    status: 'Upcoming',
+  },
+  {
+    id: 2,
+    name: 'Blub',
+    totalRaised: '$250,000',
+    progress: 40,
+    status: 'Live',
+  },
+  {
+    id: 3,
+    name: 'SolanaStar',
+    totalRaised: '0 SOL',
+    progress: 0,
+    status: 'Upcoming',
+  },
+];
+
 // Styled Components
 const HeaderStyled = styled(motion.header)`
-  background: ${props => props.isScrolled 
-    ? `rgba(${props.theme.background.replace('rgb(', '').replace(')', '')}, 0.9)` 
-    : props.theme.background}; // Restauramos el color original del tema
+  background: ${props =>
+    props.isScrolled
+      ? `rgba(${props.theme.background.replace('rgb(', '').replace(')', '')}, 0.9)`
+      : props.theme.background};
   padding: 1rem 2rem;
   color: ${props => props.theme.text};
   box-shadow: var(--shadow-light);
@@ -45,11 +71,10 @@ const HeaderStyled = styled(motion.header)`
   width: 100%;
   z-index: 1000;
   box-sizing: border-box;
-  backdrop-filter: blur(${props => props.blur}px); // Efecto borroso detrás del header
-  transition: background 0.3s ease, backdrop-filter 0.3s ease; // Transición suave
+  backdrop-filter: blur(${props => props.blur}px);
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
 `;
 
-// Resto de los styled components sin cambios
 const Nav = styled.nav`
   display: flex;
   justify-content: space-between;
@@ -57,6 +82,10 @@ const Nav = styled.nav`
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  @media (max-width: 768px) {
+    flex-wrap: wrap; /* Permitimos que los elementos se ajusten en varias líneas */
+    gap: 0.5rem;
+  }
 `;
 
 const LogoContainer = styled(motion.div)`
@@ -71,7 +100,83 @@ const LogoText = styled(motion.span)`
   color: ${props => props.theme.text};
   text-shadow: 0 0 10px rgba(255, 64, 255, 0.4);
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    display: none; /* Ocultamos el texto "ETN-IA" en vista móvil */
+  }
+`;
+
+const SearchContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 2rem;
+  flex: 1;
+  max-width: 300px;
+  position: relative; /* Para el dropdown de resultados */
+  @media (max-width: 768px) {
+    margin-left: 0;
+    flex: 1;
+    max-width: none; /* Permitimos que ocupe todo el espacio disponible */
+    width: 100%; /* Aseguramos que ocupe el ancho completo */
+  }
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary-color);
+  border-radius: 20px;
+  color: ${props => props.theme.text};
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  &::placeholder {
+    color: ${props => props.theme.text};
+    opacity: 0.7;
+  }
+  &:focus {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+  }
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+`;
+
+const SearchResults = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1001;
+  margin-top: 0.5rem;
+  @media (max-width: 768px) {
+    left: 0;
+    right: 0;
+  }
+`;
+
+const SearchResultItem = styled(Link)`
+  display: block;
+  padding: 0.5rem 1rem;
+  color: ${props => props.theme.text};
+  text-decoration: none;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  &:hover {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+  }
+  &:last-child {
+    border-bottom: none;
   }
 `;
 
@@ -198,7 +303,7 @@ const MobileBlockchainLogo = styled(BlockchainLogo)`
   margin: 1rem 0;
 `;
 
-// Animaciones (sin cambios)
+// Animaciones
 const headerVariants = {
   hidden: { opacity: 0, y: -20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -220,6 +325,11 @@ const mobileMenuVariants = {
   exit: { x: '100%', opacity: 0, transition: { duration: 0.3, ease: 'easeOut' } },
 };
 
+const searchResultsVariants = {
+  hidden: { opacity: 0, y: -10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+};
+
 const hamburgerVariants = {
   open: { rotate: 45, y: 6 },
   closed: { rotate: 0, y: 0 },
@@ -235,7 +345,7 @@ const hamburgerBottomVariants = {
   closed: { rotate: 0, y: 0 },
 };
 
-// Configuración de Thirdweb (sin cambios)
+// Configuración de Thirdweb
 const supportedChains = [Ethereum, Polygon, Binance, PolygonAmoy];
 const clientId = "243d848db8bb3a11167e6b53bfc7e2d4";
 
@@ -270,33 +380,48 @@ function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false); // Estado para detectar scroll
-  const [blur, setBlur] = useState(0); // Estado para el efecto borroso
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [blur, setBlur] = useState(0);
   const { theme, isDarkMode, toggleTheme } = useTheme();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   const networks = [
     { name: 'Ethereum', logo: ethereumLogo, chainId: 1 },
-    { name: 'Polygon', logo: polygonLogo, chainId: 137 },
+    { name: 'Polygon', logo: dexviewLogo, chainId: 137 },
     { name: 'Binance Smart Chain', logo: bscLogo, chainId: 56 },
-    { name: 'Polygon Amoy', logo: polygonLogo, chainId: 80002 },
+    { name: 'Polygon Amoy', logo: dexviewLogo, chainId: 80002 },
   ];
 
   // Efecto para detectar el scroll
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      if (scrollPosition > 50) { // Activa el efecto después de 50px de scroll
+      if (scrollPosition > 50) {
         setIsScrolled(true);
-        setBlur(8); // Aplica un desenfoque de 8px
+        setBlur(8);
       } else {
         setIsScrolled(false);
-        setBlur(0); // Sin desenfoque cuando está arriba
+        setBlur(0);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll); // Limpiar el evento
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Lógica de búsqueda
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+
+    const filteredPools = mockPools.filter(pool =>
+      pool.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setSearchResults(filteredPools);
+  }, [searchQuery]);
 
   const handleNetworkSelect = (network) => {
     setSelectedNetwork(network);
@@ -306,6 +431,10 @@ function Header() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleDexViewClick = () => {
+    window.open('https://www.dexview.com/', '_blank');
   };
 
   const connectWalletStyle = {
@@ -335,8 +464,8 @@ function Header() {
         initial="hidden"
         animate="visible"
         theme={theme}
-        isScrolled={isScrolled} // Pasamos el estado de scroll
-        blur={blur} // Pasamos el valor de blur
+        isScrolled={isScrolled}
+        blur={blur}
       >
         <Nav>
           <LogoContainer
@@ -354,6 +483,39 @@ function Header() {
             </Link>
             <LogoText variants={logoVariants}>ETN-IA</LogoText>
           </LogoContainer>
+
+          {/* Input de búsqueda para todas las vistas */}
+          <SearchContainer>
+            <SearchInput
+              type="text"
+              placeholder="Search launchpads..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              theme={theme}
+            />
+            <AnimatePresence>
+              {searchResults.length > 0 && (
+                <SearchResults
+                  variants={searchResultsVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                >
+                  {searchResults.map(pool => (
+                    <SearchResultItem
+                      key={pool.id}
+                      to={`/launchpad/${pool.id}`} // Ajusta la ruta según tu estructura
+                      onClick={() => setSearchQuery('')} // Limpiar búsqueda al hacer clic
+                      theme={theme}
+                    >
+                      {pool.name} ({pool.status})
+                    </SearchResultItem>
+                  ))}
+                </SearchResults>
+              )}
+            </AnimatePresence>
+          </SearchContainer>
+
           <NavLinks variants={navItemVariants} initial="hidden" animate="visible">
             <StyledLink
               to="/"
@@ -380,9 +542,9 @@ function Header() {
               Create a Sale
             </StyledLink>
             <BlockchainLogo
-              src={selectedNetwork?.logo || polygonLogo}
-              alt="Blockchain Network"
-              onClick={() => setIsModalOpen(true)}
+              src={selectedNetwork?.logo || dexviewLogo}
+              alt="DexView"
+              onClick={handleDexViewClick}
             />
             <ConnectWallet
               theme="dark"
@@ -421,6 +583,7 @@ function Header() {
             />
           </HamburgerButton>
         </Nav>
+
         <AnimatePresence>
           {isMobileMenuOpen && (
             <MobileMenu
@@ -439,10 +602,10 @@ function Header() {
                 Create a Sale
               </MobileMenuLink>
               <MobileBlockchainLogo
-                src={selectedNetwork?.logo || polygonLogo}
-                alt="Blockchain Network"
+                src={selectedNetwork?.logo || dexviewLogo}
+                alt="DexView"
                 onClick={() => {
-                  setIsModalOpen(true);
+                  handleDexViewClick();
                   toggleMobileMenu();
                 }}
               />
