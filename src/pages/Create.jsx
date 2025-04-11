@@ -22,7 +22,7 @@ import polygonLogo from '../assets/images/polygon-logo.png';
 import botImage from '../assets/images/bot1.png';
 
 // Importamos el video
-import videoFile from '../assets/videos/video.mp4'; // Asegúrate de tener tu video aquí
+import videoFile from '../assets/videos/video1.mp4'; // Asegúrate de tener tu video aquí
 
 // Animación para los puntos
 const dotAnimation = keyframes`
@@ -62,6 +62,13 @@ const PageContainer = styled.div`
   padding: 0;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+
+  @media (max-width: 480px) {
+    justify-content: flex-start;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
 `;
 
 const StyledButton = styled(motion.button)`
@@ -69,15 +76,15 @@ const StyledButton = styled(motion.button)`
   font-size: 0.9rem;
   background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
   border: 2px solid transparent;
-  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1; /* Gradiente más suave */
-  border-radius: 4px; /* Bordes más suaves */
+  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
+  border-radius: 4px;
   color: white;
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2); /* Sombra más sutil */
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
   transition: all 0.3s ease;
 
   &:hover {
@@ -106,8 +113,8 @@ const StyledCancelButton = styled(StyledButton)`
 `;
 
 const CreatePresaleButton = styled(StyledButton)`
-  padding: 0.8rem 1.5rem; /* Reducido para un tamaño más pequeño */
-  font-size: 1rem; /* Texto más pequeño */
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,6 +138,7 @@ const CreatePresaleButton = styled(StyledButton)`
   @media (max-width: 480px) {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
+    margin: 0.5rem auto;
   }
 `;
 
@@ -140,9 +148,9 @@ const CreatePresaleContainer = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  margin: 1rem 0; /* Reducido */
+  margin: 1rem 0;
   background: #1a1a1a;
-  padding: 0.5rem; /* Reducido */
+  padding: 0.5rem;
   box-sizing: border-box;
 
   @media (max-width: 768px) {
@@ -151,35 +159,39 @@ const CreatePresaleContainer = styled.div`
   }
 
   @media (max-width: 480px) {
-    margin: 0.5rem 0;
-    padding: 0.3rem;
+    margin: 1rem 0;
+    padding: 0.5rem;
   }
 `;
 
 const VideoContainer = styled(motion.div)`
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   max-width: 600px;
+  width: 100%;
+  aspect-ratio: 16 / 9; /* Relación de aspecto tipo cine */
   margin-left: auto;
   margin-right: auto;
-  border: 2px solid transparent;
+  border: 3px solid transparent; /* Borde un poco más grueso */
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.4); /* Sombra más pronunciada */
+  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 10px; /* Bordes más suaves */
 
   @media (max-width: 768px) {
-    max-width: 400px;
+    max-width: 450px;
   }
 
   @media (max-width: 480px) {
-    max-width: 300px;
+    max-width: 360px; /* Ligeramente más grande */
+    margin-top: 1rem;
   }
 `;
 
 const Video = styled.video`
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover; /* Asegura que el video llene el contenedor */
   display: block;
 `;
 
@@ -258,14 +270,14 @@ const FeaturedSection = styled.div`
   }
 
   @media (max-width: 480px) {
-    margin: 1rem auto 0;
+    margin: 1rem auto;
     padding: 0.5rem 0;
     .slick-slider {
       padding: 0;
     }
     .slick-slide {
       padding: 0 0.1rem;
-      min-height: 100px;
+      min-height: 95px;
     }
     .slick-list {
       overflow: hidden;
@@ -295,7 +307,7 @@ const SectionTitle = styled.h2`
 
   @media (max-width: 480px) {
     font-size: 1.2rem;
-    margin: 0.5rem auto;
+    margin: 0.5rem auto 1rem;
     padding: 0 0.5rem;
   }
 `;
@@ -333,9 +345,9 @@ const CarouselCard = styled(motion.div)`
   }
 
   @media (max-width: 480px) {
-    width: 140px;
-    min-height: 100px;
-    padding: 0.3rem;
+    width: 110px;
+    min-height: 95px;
+    padding: 0.25rem;
     clip-path: polygon(5% 0, 100% 0, 100% 85%, 95% 100%, 0 100%, 0 5%);
   }
 `;
@@ -348,6 +360,9 @@ const CardImage = styled.img`
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
   box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+  object-fit: cover; /* Asegura que la imagen se ajuste bien */
+  padding: 2px; /* Espacio entre la imagen y el borde */
+  background: transparent; /* Fondo transparente para que el borde circular sea visible */
 
   @media (max-width: 768px) {
     width: 30px;
@@ -359,6 +374,7 @@ const CardImage = styled.img`
     width: 20px;
     height: 20px;
     margin-bottom: 0.2rem;
+    padding: 1px;
   }
 `;
 
@@ -669,14 +685,14 @@ const BlockchainDescription = styled.p`
 `;
 
 const CreateContainer = styled(motion.div)`
-  max-width: 800px; /* Reducido para un tamaño más proporcional */
-  margin: 1rem auto; /* Reducido */
-  padding: 1.5rem; /* Reducido */
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1.5rem;
   background: #1a1a1a;
   border: 2px solid transparent;
-  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1; /* Gradiente más suave */
-  border-radius: 8px; /* Bordes más suaves */
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); /* Sombra más sutil */
+  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
   position: relative;
   z-index: 3;
 
@@ -696,9 +712,9 @@ const CreateContainer = styled(motion.div)`
 const PresaleTitle = styled.h1`
   color: var(--text-dark);
   text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-  margin-bottom: 1rem; /* Reducido */
+  margin-bottom: 1rem;
   text-align: center;
-  font-size: 1.8rem; /* Reducido */
+  font-size: 1.8rem;
   font-weight: bold;
   text-transform: uppercase;
 
@@ -714,7 +730,7 @@ const PresaleTitle = styled.h1`
 `;
 
 const StepContainer = styled.div`
-  margin-bottom: 1rem; /* Reducido */
+  margin-bottom: 1rem;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
   border-radius: 8px;
@@ -730,11 +746,11 @@ const StepHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem; /* Reducido */
-  background: #333; /* Fondo más oscuro para un look profesional */
+  padding: 1rem;
+  background: #333;
   cursor: pointer;
   color: var(--text-light);
-  font-size: 1.2rem; /* Reducido */
+  font-size: 1.2rem;
   text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
   border-radius: 6px 6px 0 0;
 
@@ -757,13 +773,13 @@ const StepNumber = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px; /* Reducido */
-  height: 24px; /* Reducido */
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--primary-color);
   color: white;
   margin-right: 0.6rem;
-  font-size: 0.9rem; /* Reducido */
+  font-size: 0.9rem;
 
   @media (max-width: 480px) {
     width: 20px;
@@ -774,10 +790,10 @@ const StepNumber = styled.span`
 `;
 
 const StepContent = styled(motion.div)`
-  padding: 1rem; /* Reducido */
+  padding: 1rem;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem; /* Reducido */
+  gap: 1rem;
   background: #1a1a1a;
   border-radius: 0 0 6px 6px;
 
@@ -796,12 +812,12 @@ const StepContent = styled(motion.div)`
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* Reducido */
+  gap: 0.5rem;
 `;
 
 const Label = styled.label`
   color: var(--text-dark);
-  font-size: 0.9rem; /* Reducido */
+  font-size: 0.9rem;
   text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
   font-weight: 500;
 
@@ -815,8 +831,8 @@ const Label = styled.label`
 `;
 
 const Input = styled(motion.input)`
-  padding: 0.6rem; /* Reducido */
-  font-size: 0.9rem; /* Reducido */
+  padding: 0.6rem;
+  font-size: 0.9rem;
   border: 1px solid var(--primary-color);
   border-radius: 4px;
   background: #2a2a2a;
@@ -847,8 +863,8 @@ const Input = styled(motion.input)`
 `;
 
 const Select = styled(motion.select)`
-  padding: 0.6rem; /* Reducido */
-  font-size: 0.9rem; /* Reducido */
+  padding: 0.6rem;
+  font-size: 0.9rem;
   border: 1px solid var(--primary-color);
   border-radius: 4px;
   background: #2a2a2a;
@@ -875,7 +891,7 @@ const Select = styled(motion.select)`
 
 const ErrorMessage = styled.p`
   color: var(--primary-color);
-  font-size: 0.8rem; /* Reducido */
+  font-size: 0.8rem;
   margin-top: -0.3rem;
   margin-bottom: 0.3rem;
 
@@ -888,16 +904,16 @@ const ErrorMessage = styled.p`
 
 const Summary = styled(motion.div)`
   background: #1a1a1a;
-  padding: 1.5rem; /* Reducido */
+  padding: 1.5rem;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
   border-radius: 8px;
   box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-  margin-top: 1rem; /* Reducido */
+  margin-top: 1rem;
   display: block;
 
   h3 {
-    font-size: 1.5rem; /* Reducido */
+    font-size: 1.5rem;
     margin-bottom: 1rem;
     text-align: center;
     color: var(--text-dark);
@@ -905,7 +921,7 @@ const Summary = styled(motion.div)`
   }
 
   p {
-    font-size: 0.9rem; /* Reducido */
+    font-size: 0.9rem;
     margin: 0.3rem 0;
   }
 
@@ -1255,7 +1271,7 @@ function CreatePresale() {
     projectInfo: false,
     purchaseToken: false,
   });
-  const [showVideo, setShowVideo] = useState(true); // Estado para controlar la visibilidad del video
+  const [showVideo, setShowVideo] = useState(true);
   const { theme } = useTheme();
   const [contractAddress, setContractAddress] = useState('');
 
@@ -1332,7 +1348,7 @@ function CreatePresale() {
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 3,
           slidesToScroll: 1,
           arrows: false,
           dots: true,
@@ -1423,26 +1439,24 @@ function CreatePresale() {
     setShowSummary(false);
     setActiveField(null);
     setContractAddress('');
-    setShowVideo(true); // Volver a mostrar el video después de confirmar
+    setShowVideo(true);
   };
 
   const handleSelectChain = (chain) => {
     setFormData({ ...formData, selectedChain: chain });
     setIsModalOpen(false);
-    setShowVideo(false); // Ocultar el video cuando se selecciona una cadena
+    setShowVideo(false);
   };
 
   const handleCreatePresaleClick = () => {
     if (formData.selectedChain) {
-      // Si el formulario está abierto, cerrarlo
       setFormData({ ...formData, selectedChain: '' });
       setShowSummary(false);
       setErrors({});
       setActiveField(null);
       setContractAddress('');
-      setShowVideo(true); // Mostrar el video al cancelar
+      setShowVideo(true);
     } else {
-      // Si el formulario está cerrado, abrir el modal
       setIsModalOpen(true);
     }
   };
@@ -1501,7 +1515,6 @@ function CreatePresale() {
           )}
         </CreatePresaleButton>
 
-        {/* Video que se muestra inicialmente */}
         <AnimatePresence>
           {showVideo && !formData.selectedChain && (
             <VideoContainer
@@ -1611,7 +1624,7 @@ function CreatePresale() {
                       type="text"
                       name="tokenSymbol"
                       placeholder="Enter token symbol"
-                      value={formData.projectName}
+                      value={formData.tokenSymbol}
                       onChange={handleChange}
                       onFocus={() => handleFocus('tokenSymbol')}
                       required
