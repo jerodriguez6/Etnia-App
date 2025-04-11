@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
 import Slider from 'react-slick';
 import { useTheme } from '../context/ThemeContext';
@@ -20,6 +20,9 @@ import polygonLogo from '../assets/images/polygon-logo.png';
 
 // Importamos la imagen del asistente IA
 import botImage from '../assets/images/bot1.png';
+
+// Importamos el video
+import videoFile from '../assets/videos/video.mp4'; // Asegúrate de tener tu video aquí
 
 // Animación para los puntos
 const dotAnimation = keyframes`
@@ -151,6 +154,33 @@ const CreatePresaleContainer = styled.div`
     margin: 0.5rem 0;
     padding: 0.3rem;
   }
+`;
+
+const VideoContainer = styled(motion.div)`
+  margin-top: 1rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  overflow: hidden;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
+    max-width: 400px;
+  }
+
+  @media (max-width: 480px) {
+    max-width: 300px;
+  }
+`;
+
+const Video = styled.video`
+  width: 100%;
+  height: auto;
+  display: block;
 `;
 
 const JoinNowButton = styled(StyledButton)`
@@ -934,6 +964,7 @@ const ContractDisplay = styled.div`
   }
 `;
 
+// Animaciones
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
@@ -969,6 +1000,12 @@ const aiAssistantVariants = {
 const stepContentVariants = {
   hidden: { opacity: 0, height: 0 },
   visible: { opacity: 1, height: 'auto', transition: { duration: 0.3 } },
+};
+
+const videoVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
 };
 
 const blockchains = [
@@ -1218,6 +1255,7 @@ function CreatePresale() {
     projectInfo: false,
     purchaseToken: false,
   });
+  const [showVideo, setShowVideo] = useState(true); // Estado para controlar la visibilidad del video
   const { theme } = useTheme();
   const [contractAddress, setContractAddress] = useState('');
 
@@ -1385,11 +1423,13 @@ function CreatePresale() {
     setShowSummary(false);
     setActiveField(null);
     setContractAddress('');
+    setShowVideo(true); // Volver a mostrar el video después de confirmar
   };
 
   const handleSelectChain = (chain) => {
     setFormData({ ...formData, selectedChain: chain });
     setIsModalOpen(false);
+    setShowVideo(false); // Ocultar el video cuando se selecciona una cadena
   };
 
   const handleCreatePresaleClick = () => {
@@ -1400,6 +1440,7 @@ function CreatePresale() {
       setErrors({});
       setActiveField(null);
       setContractAddress('');
+      setShowVideo(true); // Mostrar el video al cancelar
     } else {
       // Si el formulario está cerrado, abrir el modal
       setIsModalOpen(true);
@@ -1459,6 +1500,24 @@ function CreatePresale() {
             'Create Presale'
           )}
         </CreatePresaleButton>
+
+        {/* Video que se muestra inicialmente */}
+        <AnimatePresence>
+          {showVideo && !formData.selectedChain && (
+            <VideoContainer
+              variants={videoVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <Video autoPlay loop muted>
+                <source src={videoFile} type="video/mp4" />
+                Your browser does not support the video tag.
+              </Video>
+            </VideoContainer>
+          )}
+        </AnimatePresence>
+
         {!formData.selectedChain && (
           <LoadingDots>
             <Dot delay={0} />
@@ -1552,7 +1611,7 @@ function CreatePresale() {
                       type="text"
                       name="tokenSymbol"
                       placeholder="Enter token symbol"
-                      value={formData.tokenSymbol}
+                      value={formData.projectName}
                       onChange={handleChange}
                       onFocus={() => handleFocus('tokenSymbol')}
                       required
