@@ -7,7 +7,12 @@ import ReactPlayer from 'react-player';
 import Modal from 'react-modal';
 import Button from '../components/common/Button';
 import Web3 from 'web3';
-import { mockPools } from '../data/mockPools'; // Importamos los datos centralizados
+import { mockPools } from '../data/mockPools';
+import { Doughnut } from 'react-chartjs-2'; // Importamos el gráfico Doughnut
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'; // Importamos los componentes necesarios de Chart.js
+
+// Registramos los elementos de Chart.js
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 Modal.setAppElement('#root');
 
@@ -39,12 +44,15 @@ const RightSection = styled.div`
   padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: 0 0 10px rgba(255, 64, 255, 0.2);
+  text-align: center;
 `;
 
 const Banner = styled.div`
   width: 100%;
   height: 200px;
-  background: linear-gradient(90deg, #00c4ff, #ff00ff);
+  background-image: url(${(props) => props.image});
+  background-size: cover;
+  background-position: center;
   border-radius: var(--border-radius);
   display: flex;
   align-items: center;
@@ -53,7 +61,18 @@ const Banner = styled.div`
   font-size: 2rem;
   font-weight: bold;
   color: #fff;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+  position: relative;
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: var(--border-radius);
+  }
 `;
 
 const TokenInfo = styled.div`
@@ -89,22 +108,27 @@ const VideoPromo = styled.div`
 
 const Timer = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   justify-content: center;
   margin-bottom: 1rem;
   div {
-    background: ${(props) => props.theme.backgroundDark || '#222'};
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
+    background: #1a1a1a;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
-    color: ${(props) => props.theme.text};
+    min-width: 50px;
+    color: #fff;
     span:first-child {
       display: block;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: bold;
+      line-height: 1;
     }
     span:last-child {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
     }
   }
 `;
@@ -132,6 +156,7 @@ const SaleInfo = styled.div`
     justify-content: space-between;
     margin: 0.5rem 0;
     color: ${(props) => props.theme.text};
+    font-size: 0.9rem;
   }
 `;
 
@@ -188,15 +213,34 @@ function PoolDetail() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [investment, setInvestment] = useState('');
   const [account, setAccount] = useState(null);
+  const [timerLabel, setTimerLabel] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (pool?.status === 'Live' && pool?.saleEndDate) {
-        setTimeLeft(calculateTimeLeft(pool.saleEndDate));
-      } else if (pool?.status === 'Upcoming' && pool?.saleStartDate) {
+      if (!pool) return;
+
+      const now = new Date();
+      const startDate = new Date(pool.saleStartDate);
+      const endDate = new Date(pool.saleEndDate);
+
+      if (pool.status === 'Ended') {
+        setTimerLabel('Sale Ended');
+        setTimeLeft({});
+      } else if (pool.status === 'Upcoming' && now < startDate) {
+        setTimerLabel('Presale Starts In');
         setTimeLeft(calculateTimeLeft(pool.saleStartDate));
+      } else if (
+        (pool.status === 'Live' || (pool.status === 'Upcoming' && now >= startDate)) &&
+        now < endDate
+      ) {
+        setTimerLabel('Presale Ends In');
+        setTimeLeft(calculateTimeLeft(pool.saleEndDate));
+      } else {
+        setTimerLabel('Sale Ended');
+        setTimeLeft({});
       }
     }, 1000);
+
     return () => clearInterval(timer);
   }, [pool]);
 
@@ -240,11 +284,39 @@ function PoolDetail() {
     }
   };
 
+  // Datos para el gráfico de tokenomics
+  const tokenomicsData = {
+    labels: ['Presale Allocation', 'Liquidity', 'Team', 'Marketing'],
+    datasets: [
+      {
+        data: [
+          parseFloat(pool.tokenomics.presaleAllocation),
+          parseFloat(pool.tokenomics.liquidity),
+          parseFloat(pool.tokenomics.team),
+          parseFloat(pool.tokenomics.marketing),
+        ],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+      },
+    ],
+  };
+
+  const chartOptions = {
+    plugins: {
+      legend: {
+        labels: {
+          color: theme.text, // Color del texto de la leyenda según el tema
+        },
+      },
+    },
+    maintainAspectRatio: false,
+  };
+
   return (
     <MainContainer variants={containerVariants} initial="hidden" animate="visible" theme={theme}>
       {/* Sección Izquierda: Detalles del Proyecto */}
       <LeftSection theme={theme}>
-        <Banner>{pool.bannerText}</Banner>
+        <Banner image={pool.image}>{pool.bannerText}</Banner>
         <h1>{pool.name} Presale</h1>
         <TokenInfo>
           <h3>About</h3>
@@ -273,6 +345,9 @@ function PoolDetail() {
         </TokenInfo>
         <TokenInfo>
           <h3>Tokenomics</h3>
+          <div style={{ height: '200px', margin: '1rem 0' }}>
+            <Doughnut data={tokenomicsData} options={chartOptions} />
+          </div>
           <p>
             <strong>Total Supply:</strong> {pool.tokenomics.totalSupply}
           </p>
@@ -302,8 +377,8 @@ function PoolDetail() {
 
       {/* Sección Derecha: Compra y Contador */}
       <RightSection theme={theme}>
-        <h3>{pool.status === 'Live' ? 'Presale Ends in' : 'Presale Starts in'}</h3>
-        {timeLeft.days !== undefined ? (
+        <h3 style={{ marginBottom: '1rem', color: theme.text }}>{timerLabel}</h3>
+        {Object.keys(timeLeft).length > 0 ? (
           <Timer theme={theme}>
             <div>
               <span>{timeLeft.days}</span>
@@ -323,7 +398,9 @@ function PoolDetail() {
             </div>
           </Timer>
         ) : (
-          <p>Calculating...</p>
+          <p style={{ color: theme.text, marginBottom: '1rem' }}>
+            {timerLabel === 'Sale Ended' ? 'The sale has ended.' : 'Calculating...'}
+          </p>
         )}
         <SaleInfo theme={theme}>
           <p>
