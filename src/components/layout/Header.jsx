@@ -17,7 +17,7 @@ import {
 } from '@thirdweb-dev/react';
 import { Ethereum, Polygon, Binance } from '@thirdweb-dev/chains';
 
-// Definición manual de Polygon Amoy (sin cambios)
+// Definición manual de Polygon Amoy
 const PolygonAmoy = {
   chainId: 80002,
   name: 'Polygon Amoy',
@@ -31,7 +31,7 @@ const PolygonAmoy = {
   testnet: true,
 };
 
-// Datos de ejemplo para la búsqueda (puedes reemplazarlos con tus propios datos o una API)
+// Datos de ejemplo para la búsqueda
 const mockPools = [
   {
     id: 1,
@@ -83,7 +83,7 @@ const Nav = styled.nav`
   margin: 0 auto;
   width: 100%;
   @media (max-width: 768px) {
-    flex-wrap: wrap; /* Permitimos que los elementos se ajusten en varias líneas */
+    flex-wrap: wrap;
     gap: 0.5rem;
   }
 `;
@@ -100,7 +100,7 @@ const LogoText = styled(motion.span)`
   color: ${props => props.theme.text};
   text-shadow: 0 0 10px rgba(255, 64, 255, 0.4);
   @media (max-width: 768px) {
-    display: none; /* Ocultamos el texto "ETN-IA" en vista móvil */
+    display: none;
   }
 `;
 
@@ -110,12 +110,12 @@ const SearchContainer = styled.div`
   margin-left: 2rem;
   flex: 1;
   max-width: 300px;
-  position: relative; /* Para el dropdown de resultados */
+  position: relative;
   @media (max-width: 768px) {
     margin-left: 0;
     flex: 1;
-    max-width: none; /* Permitimos que ocupe todo el espacio disponible */
-    width: 100%; /* Aseguramos que ocupe el ancho completo */
+    max-width: none;
+    width: 100%;
   }
 `;
 
@@ -504,8 +504,8 @@ function Header() {
                   {searchResults.map(pool => (
                     <SearchResultItem
                       key={pool.id}
-                      to={`/launchpad/${pool.id}`} // Ajusta la ruta según tu estructura
-                      onClick={() => setSearchQuery('')} // Limpiar búsqueda al hacer clic
+                      to={`/launchpad/${pool.id}`}
+                      onClick={() => setSearchQuery('')}
                       theme={theme}
                     >
                       {pool.name} ({pool.status})
@@ -540,6 +540,14 @@ function Header() {
               theme={theme}
             >
               Create a Sale
+            </StyledLink>
+            <StyledLink
+              to="/swap"
+              data-tooltip-id="nav-tooltip"
+              data-tooltip-content="Swap Tokens"
+              theme={theme}
+            >
+              Swap
             </StyledLink>
             <BlockchainLogo
               src={selectedNetwork?.logo || dexviewLogo}
@@ -600,6 +608,9 @@ function Header() {
               </MobileMenuLink>
               <MobileMenuLink to="/create" onClick={toggleMobileMenu} theme={theme}>
                 Create a Sale
+              </MobileMenuLink>
+              <MobileMenuLink to="/swap" onClick={toggleMobileMenu} theme={theme}>
+                Swap
               </MobileMenuLink>
               <MobileBlockchainLogo
                 src={selectedNetwork?.logo || dexviewLogo}

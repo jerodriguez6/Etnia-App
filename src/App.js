@@ -5,7 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { Particles } from "@tsparticles/react";
 import { loadSlim } from 'tsparticles-slim';
 import styled from 'styled-components';
-import { Tooltip } from 'react-tooltip'; // Cambiado a importación nombrada
+import { Tooltip } from 'react-tooltip';
 import { ErrorBoundary } from 'react-error-boundary';
 
 // Componentes
@@ -15,6 +15,7 @@ import Home from './pages/Home';
 import Launchpad from './pages/Launchpad';
 import Create from './pages/Create';
 import PoolDetail from './pages/PoolDetail';
+import Swap from './pages/Swap'; // Importamos el nuevo componente Swap
 
 // Estilos para el contenedor principal
 const AppContainer = styled.div`
@@ -87,6 +88,7 @@ const AnimatedRoutes = () => {
             <Route path="/launchpads" element={<Launchpad />} />
             <Route path="/create" element={<Create />} />
             <Route path="/pools/:id" element={<PoolDetail />} />
+            <Route path="/swap" element={<Swap />} /> {/* Nueva ruta para Swap */}
           </Routes>
         </Suspense>
       </PageTransition>
@@ -129,7 +131,7 @@ function App() {
             </ErrorBoundary>
           </MainContent>
           <Footer />
-          <Tooltip id="pool-tooltip" place="bottom" effect="solid" /> {/* Cambiado a Tooltip */}
+          <Tooltip id="pool-tooltip" place="bottom" effect="solid" />
         </AppContainer>
       </Router>
     </ThemeProvider>

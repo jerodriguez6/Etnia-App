@@ -19,5 +19,5 @@ body {
     font-size: 14px;
     line-height: 1.6;
     color: var(--text-dark);
-    background: var(--gray-light);
+    background: #1a1a1a;
 }
