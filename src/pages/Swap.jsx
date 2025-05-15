@@ -15,7 +15,7 @@ import {
   Legend,
 } from 'chart.js';
 import axios from 'axios';
-import { FaCog, FaGlobe, FaTwitter, FaEthereum } from 'react-icons/fa'; // Icons for config, website, Twitter, and Etherscan
+import { FaCog, FaGlobe, FaTwitter, FaEthereum } from 'react-icons/fa';
 
 // Imágenes locales
 import ethLogo from '../assets/images/eth-logo.png';
@@ -34,7 +34,7 @@ const SwapSection = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
- // background: var(--background-dark);
+  // background: var(--background-dark);
   padding: 2rem;
   box-sizing: border-box;
 `;
@@ -148,13 +148,92 @@ const ChartTitle = styled.h3`
   margin-bottom: 1rem;
 `;
 
+const SectionTabsContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+`;
+
+const SectionTab = styled.button`
+  background: ${(props) =>
+    props.active
+      ? 'linear-gradient(90deg, var(--primary-color), var(--secondary-color))'
+      : 'transparent'};
+  color: var(--text-light);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  &:hover {
+    background: ${(props) =>
+      props.active
+        ? 'linear-gradient(90deg, var(--primary-color), var(--secondary-color))'
+        : 'rgba(255, 255, 255, 0.1)'};
+  }
+`;
+
 const TransactionHistory = styled.div`
   width: 100%;
   background: rgba(255, 255, 255, 0.05);
   border-radius: var(--border-radius);
   padding: 1rem;
-  margin-top: 1rem;
   box-shadow: var(--shadow-light);
+`;
+
+const HoldersSection = styled.div`
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--shadow-light);
+`;
+
+const HoldersTitle = styled.h3`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+`;
+
+const HoldersTableWrapper = styled.div`
+  width: 100%;
+  overflow-x: auto;
+`;
+
+const HoldersTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  min-width: 600px;
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
+`;
+
+const HoldersTableHeader = styled.th`
+  padding: 0.5rem;
+  text-align: left;
+  color: var(--text-dark);
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const HoldersTableRow = styled.tr`
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+`;
+
+const HoldersTableCell = styled.td`
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const HistoryTitle = styled.h3`
@@ -360,7 +439,6 @@ const SwapButton = styled.button`
   box-shadow: var(--shadow-light);
   &:hover {
     background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
-    box-shadow: var(--shadow-hover);
   }
 `;
 
@@ -386,6 +464,7 @@ function Swap() {
     twitter: '',
     etherscan: '',
   });
+  const [activeSection, setActiveSection] = useState('transactions'); // State to track active section
 
   const tokens = [
     { symbol: 'ETNIA', name: 'Etnia', logo: svLogo, coingeckoId: 'ripple' },
@@ -393,6 +472,15 @@ function Swap() {
     { symbol: 'BNB', name: 'Binance Coin', logo: bnbLogo, coingeckoId: 'binancecoin' },
     { symbol: 'USDT', name: 'Tether', logo: usdtLogo, coingeckoId: 'tether' },
     { symbol: 'MATIC', name: 'Polygon', logo: maticLogo, coingeckoId: 'matic-network' },
+  ];
+
+  // Mock data for holders
+  const holdersData = [
+    { rank: 1, holder: '0x1234...abcd', percentage: '15.5%' },
+    { rank: 2, holder: '0x5678...efgh', percentage: '10.2%' },
+    { rank: 3, holder: '0x9abc...ijkl', percentage: '8.7%' },
+    { rank: 4, holder: '0xdef1...mnop', percentage: '5.3%' },
+    { rank: 5, holder: '0x3456...qrst', percentage: '3.9%' },
   ];
 
   // Datos simulados para el historial de transacciones (al estilo Uniswap)
@@ -650,7 +738,7 @@ function Swap() {
                   plugins: {
                     legend: {
                       display: true,
-                      labels: { color: 'rgba(255, 255, 255, 0.8)' }, // Grayish white
+                      labels: { color: 'rgba(255, 255, 255, 0.8)' },
                     },
                     tooltip: {
                       enabled: true,
@@ -661,11 +749,11 @@ function Swap() {
                   },
                   scales: {
                     x: {
-                      ticks: { color: 'rgba(255, 255, 255, 0.8)' }, // Grayish white for dates
+                      ticks: { color: 'rgba(255, 255, 255, 0.8)' },
                       grid: { display: false },
                     },
                     y: {
-                      ticks: { color: 'rgba(255, 255, 255, 0.8)' }, // Grayish white for prices
+                      ticks: { color: 'rgba(255, 255, 255, 0.8)' },
                       grid: { color: 'rgba(255, 255, 255, 0.1)' },
                     },
                   },
@@ -676,33 +764,74 @@ function Swap() {
             )}
           </ChartContainer>
 
-          <TransactionHistory>
-            <HistoryTitle>Transactions</HistoryTitle>
-            <TransactionTableWrapper>
-              <TransactionTable>
-                <thead>
-                  <tr>
-                    <TableHeader>Type</TableHeader>
-                    <TableHeader>Total Value</TableHeader>
-                    <TableHeader>Token Amount</TableHeader>
-                    <TableHeader>Account</TableHeader>
-                    <TableHeader>Time</TableHeader>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactionHistory.map((tx, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{tx.type}</TableCell>
-                      <TableCell>{tx.totalValue}</TableCell>
-                      <TableCell>{tx.tokenAmount}</TableCell>
-                      <TableCell>{tx.account}</TableCell>
-                      <TableCell>{tx.time}</TableCell>
-                    </TableRow>
-                  ))}
-                </tbody>
-              </TransactionTable>
-            </TransactionTableWrapper>
-          </TransactionHistory>
+          <SectionTabsContainer>
+            <SectionTab
+              active={activeSection === 'transactions'}
+              onClick={() => setActiveSection('transactions')}
+            >
+              Transactions
+            </SectionTab>
+            <SectionTab
+              active={activeSection === 'holders'}
+              onClick={() => setActiveSection('holders')}
+            >
+              Holders
+            </SectionTab>
+          </SectionTabsContainer>
+
+          {activeSection === 'transactions' ? (
+            <TransactionHistory>
+              <HistoryTitle>Transactions</HistoryTitle>
+              <TransactionTableWrapper>
+                <TransactionTable>
+                  <thead>
+                    <tr>
+                      <TableHeader>Type</TableHeader>
+                      <TableHeader>Total Value</TableHeader>
+                      <TableHeader>Token Amount</TableHeader>
+                      <TableHeader>Account</TableHeader>
+                      <TableHeader>Time</TableHeader>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactionHistory.map((tx, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{tx.type}</TableCell>
+                        <TableCell>{tx.totalValue}</TableCell>
+                        <TableCell>{tx.tokenAmount}</TableCell>
+                        <TableCell>{tx.account}</TableCell>
+                        <TableCell>{tx.time}</TableCell>
+                      </TableRow>
+                    ))}
+                  </tbody>
+                </TransactionTable>
+              </TransactionTableWrapper>
+            </TransactionHistory>
+          ) : (
+            <HoldersSection>
+              <HoldersTitle>Holders</HoldersTitle>
+              <HoldersTableWrapper>
+                <HoldersTable>
+                  <thead>
+                    <tr>
+                      <HoldersTableHeader>Rank</HoldersTableHeader>
+                      <HoldersTableHeader>Holder</HoldersTableHeader>
+                      <HoldersTableHeader>Percentage</HoldersTableHeader>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {holdersData.map((holder, index) => (
+                      <HoldersTableRow key={index}>
+                        <HoldersTableCell>{holder.rank}</HoldersTableCell>
+                        <HoldersTableCell>{holder.holder}</HoldersTableCell>
+                        <HoldersTableCell>{holder.percentage}</HoldersTableCell>
+                      </HoldersTableRow>
+                    ))}
+                  </tbody>
+                </HoldersTable>
+              </HoldersTableWrapper>
+            </HoldersSection>
+          )}
         </SwapRight>
       </SwapContent>
     </SwapSection>
