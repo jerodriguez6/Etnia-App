@@ -1,36 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTheme } from '../context/ThemeContext';
 import Web3 from 'web3';
 import { motion } from 'framer-motion';
-import { FaArrowUp, FaArrowDown, FaCog } from 'react-icons/fa';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import axios from 'axios';
+import { FaCog, FaGlobe, FaTwitter, FaEthereum } from 'react-icons/fa'; // Icons for config, website, Twitter, and Etherscan
 
 // Imágenes locales
 import ethLogo from '../assets/images/eth-logo.png';
 import bnbLogo from '../assets/images/bnb-logo.png';
 import usdtLogo from '../assets/images/usdt-logo.png';
 import maticLogo from '../assets/images/matic-logo.png';
-import swapImage from '../assets/images/img5.png';
+import svLogo from '../assets/images/sv.png';
+
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 // Estilos para el contenedor principal
 const SwapSection = styled.div`
   display: flex;
-  flex-direction: column; /* Cambiado a columna para apilar las secciones */
-  align-items: center; /* Centramos todo el contenido */
-  justify-content: flex-start;
-  margin: 2rem auto;
-  max-width: 1000px;
-  gap: 2rem;
-  background: #1a1a1a; /* Color del header */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+ // background: var(--background-dark);
   padding: 2rem;
-  border-radius: var(--border-radius);
-  min-height: 80vh;
-  width: 100%;
   box-sizing: border-box;
-  @media (max-width: 768px) {
-    gap: 1.5rem;
-    padding: 1.5rem;
-  }
 `;
 
 const SwapContent = styled.div`
@@ -39,6 +45,7 @@ const SwapContent = styled.div`
   align-items: flex-start;
   justify-content: center;
   width: 100%;
+  max-width: 1200px;
   gap: 2rem;
   @media (max-width: 768px) {
     flex-direction: column;
@@ -57,167 +64,214 @@ const SwapLeft = styled.div`
 `;
 
 const SwapRight = styled.div`
-  flex: 1;
+  flex: 2;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  max-width: 400px;
   width: 100%;
   padding: 1rem;
   gap: 1rem;
-  margin-top: 3.5rem;
-  @media (max-width: 768px) {
-    margin-top: 0;
-  }
 `;
 
-const SwapImage = styled(motion.img)`
+const TokenOverview = styled.div`
   width: 100%;
-  max-height: 500px;
-  object-fit: cover;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--border-radius);
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  padding: 1rem;
   box-shadow: var(--shadow-light);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: var(--text-dark);
+`;
+
+const TokenTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const TokenStats = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+const StatItem = styled.div`
+  flex: 1;
+  min-width: 150px;
+`;
+
+const StatLabel = styled.div`
+  font-size: 0.85rem;
+  color: var(--text-light);
+  opacity: 0.7;
+`;
+
+const StatValue = styled.div`
+  font-size: 1rem;
+  color: var(--text-dark);
+`;
+
+const SocialLinks = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+const SocialLink = styled.a`
+  color: var(--text-light);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
   &:hover {
-    transform: scale(1.03);
-    box-shadow: var(--shadow-hover);
-  }
-  @media (max-width: 768px) {
-    max-height: 350px;
+    color: var(--primary-color);
   }
 `;
 
-const SwapTitle = styled(motion.h1)`
-  font-size: 2.2rem;
-  font-weight: 800;
+const ChartContainer = styled.div`
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--shadow-light);
   color: var(--text-dark);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-  margin-bottom: 1.5rem;
-  text-align: center;
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 1px;
-  font-family: 'violet_sansregular', sans-serif;
+  margin-top: 1rem;
+`;
+
+const ChartTitle = styled.h3`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+`;
+
+const TransactionHistory = styled.div`
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin-top: 1rem;
+  box-shadow: var(--shadow-light);
+`;
+
+const HistoryTitle = styled.h3`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+`;
+
+const TransactionTableWrapper = styled.div`
+  width: 100%;
+  overflow-x: auto;
+`;
+
+const TransactionTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  min-width: 600px;
   @media (max-width: 768px) {
-    font-size: 1.7rem;
+    font-size: 0.75rem;
   }
 `;
 
-const SwapImageTitle = styled(motion.h2)`
-  font-size: 1.8rem;
-  font-weight: 700;
+const TableHeader = styled.th`
+  padding: 0.5rem;
+  text-align: left;
   color: var(--text-dark);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-  margin-top: 0.5rem;
-  text-align: center;
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 1px;
-  font-family: 'violet_sansregular', sans-serif;
-  @media (max-width: 768px) {
-    font-size: 1.4rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const TableRow = styled.tr`
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
   }
+`;
+
+const TableCell = styled.td`
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const SwapTabsContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  width: 100%;
-  margin-bottom: 0.5rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 `;
 
-const Tabs = styled.div`
-  display: flex;
-  gap: 1rem;
+const ConfigIcon = styled.div`
+  color: var(--text-light);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  &:hover {
+    color: var(--primary-color);
+  }
 `;
 
 const Tab = styled.button`
   background: ${(props) => (props.active ? 'rgba(255, 255, 255, 0.1)' : 'transparent')};
-  color: ${(props) => (props.active ? 'var(--text-dark)' : 'var(--text-light)')};
+  color: var(--text-light);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'violet_sansregular', sans-serif;
+  transition: background 0.3s ease;
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: var(--text-dark);
-  }
-`;
-
-const SettingsIcon = styled(FaCog)`
-  color: var(--text-light);
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  &:hover {
-    color: var(--text-dark);
-    transform: rotate(90deg);
   }
 `;
 
 const SwapContainer = styled(motion.div)`
   width: 100%;
-  padding: 1rem;
-  background: var(--background-light);
-  color: var(--text-dark);
+  max-width: 400px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-light);
+  color: var(--text-dark);
   text-align: center;
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
   position: relative;
   overflow: hidden;
-  &:before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: calc(var(--border-radius) + 2px);
-    border: 2px solid transparent;
-    border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-    z-index: -1;
-  }
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
   &:hover {
-    box-shadow: var(--glow-effect);
-    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
   }
 `;
 
 const SwapForm = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 `;
 
 const TokenInputContainer = styled.div`
   background: rgba(255, 255, 255, 0.05);
-  padding: 0.6rem;
+  padding: 0.8rem;
   border-radius: var(--border-radius);
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const TokenInputLabel = styled.label`
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--text-light);
-  opacity: 0.8;
   text-align: left;
-  font-family: 'violet_sansregular', sans-serif;
 `;
 
 const TokenSelectContainer = styled.div`
@@ -227,41 +281,30 @@ const TokenSelectContainer = styled.div`
   position: relative;
 `;
 
-const TokenSelect = styled(motion.select)`
+const TokenSelect = styled.select`
   width: 100%;
-  padding: 0.4rem 2rem 0.4rem 0.5rem;
-  border: 1px solid var(--primary-color);
+  padding: 0.5rem 2.5rem 0.5rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--border-radius);
   background: transparent;
   color: var(--text-dark);
   font-size: 0.9rem;
   outline: none;
-  transition: all 0.3s ease;
   appearance: none;
   cursor: pointer;
-  font-family: 'violet_sansregular', sans-serif;
-  border-image: ${(props) =>
-    props.selected ? 'linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1' : 'none'};
-  &:focus {
-    box-shadow: var(--shadow-light);
-    border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  }
+  transition: background 0.3s ease;
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.1);
   }
   option {
-    background: rgba(26, 26, 26, 0.95);
+    background: var(--background-dark);
     color: var(--text-dark);
-    backdrop-filter: blur(5px);
-    border: none;
-    font-family: 'violet_sansregular', sans-serif;
   }
 `;
 
 const TokenLogo = styled.img`
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   position: absolute;
   right: 0.5rem;
@@ -269,164 +312,56 @@ const TokenLogo = styled.img`
   transform: translateY(-50%);
 `;
 
-const TokenInput = styled(motion.input)`
-  padding: 0.4rem;
-  border: 1px solid var(--primary-color);
+const TokenInput = styled.input`
+  padding: 0.5rem;
+  border: none;
   border-radius: var(--border-radius);
   background: transparent;
   color: var(--text-dark);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   outline: none;
-  transition: all 0.3s ease;
-  font-family: 'violet_sansregular', sans-serif;
-  &:focus {
-    box-shadow: var(--shadow-light);
-    border-color: var(--secondary-color);
-  }
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: scale(1.02);
+  width: 100%;
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
   }
 `;
 
-const SwapArrowContainer = styled(motion.div)`
+const SwapArrowContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
-  width: 40px;
-  height: 40px;
-  background: var(--background-light);
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  position: relative;
-  margin: -20px auto;
+  margin: -15px auto;
   z-index: 1;
-  border: 1px solid var(--primary-color);
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: scale(1.1);
-  }
 `;
 
-const SwapArrowUp = styled(FaArrowUp)`
-  font-size: 1rem;
-  color: var(--primary-color);
-  text-shadow: 0 0 5px rgba(255, 64, 255, 0.3);
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: translateY(-2px);
-  }
+const SwapArrow = styled.div`
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--text-light);
 `;
 
-const SwapArrowDown = styled(FaArrowDown)`
-  font-size: 1rem;
-  color: var(--primary-color);
-  text-shadow: 0 0 5px rgba(255, 64, 255, 0.3);
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: translateY(2px);
-  }
-`;
-
-const SwapInfo = styled.div`
-  margin: 0.5rem 0;
-  p {
-    display: flex;
-    justify-content: space-between;
-    margin: 0.2rem 0;
-    color: var(--text-light);
-    font-size: 0.75rem;
-    font-family: 'violet_sansregular', sans-serif;
-  }
-`;
-
-const SwapButton = styled(motion.button)`
+const SwapButton = styled.button`
   background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
   color: var(--text-dark);
-  padding: 0.4rem 0.8rem;
+  padding: 0.8rem 1rem;
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
-  margin-top: 0.5rem;
   width: 100%;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background 0.3s ease;
   box-shadow: var(--shadow-light);
-  font-family: 'violet_sansregular', sans-serif;
   &:hover {
     background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
     box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
   }
-  &:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-light);
-  }
-`;
-
-const TransactionHistory = styled.div`
-  width: 100%;
-  max-width: 400px; /* Mantenemos el mismo ancho que SwapContainer */
-  background: var(--background-light);
-  border-radius: var(--border-radius);
-  padding: 1rem;
-  margin: 0 auto; /* Centramos horizontalmente */
-  box-shadow: var(--shadow-light);
-  text-align: center; /* Centramos el contenido interno */
-`;
-
-const HistoryTitle = styled.h3`
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 1rem;
-  text-align: center;
-  font-family: 'violet_sansregular', sans-serif;
-`;
-
-const TransactionList = styled.ul`
-  list-style: none;
-  padding: 0;
-  max-height: 200px;
-  overflow-y: auto;
-  width: 100%;
-`;
-
-const TransactionItem = styled.li`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.85rem;
-  color: var(--text-light);
-  font-family: 'violet_sansregular', sans-serif;
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const TransactionDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const TransactionAmount = styled.span`
-  color: var(--text-light);
-`;
-
-const TransactionDate = styled.span`
-  font-size: 0.7rem;
-  color: var(--text-light);
-  opacity: 0.6;
-`;
-
-const TransactionStatus = styled.span`
-  font-size: 0.75rem;
-  color: ${(props) => (props.status === 'Completed' ? '#00ff00' : '#ff0000')};
 `;
 
 const containerVariants = {
@@ -437,42 +372,139 @@ const containerVariants = {
 function Swap() {
   const { theme } = useTheme();
   const [account, setAccount] = useState(null);
-  const [fromToken, setFromToken] = useState('');
+  const [fromToken, setFromToken] = useState('ETNIA');
   const [toToken, setToToken] = useState('');
   const [fromAmount, setFromAmount] = useState('');
-  const [toAmount, setToAmount] = useState('');
-  const [activeTab, setActiveTab] = useState('swap');
+  const [chartData, setChartData] = useState(null);
+  const [tokenStats, setTokenStats] = useState({
+    price: 'Loading...',
+    marketCap: 'Loading...',
+    volume24h: 'Loading...',
+  });
+  const [socialLinks, setSocialLinks] = useState({
+    website: '',
+    twitter: '',
+    etherscan: '',
+  });
 
   const tokens = [
-    { symbol: 'ETH', name: 'Ethereum', logo: ethLogo },
-    { symbol: 'BNB', name: 'Binance Coin', logo: bnbLogo },
-    { symbol: 'USDT', name: 'Tether', logo: usdtLogo },
-    { symbol: 'MATIC', name: 'Polygon', logo: maticLogo },
+    { symbol: 'ETNIA', name: 'Etnia', logo: svLogo, coingeckoId: 'ripple' },
+    { symbol: 'ETH', name: 'Ethereum', logo: ethLogo, coingeckoId: 'ethereum' },
+    { symbol: 'BNB', name: 'Binance Coin', logo: bnbLogo, coingeckoId: 'binancecoin' },
+    { symbol: 'USDT', name: 'Tether', logo: usdtLogo, coingeckoId: 'tether' },
+    { symbol: 'MATIC', name: 'Polygon', logo: maticLogo, coingeckoId: 'matic-network' },
   ];
 
+  // Datos simulados para el historial de transacciones (al estilo Uniswap)
   const transactionHistory = [
     {
-      from: 'ETH',
-      to: 'SOL',
-      amount: '0.5 ETH → 12.4 SOL',
-      date: 'May 14, 2025, 01:30 AM',
-      status: 'Completed',
+      type: 'Swap',
+      totalValue: '$150.00',
+      tokenAmount: '100 ETNIA',
+      account: '0x9151...EcC5',
+      time: '1h ago',
     },
     {
-      from: 'BNB',
-      to: 'USDT',
-      amount: '1.2 BNB → 580 USDT',
-      date: 'May 13, 2025, 11:45 PM',
-      status: 'Completed',
+      type: 'Swap',
+      totalValue: '$580.00',
+      tokenAmount: '1.2 BNB',
+      account: '0x9151...EcC5',
+      time: '2h ago',
     },
     {
-      from: 'MATIC',
-      to: 'ETH',
-      amount: '100 MATIC → 0.03 ETH',
-      date: 'May 13, 2025, 09:15 PM',
-      status: 'Failed',
+      type: 'Swap',
+      totalValue: '$45.00',
+      tokenAmount: '100 MATIC',
+      account: '0x9151...EcC5',
+      time: '3h ago',
     },
   ];
+
+  // Fetch token stats and social links
+  useEffect(() => {
+    const fetchTokenStats = async () => {
+      const token = tokens.find((t) => t.symbol === fromToken);
+      if (!token) return;
+
+      try {
+        const response = await axios.get(
+          `https://api.coingecko.com/api/v3/coins/${token.coingeckoId}`
+        );
+        const data = response.data;
+        setTokenStats({
+          price: `$${data.market_data.current_price.usd.toFixed(2)}`,
+          marketCap: `$${data.market_data.market_cap.usd.toLocaleString()}`,
+          volume24h: `$${data.market_data.total_volume.usd.toLocaleString()}`,
+        });
+
+        // Fetch social links
+        const website = data.links.homepage[0] || '';
+        const twitter = data.links.twitter_screen_name
+          ? `https://twitter.com/${data.links.twitter_screen_name}`
+          : '';
+        const etherscan =
+          data.links.blockchain_site?.find((site) => site.includes('etherscan')) || '';
+
+        setSocialLinks({
+          website,
+          twitter,
+          etherscan,
+        });
+      } catch (error) {
+        console.error('Error fetching token stats:', error);
+        setTokenStats({
+          price: 'Error',
+          marketCap: 'Error',
+          volume24h: 'Error',
+        });
+        setSocialLinks({
+          website: '',
+          twitter: '',
+          etherscan: '',
+        });
+      }
+    };
+
+    fetchTokenStats();
+  }, [fromToken]);
+
+  // Fetch chart data for the selected token
+  useEffect(() => {
+    const fetchChartData = async () => {
+      const token = tokens.find((t) => t.symbol === fromToken);
+      if (!token) return;
+
+      try {
+        const response = await axios.get(
+          `https://api.coingecko.com/api/v3/coins/${token.coingeckoId}/market_chart?vs_currency=usd&days=7`
+        );
+        const prices = response.data.prices;
+        const labels = prices.map(([timestamp]) =>
+          new Date(timestamp).toLocaleDateString()
+        );
+        const priceValues = prices.map(([, price]) => price);
+
+        setChartData({
+          labels: labels,
+          datasets: [
+            {
+              label: `${fromToken} Price (USD)`,
+              data: priceValues,
+              borderColor: 'rgba(255, 64, 255, 1)',
+              backgroundColor: 'rgba(255, 64, 255, 0.2)',
+              fill: true,
+              tension: 0.4,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+        setChartData(null);
+      }
+    };
+
+    fetchChartData();
+  }, [fromToken]);
 
   const connectWallet = async () => {
     if (window.ethereum) {
@@ -490,22 +522,6 @@ function Swap() {
     }
   };
 
-  const handleSwap = () => {
-    if (!account) {
-      alert('Please connect your wallet first.');
-      return;
-    }
-    if (!fromToken || !toToken || !fromAmount) {
-      alert('Please fill in all fields.');
-      return;
-    }
-    alert('Swap functionality coming soon!');
-  };
-
-  const handleSettingsClick = () => {
-    alert('Settings functionality coming soon!');
-  };
-
   const getTokenLogo = (symbol) => {
     const token = tokens.find((t) => t.symbol === symbol);
     return token ? token.logo : null;
@@ -513,34 +529,14 @@ function Swap() {
 
   return (
     <SwapSection theme={theme}>
-      {/* Contenedor para SwapLeft y SwapRight */}
       <SwapContent>
         <SwapLeft>
-          <SwapTitle
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            theme={theme}
-          >
-            Intercambia en Cualquier Momento
-          </SwapTitle>
-
           <SwapTabsContainer>
-            <Tabs>
-              <Tab
-                active={activeTab === 'swap'}
-                onClick={() => setActiveTab('swap')}
-              >
-                Swap
-              </Tab>
-              <Tab
-                active={activeTab === 'limit'}
-                onClick={() => setActiveTab('limit')}
-              >
-                Limit
-              </Tab>
-            </Tabs>
-            <SettingsIcon onClick={handleSettingsClick} />
+            <Tab active={true}>Swap</Tab>
+            <Tab active={false}>Pool</Tab>
+            <ConfigIcon>
+              <FaCog />
+            </ConfigIcon>
           </SwapTabsContainer>
 
           <SwapContainer
@@ -552,148 +548,163 @@ function Swap() {
             <SwapForm>
               <TokenInputContainer>
                 <TokenInputLabel>From</TokenInputLabel>
+                <TokenInput
+                  type="number"
+                  placeholder="0.0"
+                  value={fromAmount}
+                  onChange={(e) => setFromAmount(e.target.value)}
+                />
                 <TokenSelectContainer>
-                  <TokenSelect
-                    value={fromToken}
-                    onChange={(e) => setFromToken(e.target.value)}
-                    theme={theme}
-                    selected={!!fromToken}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <option value="">Select Token</option>
+                  <TokenSelect value={fromToken} onChange={(e) => setFromToken(e.target.value)}>
                     {tokens.map((token) => (
                       <option key={token.symbol} value={token.symbol}>
-                        {token.name} ({token.symbol})
+                        {token.symbol}
                       </option>
                     ))}
                   </TokenSelect>
-                  {fromToken && (
+                  {fromToken && getTokenLogo(fromToken) && (
                     <TokenLogo src={getTokenLogo(fromToken)} alt={`${fromToken} logo`} />
                   )}
                 </TokenSelectContainer>
-                <TokenInput
-                  type="number"
-                  placeholder="Amount"
-                  value={fromAmount}
-                  onChange={(e) => setFromAmount(e.target.value)}
-                  theme={theme}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                />
               </TokenInputContainer>
 
-              <SwapArrowContainer
-                theme={theme}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <SwapArrowUp />
-                <SwapArrowDown />
+              <SwapArrowContainer>
+                <SwapArrow />
               </SwapArrowContainer>
 
               <TokenInputContainer>
                 <TokenInputLabel>To</TokenInputLabel>
+                <TokenInput type="number" placeholder="0.0" readOnly />
                 <TokenSelectContainer>
-                  <TokenSelect
-                    value={toToken}
-                    onChange={(e) => setToToken(e.target.value)}
-                    theme={theme}
-                    selected={!!toToken}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <option value="">Select Token</option>
+                  <TokenSelect value={toToken} onChange={(e) => setToToken(e.target.value)}>
+                    <option value="">Select a token</option>
                     {tokens.map((token) => (
                       <option key={token.symbol} value={token.symbol}>
-                        {token.name} ({token.symbol})
+                        {token.symbol}
                       </option>
                     ))}
                   </TokenSelect>
-                  {toToken && (
+                  {toToken && getTokenLogo(toToken) && (
                     <TokenLogo src={getTokenLogo(toToken)} alt={`${toToken} logo`} />
                   )}
                 </TokenSelectContainer>
-                <TokenInput
-                  type="number"
-                  placeholder="Estimated Amount"
-                  value={toAmount}
-                  readOnly
-                  theme={theme}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                />
               </TokenInputContainer>
 
-              <SwapInfo theme={theme}>
-                <p>
-                  <span>Estimated Output</span>
-                  <span>{toAmount || '0.00'} {toToken || 'Token'}</span>
-                </p>
-                <p>
-                  <span>Price Impact</span>
-                  <span>Coming soon</span>
-                </p>
-                <p>
-                  <span>Slippage Tolerance</span>
-                  <span>0.5%</span>
-                </p>
-              </SwapInfo>
-
-              {account ? (
-                <SwapButton
-                  onClick={handleSwap}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Swap
-                </SwapButton>
-              ) : (
-                <SwapButton
-                  onClick={connectWallet}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Connect Wallet
-                </SwapButton>
-              )}
+              <SwapButton onClick={connectWallet}>Connect Wallet</SwapButton>
             </SwapForm>
           </SwapContainer>
         </SwapLeft>
 
         <SwapRight>
-          <SwapImage
-            src={swapImage}
-            alt="Swap Image"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-          />
-          <SwapImageTitle
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            theme={theme}
-          >
-            Tu Puerta a las Criptomonedas
-          </SwapImageTitle>
+          <TokenOverview>
+            <TokenTitle>
+              {fromToken}
+              {getTokenLogo(fromToken) && (
+                <img
+                  src={getTokenLogo(fromToken)}
+                  alt={`${fromToken} logo`}
+                  style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+                />
+              )}
+            </TokenTitle>
+            <TokenStats>
+              <StatItem>
+                <StatLabel>Price</StatLabel>
+                <StatValue>{tokenStats.price}</StatValue>
+              </StatItem>
+              <StatItem>
+                <StatLabel>Market Cap</StatLabel>
+                <StatValue>{tokenStats.marketCap}</StatValue>
+              </StatItem>
+              <StatItem>
+                <StatLabel>24h Volume</StatLabel>
+                <StatValue>{tokenStats.volume24h}</StatValue>
+              </StatItem>
+            </TokenStats>
+            <SocialLinks>
+              {socialLinks.website && (
+                <SocialLink href={socialLinks.website} target="_blank" rel="noopener noreferrer">
+                  <FaGlobe />
+                </SocialLink>
+              )}
+              {socialLinks.twitter && (
+                <SocialLink href={socialLinks.twitter} target="_blank" rel="noopener noreferrer">
+                  <FaTwitter />
+                </SocialLink>
+              )}
+              {socialLinks.etherscan && (
+                <SocialLink href={socialLinks.etherscan} target="_blank" rel="noopener noreferrer">
+                  <FaEthereum />
+                </SocialLink>
+              )}
+            </SocialLinks>
+          </TokenOverview>
+
+          <ChartContainer>
+            <ChartTitle>{fromToken} Price Chart</ChartTitle>
+            {chartData ? (
+              <Line
+                data={chartData}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      display: true,
+                      labels: { color: 'rgba(255, 255, 255, 0.8)' }, // Grayish white
+                    },
+                    tooltip: {
+                      enabled: true,
+                      titleColor: 'rgba(255, 255, 255, 0.8)',
+                      bodyColor: 'rgba(255, 255, 255, 0.8)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    },
+                  },
+                  scales: {
+                    x: {
+                      ticks: { color: 'rgba(255, 255, 255, 0.8)' }, // Grayish white for dates
+                      grid: { display: false },
+                    },
+                    y: {
+                      ticks: { color: 'rgba(255, 255, 255, 0.8)' }, // Grayish white for prices
+                      grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    },
+                  },
+                }}
+              />
+            ) : (
+              <p>Loading chart...</p>
+            )}
+          </ChartContainer>
+
+          <TransactionHistory>
+            <HistoryTitle>Transactions</HistoryTitle>
+            <TransactionTableWrapper>
+              <TransactionTable>
+                <thead>
+                  <tr>
+                    <TableHeader>Type</TableHeader>
+                    <TableHeader>Total Value</TableHeader>
+                    <TableHeader>Token Amount</TableHeader>
+                    <TableHeader>Account</TableHeader>
+                    <TableHeader>Time</TableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactionHistory.map((tx, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{tx.type}</TableCell>
+                      <TableCell>{tx.totalValue}</TableCell>
+                      <TableCell>{tx.tokenAmount}</TableCell>
+                      <TableCell>{tx.account}</TableCell>
+                      <TableCell>{tx.time}</TableCell>
+                    </TableRow>
+                  ))}
+                </tbody>
+              </TransactionTable>
+            </TransactionTableWrapper>
+          </TransactionHistory>
         </SwapRight>
       </SwapContent>
-
-      {/* TransactionHistory ahora está fuera de SwapLeft */}
-      <TransactionHistory>
-        <HistoryTitle>Transaction History</HistoryTitle>
-        <TransactionList>
-          {transactionHistory.map((tx, index) => (
-            <TransactionItem key={index}>
-              <TransactionDetails>
-                <TransactionAmount>{tx.amount}</TransactionAmount>
-                <TransactionDate>{tx.date}</TransactionDate>
-              </TransactionDetails>
-              <TransactionStatus status={tx.status}>{tx.status}</TransactionStatus>
-            </TransactionItem>
-          ))}
-        </TransactionList>
-      </TransactionHistory>
     </SwapSection>
   );
 }
