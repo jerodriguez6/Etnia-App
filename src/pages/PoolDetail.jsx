@@ -8,8 +8,11 @@ import Modal from 'react-modal';
 import Button from '../components/common/Button';
 import Web3 from 'web3';
 import { mockPools } from '../data/mockPools';
-import { Doughnut } from 'react-chartjs-2'; // Importamos el gráfico Doughnut
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'; // Importamos los componentes necesarios de Chart.js
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+// Import the video file from src/assets/videos
+import video1 from '../assets/videos/tuto.mp4';
 
 // Registramos los elementos de Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -38,13 +41,107 @@ const LeftSection = styled.div`
   color: ${(props) => props.theme.text};
 `;
 
-const RightSection = styled.div`
+const RightColumn = styled.div`
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const RightSection = styled.div`
   background: rgba(255, 64, 255, 0.1);
   padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: 0 0 10px rgba(255, 64, 255, 0.2);
   text-align: center;
+`;
+
+const SummarySection = styled.div`
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  color: ${(props) => props.theme.text};
+`;
+
+const SummaryTitle = styled.h3`
+  margin-bottom: 1rem;
+  color: ${(props) => props.theme.textDark || '#fff'};
+`;
+
+const SummaryContent = styled.p`
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: ${(props) => props.theme.text};
+`;
+
+const CommentsSection = styled.div`
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  color: ${(props) => props.theme.text};
+`;
+
+const CommentsTitle = styled.h3`
+  margin-bottom: 1rem;
+  color: ${(props) => props.theme.textDark || '#fff'};
+`;
+
+const CommentForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+`;
+
+const CommentInput = styled.textarea`
+  padding: 0.8rem;
+  border: 1px solid var(--gray-light);
+  border-radius: var(--border-radius);
+  background: ${(props) => props.theme.background};
+  color: ${(props) => props.theme.text};
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  &:focus {
+    outline: none;
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-color);
+  }
+`;
+
+const CommentList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const CommentItem = styled.div`
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const CommentAuthor = styled.div`
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: ${(props) => props.theme.textDark || '#fff'};
+  margin-bottom: 0.5rem;
+`;
+
+const CommentText = styled.p`
+  font-size: 0.9rem;
+  color: ${(props) => props.theme.text};
+`;
+
+const CommentDate = styled.div`
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.5rem;
 `;
 
 const Banner = styled.div`
@@ -63,16 +160,6 @@ const Banner = styled.div`
   color: #fff;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
   position: relative;
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: var(--border-radius);
-  }
 `;
 
 const TokenInfo = styled.div`
@@ -104,6 +191,7 @@ const VideoPromo = styled.div`
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-light);
+  min-height: 200px; /* Ensure the card has a minimum height even if the video fails to load */
 `;
 
 const Timer = styled.div`
@@ -214,6 +302,8 @@ function PoolDetail() {
   const [investment, setInvestment] = useState('');
   const [account, setAccount] = useState(null);
   const [timerLabel, setTimerLabel] = useState('');
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -243,6 +333,23 @@ function PoolDetail() {
 
     return () => clearInterval(timer);
   }, [pool]);
+
+  // Mock initial comments (could be fetched from an API in a real app)
+  useEffect(() => {
+    const initialComments = [
+      {
+        author: 'User1',
+        text: 'This project looks promising! Excited to see where it goes.',
+        date: new Date('2025-05-14T10:00:00'),
+      },
+      {
+        author: 'User2',
+        text: 'I have some concerns about the tokenomics. Can the team clarify the liquidity allocation?',
+        date: new Date('2025-05-14T12:30:00'),
+      },
+    ];
+    setComments(initialComments);
+  }, []);
 
   if (!pool) {
     return (
@@ -284,6 +391,26 @@ function PoolDetail() {
     }
   };
 
+  const handleCommentSubmit = (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) {
+      alert('Please enter a comment.');
+      return;
+    }
+    if (!account) {
+      alert('Please connect your wallet to comment.');
+      return;
+    }
+
+    const newCommentObj = {
+      author: account.slice(0, 6) + '...' + account.slice(-4), // Shortened wallet address
+      text: newComment,
+      date: new Date(),
+    };
+    setComments([...comments, newCommentObj]);
+    setNewComment('');
+  };
+
   // Datos para el gráfico de tokenomics
   const tokenomicsData = {
     labels: ['Presale Allocation', 'Liquidity', 'Team', 'Marketing'],
@@ -305,7 +432,7 @@ function PoolDetail() {
     plugins: {
       legend: {
         labels: {
-          color: theme.text, // Color del texto de la leyenda según el tema
+          color: theme.text,
         },
       },
     },
@@ -366,8 +493,11 @@ function PoolDetail() {
         </TokenInfo>
         <VideoPromo>
           <ReactPlayer
-            url={pool.video}
-            controls
+            url={video1}
+            controls={false}
+            playing={true}
+            loop={true}
+            muted={true}
             width="100%"
             height="auto"
             style={{ borderRadius: 'var(--border-radius)' }}
@@ -375,104 +505,126 @@ function PoolDetail() {
         </VideoPromo>
       </LeftSection>
 
-      {/* Sección Derecha: Compra y Contador */}
-      <RightSection theme={theme}>
-        <h3 style={{ marginBottom: '1rem', color: theme.text }}>{timerLabel}</h3>
-        {Object.keys(timeLeft).length > 0 ? (
-          <Timer theme={theme}>
-            <div>
-              <span>{timeLeft.days}</span>
-              <span>Days</span>
-            </div>
-            <div>
-              <span>{timeLeft.hours}</span>
-              <span>Hrs</span>
-            </div>
-            <div>
-              <span>{timeLeft.minutes}</span>
-              <span>Mins</span>
-            </div>
-            <div>
-              <span>{timeLeft.seconds}</span>
-              <span>Secs</span>
-            </div>
-          </Timer>
-        ) : (
-          <p style={{ color: theme.text, marginBottom: '1rem' }}>
-            {timerLabel === 'Sale Ended' ? 'The sale has ended.' : 'Calculating...'}
-          </p>
-        )}
-        <SaleInfo theme={theme}>
-          <p>
-            <span>{pool.totalRaised}</span>
-            <span>{pool.target}</span>
-          </p>
-          <ProgressBar>
-            <Progress progress={pool.progress} />
-          </ProgressBar>
-          <p>
-            <span>Status</span>
-            <span>{pool.status}</span>
-          </p>
-          <p>
-            <span>Sale Type</span>
-            <span>{pool.saleType}</span>
-          </p>
-          <p>
-            <span>Unsold Tokens</span>
-            <span>{pool.unsoldTokens}</span>
-          </p>
-          <p>
-            <span>Min Buy</span>
-            <span>{pool.minBuy}</span>
-          </p>
-          <p>
-            <span>Max Buy</span>
-            <span>{pool.maxBuy}</span>
-          </p>
-          <p>
-            <span>Current Raised</span>
-            <span>
-              {pool.totalRaised} ({pool.progress}%)
-            </span>
-          </p>
-          <p>
-            <span>Total Contributors</span>
-            <span>{pool.participants}</span>
-          </p>
-        </SaleInfo>
-        {pool.status === 'Live' ? (
-          account ? (
-            <Button
-              onClick={openModal}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              theme={theme}
-              style={{ width: '100%', background: '#ff4081', color: '#fff' }}
-            >
-              Participate Now
-            </Button>
+      {/* Sección Derecha: Compra, Contador, Resumen y Comentarios */}
+      <RightColumn>
+        <RightSection theme={theme}>
+          <h3 style={{ marginBottom: '1rem', color: theme.text }}>{timerLabel}</h3>
+          {Object.keys(timeLeft).length > 0 ? (
+            <Timer theme={theme}>
+              <div>
+                <span>{timeLeft.days}</span>
+                <span>Days</span>
+              </div>
+              <div>
+                <span>{timeLeft.hours}</span>
+                <span>Hrs</span>
+              </div>
+              <div>
+                <span>{timeLeft.minutes}</span>
+                <span>Mins</span>
+              </div>
+              <div>
+                <span>{timeLeft.seconds}</span>
+                <span>Secs</span>
+              </div>
+            </Timer>
+          ) : (
+            <p style={{ color: theme.text, marginBottom: '1rem' }}>
+              {timerLabel === 'Sale Ended' ? 'The sale has ended.' : 'Calculating...'}
+            </p>
+          )}
+          <SaleInfo theme={theme}>
+            <p>
+              <span>{pool.totalRaised}</span>
+              <span>{pool.target}</span>
+            </p>
+            <ProgressBar>
+              <Progress progress={pool.progress} />
+            </ProgressBar>
+            <p>
+              <span>Status</span>
+              <span>{pool.status}</span>
+            </p>
+            <p>
+              <span>Sale Type</span>
+              <span>{pool.saleType}</span>
+            </p>
+          </SaleInfo>
+          {pool.status === 'Live' ? (
+            account ? (
+              <Button
+                onClick={openModal}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                theme={theme}
+                style={{ width: '100%', background: '#ff4081', color: '#fff' }}
+              >
+                Participate Now
+              </Button>
+            ) : (
+              <Button
+                onClick={connectWallet}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                theme={theme}
+                style={{ width: '100%', background: '#ff4081', color: '#fff' }}
+              >
+                Connect Wallet
+              </Button>
+            )
           ) : (
             <Button
-              onClick={connectWallet}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              disabled
+              style={{ width: '100%', background: '#ccc', color: '#666' }}
               theme={theme}
-              style={{ width: '100%', background: '#ff4081', color: '#fff' }}
             >
-              Connect Wallet
+              {pool.status === 'Upcoming' ? 'Coming Soon' : 'Sale Ended'}
             </Button>
-          )
-        ) : (
-          <Button
-            disabled
-            style={{ width: '100%', background: '#ccc', color: '#666' }}
-            theme={theme}
-          >
-            {pool.status === 'Upcoming' ? 'Coming Soon' : 'Sale Ended'}
-          </Button>
-        )}
-      </RightSection>
+          )}
+        </RightSection>
+
+        {/* Sección de Resumen */}
+        <SummarySection theme={theme}>
+          <SummaryTitle>Project Summary</SummaryTitle>
+          <SummaryContent>
+            {pool.name} aims to revolutionize {pool.industry || 'its sector'} by {pool.summary || 'introducing innovative solutions.'}. Key highlights include:
+            <ul>
+              <li>Unique Value Proposition: {pool.valueProp || 'TBD'}</li>
+              <li>Target Market: {pool.targetMarket || 'Global'}</li>
+              <li>Team Experience: {pool.teamExperience || 'Experienced blockchain developers'}</li>
+            </ul>
+          </SummaryContent>
+        </SummarySection>
+
+        {/* Sección de Comentarios */}
+        <CommentsSection theme={theme}>
+          <CommentsTitle>Community Comments</CommentsTitle>
+          <CommentForm onSubmit={handleCommentSubmit}>
+            <CommentInput
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add your comment about the project..."
+              theme={theme}
+            />
+            <Button type="submit" theme={theme}>
+              Submit Comment
+            </Button>
+          </CommentForm>
+          <CommentList>
+            {comments.length > 0 ? (
+              comments.map((comment, index) => (
+                <CommentItem key={index}>
+                  <CommentAuthor>{comment.author}</CommentAuthor>
+                  <CommentText>{comment.text}</CommentText>
+                  <CommentDate>{comment.date.toLocaleString()}</CommentDate>
+                </CommentItem>
+              ))
+            ) : (
+              <p>No comments yet. Be the first to comment!</p>
+            )}
+          </CommentList>
+        </CommentsSection>
+      </RightColumn>
 
       {/* Modal para Participar */}
       <Modal
