@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
-import Slider from 'react-slick';
 import { useTheme } from '../context/ThemeContext';
 
 // Importamos las imágenes de Launchpads.jsx
@@ -22,7 +21,11 @@ import polygonLogo from '../assets/images/polygon-logo.png';
 import botImage from '../assets/images/bot1.png';
 
 // Importamos el video
-import videoFile from '../assets/videos/video1.mp4'; // Asegúrate de tener tu video aquí
+import videoFile from '../assets/videos/video1.mp4';
+
+// URLs de los logotipos de USDT y USDC
+const usdtLogo = 'https://assets.coingecko.com/coins/images/325/large/Tether.png';
+const usdcLogo = 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png';
 
 // Animación para los puntos
 const dotAnimation = keyframes`
@@ -30,6 +33,12 @@ const dotAnimation = keyframes`
   40% { opacity: 1; transform: translateY(-3px); }
   60% { opacity: 0.4; transform: translateY(0); }
   100% { opacity: 0.4; transform: translateY(0); }
+`;
+
+// Animación para el desplazamiento del carrusel
+const slideAnimation = keyframes`
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 `;
 
 const LoadingDots = styled.div`
@@ -55,78 +64,94 @@ const Dot = styled.span`
 `;
 
 const PageContainer = styled.div`
-  background: #1a1a1a;
+  background: #00000a;
   min-height: 100vh;
   width: 100%;
   margin: 0;
-  padding: 0;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: flex-start;
 
+  @media (max-width: 768px) {
+    padding: 1.5rem 0.5rem;
+  }
+
   @media (max-width: 480px) {
-    justify-content: flex-start;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding: 1rem 0.5rem;
   }
 `;
 
-const StyledButton = styled(motion.button)`
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
-  border-radius: 4px;
-  color: white;
-  font-family: 'Roboto', sans-serif;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-    transform: translateY(-2px);
-  }
+const CreatePresaleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+`;
+
+const VideoContainer = styled(motion.div)`
+  margin-top: 1.5rem;
+  max-width: 600px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  box-shadow: var(--shadow-light);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    max-width: 450px;
   }
 
   @media (max-width: 480px) {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.7rem;
+    max-width: 100%;
+    margin-top: 1rem;
   }
 `;
 
-const StyledCancelButton = styled(StyledButton)`
-  background: linear-gradient(45deg, #444, #666);
-  border-image: linear-gradient(45deg, #444, #666) 1;
-
-  &:hover {
-    box-shadow: 0 0 10px rgba(255, 64, 255, 0.4);
-  }
+const Video = styled.video`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 `;
 
-const CreatePresaleButton = styled(StyledButton)`
+const CreatePresaleButton = styled(motion.button)`
+  background: var(--primary-color);
+  color: var(--text-dark);
   padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
   font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  margin: 0;
+
+  &:hover {
+    background: var(--secondary-color);
+    box-shadow: var(--shadow-hover);
+  }
 
   &.form-open {
-    background: transparent;
-    box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+    background: var(--gray-light);
     &:hover {
-      box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-      transform: translateY(-2px);
+      background: var(--secondary-color);
+      box-shadow: var(--shadow-hover);
     }
   }
 
@@ -138,302 +163,480 @@ const CreatePresaleButton = styled(StyledButton)`
   @media (max-width: 480px) {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
-    margin: 0.5rem auto;
   }
 `;
 
-const CreatePresaleContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+const CreateContainer = styled(motion.div)`
+  background: var(--background-light);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
   width: 100%;
-  margin: 1rem 0;
-  background: #1a1a1a;
-  padding: 0.5rem;
-  box-sizing: border-box;
+  max-width: 800px;
+  margin: 2rem 0;
 
   @media (max-width: 768px) {
-    margin: 0.8rem 0;
-    padding: 0.4rem;
+    max-width: 98%;
+    padding: 1.5rem;
   }
 
   @media (max-width: 480px) {
-    margin: 1rem 0;
-    padding: 0.5rem;
+    max-width: 100%;
+    padding: 1rem;
   }
 `;
 
-const VideoContainer = styled(motion.div)`
-  margin-top: 1.5rem;
-  max-width: 600px;
-  width: 100%;
-  aspect-ratio: 16 / 9; /* Relación de aspecto tipo cine */
-  margin-left: auto;
-  margin-right: auto;
-  border: 3px solid transparent; /* Borde un poco más grueso */
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.4); /* Sombra más pronunciada */
-  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-  overflow: hidden;
-  border-radius: 10px; /* Bordes más suaves */
-
-  @media (max-width: 768px) {
-    max-width: 450px;
-  }
-
-  @media (max-width: 480px) {
-    max-width: 360px; /* Ligeramente más grande */
-    margin-top: 1rem;
-  }
-`;
-
-const Video = styled.video`
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Asegura que el video llene el contenedor */
-  display: block;
-`;
-
-const JoinNowButton = styled(StyledButton)`
-  background: transparent;
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
-
-  &:hover {
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-    transform: translateY(-5px);
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.5rem;
-  }
-`;
-
-const FeaturedSection = styled.div`
-  max-width: 1200px;
-  margin: 3rem auto 0;
-  padding: 1rem 0;
-  position: relative;
-  z-index: 2;
-  background: #1a1a1a;
-  width: 100%;
-  box-sizing: border-box;
-
-  .slick-slider {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .slick-list {
-    overflow: hidden;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  .slick-track {
-    display: flex;
-    align-items: center;
-  }
-
-  .slick-slide {
-    padding: 0 0.5rem;
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    min-height: 150px;
-  }
-
-  .slick-dots {
-    margin-top: 1rem;
-    li button:before {
-      color: var(--text-light);
-      font-size: 12px;
-      opacity: 0.5;
-    }
-    li.slick-active button:before {
-      opacity: 1;
-      color: var(--primary-color);
-    }
-  }
-
-  @media (max-width: 768px) {
-    margin: 2rem auto 0;
-    padding: 0.5rem 0;
-    .slick-slide {
-      padding: 0 0.3rem;
-      min-height: 130px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    margin: 1rem auto;
-    padding: 0.5rem 0;
-    .slick-slider {
-      padding: 0;
-    }
-    .slick-slide {
-      padding: 0 0.1rem;
-      min-height: 95px;
-    }
-    .slick-list {
-      overflow: hidden;
-    }
-  }
-`;
-
-const SectionTitle = styled.h2`
-  color: var(--text-light);
-  text-shadow: 0 0 10px rgba(255, 64, 255, 0.6);
-  margin: 0 auto 1.5rem;
-  text-align: center;
+const PresaleTitle = styled.h1`
+  color: var(--text-dark);
   font-size: 2rem;
-  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
   text-transform: uppercase;
-  display: block;
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  padding: 0 1rem;
-  box-sizing: border-box;
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   @media (max-width: 480px) {
     font-size: 1.2rem;
-    margin: 0.5rem auto 1rem;
-    padding: 0 0.5rem;
+    margin-bottom: 1rem;
   }
 `;
 
-const CarouselCard = styled(motion.div)`
-  background: #1a1a1a;
+const StepContainer = styled.div`
+  margin-bottom: 1rem;
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  border-radius: 0;
-  padding: 0.6rem;
-  margin: 0 auto;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: var(--border-radius);
+  background: var(--background-dark);
+  box-shadow: var(--shadow-light);
+
+  @media (max-width: 480px) {
+    margin-bottom: 0.8rem;
+  }
+`;
+
+const StepHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--gray-light);
+  cursor: pointer;
   color: var(--text-light);
-  text-align: center;
-  min-height: 150px;
-  width: 200px;
-  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+  font-size: 1.2rem;
+  border-radius: 6px 6px 0 0;
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-  }
-
-  @media (max-width: 1024px) {
-    width: 180px;
-    min-height: 140px;
-    padding: 0.5rem;
+    background: var(--gray-light);
+    filter: brightness(1.2);
   }
 
   @media (max-width: 768px) {
-    width: 160px;
-    min-height: 130px;
-    padding: 0.4rem;
+    padding: 0.8rem;
+    font-size: 1rem;
   }
 
   @media (max-width: 480px) {
-    width: 110px;
-    min-height: 95px;
-    padding: 0.25rem;
-    clip-path: polygon(5% 0, 100% 0, 100% 85%, 95% 100%, 0 100%, 0 5%);
+    padding: 0.6rem;
+    font-size: 0.9rem;
   }
 `;
 
-const CardImage = styled.img`
-  width: 35px;
-  height: 35px;
+const StepNumber = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  margin: 0 auto 0.4rem;
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-  object-fit: cover; /* Asegura que la imagen se ajuste bien */
-  padding: 2px; /* Espacio entre la imagen y el borde */
-  background: transparent; /* Fondo transparente para que el borde circular sea visible */
-
-  @media (max-width: 768px) {
-    width: 30px;
-    height: 30px;
-    margin-bottom: 0.3rem;
-  }
+  background: var(--primary-color);
+  color: var(--text-dark);
+  margin-right: 0.6rem;
+  font-size: 0.9rem;
 
   @media (max-width: 480px) {
     width: 20px;
     height: 20px;
-    margin-bottom: 0.2rem;
-    padding: 1px;
+    font-size: 0.8rem;
+    margin-right: 0.4rem;
   }
+`;
+
+const StepContent = styled(motion.div)`
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  background: var(--background-dark);
+  border-radius: 0 0 6px 6px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.6rem;
+    gap: 0.6rem;
+  }
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const Label = styled.label`
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const Input = styled(motion.input)`
+  padding: 0.8rem;
+  border: 1px solid var(--gray-light);
+  border-radius: var(--border-radius);
+  background: var(--background-dark);
+  color: var(--text-light);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-hover);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+`;
+
+const Select = styled(motion.select)`
+  padding: 0.8rem;
+  border: 1px solid var(--gray-light);
+  border-radius: var(--border-radius);
+  background: var(--background-dark);
+  color: var(--text-light);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-hover);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+`;
+
+const PaymentOption = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  input[type="radio"] {
+    accent-color: var(--primary-color);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+  }
+`;
+
+const TokenIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+`;
+
+const ErrorMessage = styled.p`
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+  }
+`;
+
+const SubmitButton = styled(motion.button)`
+  background: var(--primary-color);
+  color: var(--text-dark);
+  padding: 0.8rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+
+  &:hover {
+    background: var(--secondary-color);
+    box-shadow: var(--shadow-hover);
+  }
+
+  &:disabled {
+    background: var(--gray-light);
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+`;
+
+const CancelButton = styled(motion.button)`
+  background: var(--gray-light);
+  color: var(--text-light);
+  padding: 0.8rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+
+  &:hover {
+    background: var(--secondary-color);
+    color: var(--text-dark);
+    box-shadow: var(--shadow-hover);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+`;
+
+const FeaturedSection = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 3rem 0;
+  overflow: hidden;
+  position: relative;
+`;
+
+const SectionTitle = styled.h2`
+  color: var(--text-dark);
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.05rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+`;
+
+const CarouselContainer = styled.div`
+  width: 100%;
+  overflow: hidden;
+`;
+
+const CarouselTrack = styled(motion.div)`
+  display: flex;
+  width: ${(props) => props.cardCount * 360}px;
+  animation: ${slideAnimation} 40s linear infinite;
+  animation-play-state: running;
+
+  &:hover {
+    animation-play-state: paused;
+  }
+
+  @media (max-width: 768px) {
+    width: ${(props) => props.cardCount * 320}px;
+  }
+
+  @media (max-width: 480px) {
+    width: ${(props) => props.cardCount * 280}px;
+  }
+`;
+
+const FeaturedCard = styled(motion.div)`
+  background: var(--background-light);
+  padding: 0.8rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  color: var(--text-dark);
+  flex: 0 0 auto;
+  width: fit-content;
+  height: 100px;
+  margin: 0 0.8rem;
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  position: relative;
+  clip-path: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 8px
+  );
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  @media (max-width: 768px) {
+    height: 90px;
+    padding: 0.6rem;
+    margin: 0 0.6rem;
+  }
+
+  @media (max-width: 480px) {
+    height: 80px;
+    padding: 0.5rem;
+    margin: 0 0.5rem;
+  }
+`;
+
+const CardImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+  object-fit: cover;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+  }
+
+  @media (max-width: 480px) {
+    width: 32px;
+    height: 32px;
+  }
+`;
+
+const CardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  text-align: left;
 `;
 
 const CardTitle = styled.h3`
-  font-size: 0.9rem;
-  margin-bottom: 0.2rem;
-  text-shadow: 0 0 5px rgba(255, 64, 255, 0.5);
-  color: #ffffff;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+  color: var(--text-dark);
+  font-weight: 600;
 
   @media (max-width: 768px) {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
   @media (max-width: 480px) {
-    font-size: 0.55rem;
-    margin-bottom: 0.1rem;
-    line-height: 1;
+    font-size: 0.75rem;
   }
 `;
 
-const CardDetail = styled.p`
-  font-size: 0.65rem;
-  margin: 0.1rem 0;
-  color: #ffffff;
-  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+const NetworkLogo = styled.img`
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-top: 0.2rem;
 
   @media (max-width: 768px) {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media (max-width: 480px) {
+    width: 14px;
+    height: 14px;
+  }
+`;
+
+const JoinNowButton = styled(motion.button)`
+  background: var(--primary-color);
+  color: var(--text-dark);
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  clip-path: polygon(
+    4px 0,
+    calc(100% - 4px) 0,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    0 calc(100% - 4px),
+    0 4px
+  );
+
+  &:hover {
+    background: var(--secondary-color);
+    box-shadow: var(--shadow-hover);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.65rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.15rem 0.35rem;
     font-size: 0.6rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.45rem;
-    margin: 0.05rem 0;
-    line-height: 1;
-  }
-`;
-
-const NetworkLabel = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2rem;
-  font-size: 0.55rem;
-  color: #ffffff;
-  background: #2a2a2a;
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-  margin-top: 0.3rem;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-
-  @media (max-width: 768px) {
-    font-size: 0.5rem;
-    padding: 0.15rem 0.4rem;
-    margin-top: 0.2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.4rem;
-    padding: 0.1rem 0.3rem;
-    margin-top: 0.1rem;
   }
 `;
 
@@ -441,16 +644,15 @@ const AIAssistantContainer = styled(motion.div)`
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #1a1a1a;
+  background: var(--background-light);
   border: 2px solid transparent;
   border-image: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) 1;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 1rem;
   max-width: 300px;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  box-shadow: var(--shadow-light);
   z-index: 1000;
   color: var(--text-light);
-  font-family: 'Roboto', sans-serif;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -465,9 +667,9 @@ const AIAssistantContainer = styled(motion.div)`
   @media (max-width: 480px) {
     max-width: 200px;
     padding: 0.6rem;
-    font-size: 0.8rem;
     bottom: 5px;
     right: 5px;
+    font-size: 0.8rem;
   }
 `;
 
@@ -481,7 +683,7 @@ const AIAssistantHeader = styled.div`
 const AIAssistantTitle = styled.h4`
   margin: 0;
   font-size: 1rem;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  color: var(--text-dark);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -494,7 +696,6 @@ const AIAssistantTitle = styled.h4`
 const BotIcon = styled.img`
   width: 24px;
   height: 24px;
-  vertical-align: middle;
 
   @media (max-width: 480px) {
     width: 20px;
@@ -508,7 +709,6 @@ const MinimizeButton = styled.button`
   color: var(--text-light);
   font-size: 1rem;
   cursor: pointer;
-  text-shadow: 0 0 5px rgba(255, 64, 255, 0.5);
 
   &:hover {
     color: var(--primary-color);
@@ -520,10 +720,9 @@ const MinimizeButton = styled.button`
 `;
 
 const AIAssistantMessage = styled.div`
-  margin: 0;
   font-size: 0.9rem;
   line-height: 1.4;
-  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+  color: var(--text-light);
 
   @media (max-width: 480px) {
     font-size: 0.8rem;
@@ -539,7 +738,7 @@ const SuggestionList = styled.ul`
 const SuggestionItem = styled.li`
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
-  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
+  color: var(--text-light);
 
   @media (max-width: 480px) {
     font-size: 0.8rem;
@@ -565,10 +764,10 @@ const ModalOverlay = styled(motion.div)`
 `;
 
 const ModalContent = styled(motion.div)`
-  background: #1a1a1a;
+  background: var(--background-light);
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
   max-width: 800px;
   width: 90%;
   text-align: center;
@@ -585,9 +784,8 @@ const ModalContent = styled(motion.div)`
 
 const ModalTitle = styled.h2`
   color: var(--text-dark);
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-  margin-bottom: 1.5rem;
   font-size: 1.5rem;
+  margin-bottom: 1.5rem;
 
   @media (max-width: 480px) {
     font-size: 1.2rem;
@@ -613,9 +811,9 @@ const BlockchainGrid = styled.div`
 `;
 
 const BlockchainCard = styled(motion.div)`
-  background: #2a2a2a;
+  background: var(--background-dark);
   border: 1px solid var(--primary-color);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 0.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -623,8 +821,8 @@ const BlockchainCard = styled(motion.div)`
   text-align: center;
 
   &:hover {
-    background: #3a3a3a;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    background: var(--gray-light);
+    box-shadow: var(--shadow-hover);
     transform: translateY(-5px);
   }
 
@@ -642,7 +840,7 @@ const BlockchainLogo = styled.img`
   height: 40px;
   margin: 0 auto 0.4rem;
   border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+  box-shadow: var(--shadow-light);
 
   @media (max-width: 768px) {
     width: 35px;
@@ -684,255 +882,33 @@ const BlockchainDescription = styled.p`
   }
 `;
 
-const CreateContainer = styled(motion.div)`
-  max-width: 800px;
-  margin: 1rem auto;
-  padding: 1.5rem;
-  background: #1a1a1a;
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  position: relative;
-  z-index: 3;
-
-  @media (max-width: 768px) {
-    max-width: 98%;
-    margin: 0.8rem auto;
-    padding: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    max-width: 100%;
-    margin: 0.5rem auto;
-    padding: 0.8rem;
-  }
-`;
-
-const PresaleTitle = styled.h1`
-  color: var(--text-dark);
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-  margin-bottom: 1rem;
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-
-  @media (max-width: 768px) {
-    font-size: 1.5rem;
-    margin-bottom: 0.8rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-  }
-`;
-
-const StepContainer = styled.div`
-  margin-bottom: 1rem;
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
-  border-radius: 8px;
-  background: #1a1a1a;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-
-  @media (max-width: 480px) {
-    margin-bottom: 0.8rem;
-  }
-`;
-
-const StepHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background: #333;
-  cursor: pointer;
-  color: var(--text-light);
-  font-size: 1.2rem;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-  border-radius: 6px 6px 0 0;
-
-  &:hover {
-    background: #444;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.8rem;
-    font-size: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.6rem;
-    font-size: 0.9rem;
-  }
-`;
-
-const StepNumber = styled.span`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  color: white;
-  margin-right: 0.6rem;
-  font-size: 0.9rem;
-
-  @media (max-width: 480px) {
-    width: 20px;
-    height: 20px;
-    font-size: 0.8rem;
-    margin-right: 0.4rem;
-  }
-`;
-
-const StepContent = styled(motion.div)`
-  padding: 1rem;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  background: #1a1a1a;
-  border-radius: 0 0 6px 6px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    padding: 0.8rem;
-    gap: 0.8rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.6rem;
-    gap: 0.6rem;
-  }
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Label = styled.label`
-  color: var(--text-dark);
-  font-size: 0.9rem;
-  text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
-  font-weight: 500;
-
-  @media (max-width: 768px) {
-    font-size: 0.85rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.8rem;
-  }
-`;
-
-const Input = styled(motion.input)`
-  padding: 0.6rem;
-  font-size: 0.9rem;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  background: #2a2a2a;
-  color: var(--text-dark);
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
-    border-color: var(--secondary-color);
-  }
-
-  &:invalid {
-    border-color: #dc3545;
-    box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.5rem;
-    font-size: 0.85rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.4rem;
-    font-size: 0.8rem;
-  }
-`;
-
-const Select = styled(motion.select)`
-  padding: 0.6rem;
-  font-size: 0.9rem;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  background: #2a2a2a;
-  color: var(--text-dark);
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
-    border-color: var(--secondary-color);
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.5rem;
-    font-size: 0.85rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.4rem;
-    font-size: 0.8rem;
-  }
-`;
-
-const ErrorMessage = styled.p`
-  color: var(--primary-color);
-  font-size: 0.8rem;
-  margin-top: -0.3rem;
-  margin-bottom: 0.3rem;
-
-  @media (max-width: 480px) {
-    font-size: 0.7rem;
-    margin-top: -0.2rem;
-    margin-bottom: 0.2rem;
-  }
-`;
-
 const Summary = styled(motion.div)`
-  background: #1a1a1a;
+  background: var(--background-light);
   padding: 1.5rem;
-  border: 2px solid transparent;
-  border-image: linear-gradient(45deg, #00d4ff, #ff00ff) 1;
-  border-radius: 8px;
-  box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-  margin-top: 1rem;
-  display: block;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 800px;
 
   h3 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
     text-align: center;
     color: var(--text-dark);
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
   }
 
   p {
     font-size: 0.9rem;
     margin: 0.3rem 0;
+    color: var(--text-light);
   }
 
   @media (max-width: 768px) {
     padding: 1rem;
-    margin-top: 0.8rem;
-
     h3 {
       font-size: 1.3rem;
     }
-
     p {
       font-size: 0.85rem;
     }
@@ -940,12 +916,9 @@ const Summary = styled(motion.div)`
 
   @media (max-width: 480px) {
     padding: 0.8rem;
-    margin-top: 0.5rem;
-
     h3 {
       font-size: 1.1rem;
     }
-
     p {
       font-size: 0.8rem;
     }
@@ -955,14 +928,15 @@ const Summary = styled(motion.div)`
 const ContractDisplay = styled.div`
   margin-top: 1rem;
   padding: 1rem;
-  background: #2a2a2a;
+  background: var(--background-dark);
   border: 1px solid var(--primary-color);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   color: var(--text-light);
 
   h4 {
     font-size: 1rem;
     margin-bottom: 0.5rem;
+    color: var(--text-dark);
   }
 
   @media (max-width: 768px) {
@@ -980,7 +954,7 @@ const ContractDisplay = styled.div`
   }
 `;
 
-// Animaciones
+// Animations
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
@@ -1041,7 +1015,7 @@ const blockchains = [
   },
   {
     name: 'Solana',
-    description: 'Ultra-fast, low fees, high scalability. Perfect for memecoins.',
+    description: 'Ultra-fast, low fees, high scalability.',
     logo: solanaLogo,
     nativeToken: 'SOL',
     stableToken: 'USDT',
@@ -1055,6 +1029,52 @@ const blockchains = [
   },
 ];
 
+const featuredPresales = [
+  {
+    name: 'SolanaStar',
+    symbol: 'SSTAR',
+    price: '0.03 SOL',
+    progress: '0%',
+    endDate: '2025-03-20',
+    image: pool3Image,
+    network: 'SOL',
+    networkLogo: solanaLogo,
+  },
+  {
+    name: 'MoonEth',
+    symbol: 'METH',
+    price: '0.04 ETH',
+    progress: '60%',
+    endDate: '2025-03-12',
+    image: pool4Image,
+    network: 'ETH',
+    networkLogo: ethereumLogo,
+  },
+  {
+    name: 'BNBBoost',
+    symbol: 'BNBB',
+    price: '0.01 BNB',
+    progress: '10%',
+    endDate: '2025-03-05',
+    image: pool5Image,
+    network: 'BSC',
+    networkLogo: bscLogo,
+  },
+  {
+    name: 'SolRise',
+    symbol: 'SRISE',
+    price: '0.02 SOL',
+    progress: '20%',
+    endDate: '2025-03-15',
+    image: pool6Image,
+    network: 'SOL',
+    networkLogo: solanaLogo,
+  },
+];
+
+// Duplicamos las tarjetas para crear un efecto de bucle infinito
+const doubledPresales = [...featuredPresales, ...featuredPresales];
+
 function AIAssistant({ formData, errors, activeField, showSummary }) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [message, setMessage] = useState('');
@@ -1063,13 +1083,13 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
     if (showSummary) {
       setMessage(
         <div>
-          <p>¡Tu presale está listo para ser creado! Aquí tienes algunas sugerencias para que sea más exitoso:</p>
+          <p>Your presale is ready to be created! Here are some suggestions:</p>
           <SuggestionList>
-            <SuggestionItem><strong>Auditoría del Contrato:</strong> Asegúrate de que tu contrato esté auditado.</SuggestionItem>
-            <SuggestionItem><strong>Redes Sociales:</strong> Publica tu proyecto en Twitter y Telegram.</SuggestionItem>
-            <SuggestionItem><strong>Comunidad:</strong> Crea una comunidad activa en Discord o Telegram.</SuggestionItem>
-            <SuggestionItem><strong>Precio:</strong> Revisa que el precio sea competitivo para {formData.selectedChain}.</SuggestionItem>
-            <SuggestionItem><strong>Documentación:</strong> Proporciona un whitepaper claro.</SuggestionItem>
+            <SuggestionItem><strong>Audit Contract:</strong> Ensure your contract is audited.</SuggestionItem>
+            <SuggestionItem><strong>Social Media:</strong> Promote on Twitter and Telegram.</SuggestionItem>
+            <SuggestionItem><strong>Community:</strong> Build an active Discord or Telegram community.</SuggestionItem>
+            <SuggestionItem><strong>Price:</strong> Ensure the price is competitive for {formData.selectedChain?.name}.</SuggestionItem>
+            <SuggestionItem><strong>Documentation:</strong> Provide a clear whitepaper.</SuggestionItem>
           </SuggestionList>
         </div>
       );
@@ -1077,61 +1097,64 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
     }
 
     if (!formData.selectedChain) {
-      setMessage('Por favor, selecciona una blockchain para comenzar.');
+      setMessage('Please select a blockchain to start.');
       return;
     }
 
     switch (activeField) {
       case 'projectName':
-        setMessage('Ingresa el nombre de tu proyecto.');
+        setMessage('Enter your project name.');
         break;
       case 'tokenSymbol':
-        setMessage('Ingresa el símbolo de tu token (ejemplo: SSTAR).');
+        setMessage('Enter your token symbol (e.g., SSTAR).');
         break;
       case 'tokenAddress':
-        setMessage(`Ingresa la dirección del contrato para ${formData.selectedChain}.`);
+        setMessage(`Enter the contract address for ${formData.selectedChain.name}.`);
         break;
       case 'salePrice':
-        setMessage(`Define el precio de venta por token en ${formData.selectedChain}.`);
+        setMessage(`Define the sale price per token in ${formData.selectedChain.name}.`);
         break;
       case 'totalTokens':
-        setMessage('Ingresa la cantidad total de tokens para la venta.');
+        setMessage('Enter the total tokens for the sale.');
         break;
       case 'minPurchase':
-        setMessage('Define la compra mínima por usuario.');
+        setMessage('Define the minimum purchase per user.');
         break;
       case 'maxPurchase':
-        setMessage('Define la compra máxima por usuario.');
+        setMessage('Define the maximum purchase per user.');
         break;
       case 'startDate':
-        setMessage('Selecciona la fecha y hora de inicio del presale.');
+        setMessage('Select the presale start date and time.');
         break;
       case 'endDate':
-        setMessage('Selecciona la fecha y hora de finalización.');
+        setMessage('Select the presale end date and time.');
         break;
       case 'liquidityUnlockTime':
-        setMessage('Selecciona la fecha de desbloqueo de liquidez.');
+        setMessage('Select the liquidity unlock date.');
+        break;
+      case 'liquidityPercentage':
+        setMessage('Select the percentage of liquidity to lock (up to 60%).');
         break;
       case 'creatorWallet':
-        setMessage(`Ingresa la dirección de tu billetera para ${formData.selectedChain}.`);
+        setMessage(`Enter your wallet address for ${formData.selectedChain.name}.`);
         break;
       case 'logoUrl':
-        setMessage('Ingresa la URL del logo de tu proyecto.');
+        setMessage('Enter the URL for your project logo.');
         break;
       case 'website':
-        setMessage('Ingresa la URL de la página web.');
+        setMessage('Enter the website URL.');
         break;
       case 'twitter':
-        setMessage('Ingresa la URL de Twitter.');
+        setMessage('Enter the Twitter URL.');
         break;
       case 'telegram':
-        setMessage('Ingresa la URL de Telegram.');
+        setMessage('Enter the Telegram URL.');
         break;
       case 'purchaseToken':
-        setMessage('Selecciona el token de compra.');
+        setMessage('Select the purchase token.');
         break;
       default:
-        setMessage(`¡Hola! Estoy aquí para ayudarte a crear tu presale en ${formData.selectedChain}.`);
+        setMessage(`Hello! I'm here to help you create your presale on ${formData.selectedChain.name}.`);
     }
 
     if (errors[activeField]) {
@@ -1146,9 +1169,9 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
         animate={{ opacity: 1, scale: 1 }}
         style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}
       >
-        <StyledButton onClick={() => setIsMinimized(false)}>
-          <BotIcon src={botImage} alt="IA Assistant" /> IA Asistente
-        </StyledButton>
+        <SubmitButton onClick={() => setIsMinimized(false)}>
+          <BotIcon src={botImage} alt="IA Assistant" /> AI Assistant
+        </SubmitButton>
       </motion.div>
     );
   }
@@ -1162,7 +1185,7 @@ function AIAssistant({ formData, errors, activeField, showSummary }) {
     >
       <AIAssistantHeader>
         <AIAssistantTitle>
-          <BotIcon src={botImage} alt="IA Assistant" /> IA Asistente
+          <BotIcon src={botImage} alt="IA Assistant" /> AI Assistant
         </AIAssistantTitle>
         <MinimizeButton onClick={() => setIsMinimized(true)}>−</MinimizeButton>
       </AIAssistantHeader>
@@ -1216,7 +1239,7 @@ function BlockchainModal({ isOpen, onClose, onSelect }) {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              onClick={() => onSelect(chain.name)}
+              onClick={() => onSelect(chain)}
             >
               <BlockchainLogo src={chain.logo} alt={`${chain.name} logo`} />
               <BlockchainTitle>{chain.name}</BlockchainTitle>
@@ -1224,13 +1247,13 @@ function BlockchainModal({ isOpen, onClose, onSelect }) {
             </BlockchainCard>
           ))}
         </BlockchainGrid>
-        <StyledCancelButton
+        <CancelButton
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onClose}
         >
           Cancel
-        </StyledCancelButton>
+        </CancelButton>
       </ModalContent>
     </ModalOverlay>
   );
@@ -1249,8 +1272,9 @@ function CreatePresale() {
     startDate: '',
     endDate: '',
     liquidityUnlockTime: '',
+    liquidityPercentage: '',
     creatorWallet: '',
-    selectedChain: '',
+    selectedChain: null,
     logoUrl: '',
     website: '',
     twitter: '',
@@ -1269,96 +1293,10 @@ function CreatePresale() {
     tokenDistribution: false,
     presaleTimings: false,
     projectInfo: false,
-    purchaseToken: false,
   });
   const [showVideo, setShowVideo] = useState(true);
   const { theme } = useTheme();
   const [contractAddress, setContractAddress] = useState('');
-
-  const featuredPresales = [
-    {
-      name: 'SolanaStar',
-      symbol: 'SSTAR',
-      price: '0.03 SOL',
-      progress: '0%',
-      endDate: '2025-03-20',
-      image: pool3Image,
-      network: 'SOL',
-    },
-    {
-      name: 'MoonEth',
-      symbol: 'METH',
-      price: '0.04 ETH',
-      progress: '60%',
-      endDate: '2025-03-12',
-      image: pool4Image,
-      network: 'ETH',
-    },
-    {
-      name: 'BNBBoost',
-      symbol: 'BNBB',
-      price: '0.01 BNB',
-      progress: '10%',
-      endDate: '2025-03-05',
-      image: pool5Image,
-      network: 'BSC',
-    },
-    {
-      name: 'SolRise',
-      symbol: 'SRISE',
-      price: '0.02 SOL',
-      progress: '20%',
-      endDate: '2025-03-15',
-      image: pool6Image,
-      network: 'SOL',
-    },
-  ];
-
-  const carouselSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-    cssEase: 'ease',
-    pauseOnHover: false,
-    arrows: true,
-    centerMode: false,
-    variableWidth: false,
-    centerPadding: '0px',
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 4,
-          slidesToScroll: 1,
-          arrows: true,
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          arrows: false,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          arrows: false,
-          dots: true,
-          centerMode: false,
-          variableWidth: false,
-          centerPadding: '0px',
-        },
-      },
-    ],
-  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -1373,6 +1311,8 @@ function CreatePresale() {
     if (!formData.startDate.trim()) newErrors.startDate = 'Start date is required';
     if (!formData.endDate.trim()) newErrors.endDate = 'End date is required';
     if (!formData.liquidityUnlockTime.trim()) newErrors.liquidityUnlockTime = 'Liquidity unlock time is required';
+    if (!formData.liquidityPercentage.trim()) newErrors.liquidityPercentage = 'Liquidity percentage is required';
+    if (parseFloat(formData.liquidityPercentage) > 60) newErrors.liquidityPercentage = 'Liquidity percentage cannot exceed 60%';
     if (!formData.creatorWallet.trim()) newErrors.creatorWallet = 'Creator wallet address is required';
     if (!formData.selectedChain) newErrors.selectedChain = 'Please select a blockchain';
     if (!formData.logoUrl.trim()) newErrors.logoUrl = 'Logo URL is required';
@@ -1380,10 +1320,10 @@ function CreatePresale() {
     if (!formData.purchaseToken) newErrors.purchaseToken = 'Please select a purchase token';
 
     if (formData.selectedChain && formData.creatorWallet) {
-      if (formData.selectedChain === 'Ethereum' && !formData.creatorWallet.startsWith('0x')) {
+      if (formData.selectedChain.name === 'Ethereum' && !formData.creatorWallet.startsWith('0x')) {
         newErrors.creatorWallet = 'Ethereum wallet address must start with 0x';
       }
-      if (formData.selectedChain === 'Binance Smart Chain' && !formData.creatorWallet.startsWith('0x')) {
+      if (formData.selectedChain.name === 'Binance Smart Chain' && !formData.creatorWallet.startsWith('0x')) {
         newErrors.creatorWallet = 'BSC wallet address must start with 0x';
       }
     }
@@ -1427,8 +1367,9 @@ function CreatePresale() {
       startDate: '',
       endDate: '',
       liquidityUnlockTime: '',
+      liquidityPercentage: '',
       creatorWallet: '',
-      selectedChain: '',
+      selectedChain: null,
       logoUrl: '',
       website: '',
       twitter: '',
@@ -1443,16 +1384,36 @@ function CreatePresale() {
   };
 
   const handleSelectChain = (chain) => {
-    setFormData({ ...formData, selectedChain: chain });
+    setFormData({ ...formData, selectedChain: chain, purchaseToken: '' });
     setIsModalOpen(false);
     setShowVideo(false);
   };
 
   const handleCreatePresaleClick = () => {
     if (formData.selectedChain) {
-      setFormData({ ...formData, selectedChain: '' });
-      setShowSummary(false);
+      setFormData({
+        launchType: '',
+        projectName: '',
+        tokenSymbol: '',
+        tokenAddress: '',
+        salePrice: '',
+        totalTokens: '',
+        minPurchase: '',
+        maxPurchase: '',
+        startDate: '',
+        endDate: '',
+        liquidityUnlockTime: '',
+        liquidityPercentage: '',
+        creatorWallet: '',
+        selectedChain: null,
+        logoUrl: '',
+        website: '',
+        twitter: '',
+        telegram: '',
+        purchaseToken: '',
+      });
       setErrors({});
+      setShowSummary(false);
       setActiveField(null);
       setContractAddress('');
       setShowVideo(true);
@@ -1468,35 +1429,56 @@ function CreatePresale() {
     }));
   };
 
+  const getNativeTokenLogo = () => {
+    if (!formData.selectedChain) return '';
+    switch (formData.selectedChain.name) {
+      case 'Ethereum':
+        return ethereumLogo;
+      case 'Binance Smart Chain':
+        return bscLogo;
+      case 'Solana':
+        return solanaLogo;
+      case 'Polygon':
+        return polygonLogo;
+      default:
+        return '';
+    }
+  };
+
   return (
     <PageContainer>
       <FeaturedSection>
-        <SectionTitle>Featured Presales</SectionTitle>
-        <Slider {...carouselSettings}>
-          {featuredPresales.map((presale, index) => (
-            <CarouselCard
-              key={index}
-              variants={cardVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <CardImage src={presale.image} alt={`${presale.name} logo`} />
-              <CardTitle>{presale.name}</CardTitle>
-              <CardDetail>Symbol: {presale.symbol}</CardDetail>
-              <CardDetail>Price: {presale.price}</CardDetail>
-              <CardDetail>Progress: {presale.progress}</CardDetail>
-              <NetworkLabel>
-                <span>{presale.network}</span>
-              </NetworkLabel>
-              <JoinNowButton
+        <SectionTitle>FEATURED PRESALES</SectionTitle>
+        <CarouselContainer>
+          <CarouselTrack
+            cardCount={doubledPresales.length}
+            initial={{ x: 0 }}
+            animate={{ x: '-50%' }}
+            transition={{ repeat: Infinity, duration: 40, ease: 'linear' }}
+          >
+            {doubledPresales.map((presale, index) => (
+              <FeaturedCard
+                key={index}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
-                Join Now
-              </JoinNowButton>
-            </CarouselCard>
-          ))}
-        </Slider>
+                <CardImage src={presale.image} alt={`${presale.name} logo`} />
+                <CardContent>
+                  <CardTitle>{presale.name}</CardTitle>
+                  <NetworkLogo src={presale.networkLogo} alt={`${presale.network} logo`} />
+                </CardContent>
+                <JoinNowButton
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Join Now
+                </JoinNowButton>
+              </FeaturedCard>
+            ))}
+          </CarouselTrack>
+        </CarouselContainer>
       </FeaturedSection>
 
       <CreatePresaleContainer>
@@ -1554,7 +1536,7 @@ function CreatePresale() {
             animate="visible"
             theme={theme}
           >
-            <PresaleTitle>Create a Sale on {formData.selectedChain}</PresaleTitle>
+            <PresaleTitle>Create a Sale on {formData.selectedChain.name}</PresaleTitle>
 
             <form onSubmit={handleSubmit}>
               <StepContainer>
@@ -1730,6 +1712,46 @@ function CreatePresale() {
                     />
                     {errors.maxPurchase && <ErrorMessage>{errors.maxPurchase}</ErrorMessage>}
                   </FormGroup>
+                  <FormGroup>
+                    <Label>Select Purchase Token</Label>
+                    <PaymentOption>
+                      <input
+                        type="radio"
+                        name="purchaseToken"
+                        value={formData.selectedChain.nativeToken}
+                        checked={formData.purchaseToken === formData.selectedChain.nativeToken}
+                        onChange={handleChange}
+                        onFocus={() => handleFocus('purchaseToken')}
+                      />
+                      <TokenIcon src={getNativeTokenLogo()} alt={formData.selectedChain.nativeToken} />
+                      {formData.selectedChain.nativeToken} (Native Token)
+                    </PaymentOption>
+                    <PaymentOption>
+                      <input
+                        type="radio"
+                        name="purchaseToken"
+                        value="USDT"
+                        checked={formData.purchaseToken === 'USDT'}
+                        onChange={handleChange}
+                        onFocus={() => handleFocus('purchaseToken')}
+                      />
+                      <TokenIcon src={usdtLogo} alt="USDT" />
+                      USDT
+                    </PaymentOption>
+                    <PaymentOption>
+                      <input
+                        type="radio"
+                        name="purchaseToken"
+                        value="USDC"
+                        checked={formData.purchaseToken === 'USDC'}
+                        onChange={handleChange}
+                        onFocus={() => handleFocus('purchaseToken')}
+                      />
+                      <TokenIcon src={usdcLogo} alt="USDC" />
+                      USDC
+                    </PaymentOption>
+                    {errors.purchaseToken && <ErrorMessage>{errors.purchaseToken}</ErrorMessage>}
+                  </FormGroup>
                 </StepContent>
               </StepContainer>
 
@@ -1821,6 +1843,24 @@ function CreatePresale() {
                     />
                     {errors.liquidityUnlockTime && <ErrorMessage>{errors.liquidityUnlockTime}</ErrorMessage>}
                   </FormGroup>
+                  <FormGroup>
+                    <Label>Liquidity Lock Percentage (Max 60%)</Label>
+                    <Input
+                      variants={inputVariants}
+                      initial="hidden"
+                      animate="visible"
+                      type="number"
+                      min="0"
+                      max="60"
+                      name="liquidityPercentage"
+                      placeholder="Enter percentage (0-60)"
+                      value={formData.liquidityPercentage}
+                      onChange={handleChange}
+                      onFocus={() => handleFocus('liquidityPercentage')}
+                      required
+                    />
+                    {errors.liquidityPercentage && <ErrorMessage>{errors.liquidityPercentage}</ErrorMessage>}
+                  </FormGroup>
                 </StepContent>
               </StepContainer>
 
@@ -1899,48 +1939,14 @@ function CreatePresale() {
                 </StepContent>
               </StepContainer>
 
-              <StepContainer>
-                <StepHeader onClick={() => toggleStep('purchaseToken')}>
-                  <div>
-                    <StepNumber>7</StepNumber> Purchase Token Selection
-                  </div>
-                  <span>{expandedSteps.purchaseToken ? '▼' : '▶'}</span>
-                </StepHeader>
-                <StepContent
-                  variants={stepContentVariants}
-                  initial="hidden"
-                  animate={expandedSteps.purchaseToken ? 'visible' : 'hidden'}
-                >
-                  <FormGroup>
-                    <Label>Purchase Token</Label>
-                    <Select
-                      name="purchaseToken"
-                      value={formData.purchaseToken}
-                      onChange={handleChange}
-                      onFocus={() => handleFocus('purchaseToken')}
-                      required
-                    >
-                      <option value="">Select Purchase Token</option>
-                      <option value={blockchains.find(chain => chain.name === formData.selectedChain)?.nativeToken}>
-                        {blockchains.find(chain => chain.name === formData.selectedChain)?.nativeToken} (Native Token)
-                      </option>
-                      <option value={blockchains.find(chain => chain.name === formData.selectedChain)?.stableToken}>
-                        {blockchains.find(chain => chain.name === formData.selectedChain)?.stableToken} (Stablecoin)
-                      </option>
-                    </Select>
-                    {errors.purchaseToken && <ErrorMessage>{errors.purchaseToken}</ErrorMessage>}
-                  </FormGroup>
-                </StepContent>
-              </StepContainer>
-
-              <StyledButton
+              <SubmitButton
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="submit"
-                style={{ display: 'block', margin: '1rem auto 0', padding: '0.6rem 1.2rem', fontSize: '1rem' }}
+                style={{ display: 'block', margin: '1rem auto 0' }}
               >
                 Preview Pool
-              </StyledButton>
+              </SubmitButton>
             </form>
 
             <Summary
@@ -1950,7 +1956,7 @@ function CreatePresale() {
               theme={theme}
             >
               <h3>Presale Summary</h3>
-              <p><strong>Blockchain:</strong> {formData.selectedChain}</p>
+              <p><strong>Blockchain:</strong> {formData.selectedChain?.name}</p>
               <p><strong>Launch Type:</strong> {formData.launchType}</p>
               <p><strong>Project Name:</strong> {formData.projectName}</p>
               <p><strong>Token Symbol:</strong> {formData.tokenSymbol}</p>
@@ -1962,6 +1968,7 @@ function CreatePresale() {
               <p><strong>Start Date:</strong> {formData.startDate}</p>
               <p><strong>End Date:</strong> {formData.endDate}</p>
               <p><strong>Liquidity Unlock Time:</strong> {formData.liquidityUnlockTime}</p>
+              <p><strong>Liquidity Lock Percentage:</strong> {formData.liquidityPercentage}%</p>
               <p><strong>Creator Wallet:</strong> {formData.creatorWallet}</p>
               <p><strong>Logo URL:</strong> {formData.logoUrl}</p>
               <p><strong>Website:</strong> {formData.website}</p>
@@ -1974,21 +1981,22 @@ function CreatePresale() {
                   <p>{contractAddress}</p>
                 </ContractDisplay>
               )}
-              <StyledButton
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleConfirm}
-              >
-                Confirm Creation
-              </StyledButton>
-              <StyledCancelButton
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowSummary(false)}
-                style={{ marginLeft: '1rem' }}
-              >
-                Cancel
-              </StyledCancelButton>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
+                <SubmitButton
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleConfirm}
+                >
+                  Confirm Creation
+                </SubmitButton>
+                <CancelButton
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowSummary(false)}
+                >
+                  Cancel
+                </CancelButton>
+              </div>
             </Summary>
           </CreateContainer>
 

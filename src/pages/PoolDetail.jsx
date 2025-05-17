@@ -49,7 +49,7 @@ const RightColumn = styled.div`
 `;
 
 const RightSection = styled.div`
-  background: rgba(255, 64, 255, 0.1);
+  background: rgba(206, 117, 206, 0.1);
   padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: 0 0 10px rgba(255, 64, 255, 0.2);
@@ -77,7 +77,7 @@ const SummaryContent = styled.p`
 
 const CommentsSection = styled.div`
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(134, 86, 86, 0.05);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-light);
   color: ${(props) => props.theme.text};

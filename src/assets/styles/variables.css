@@ -1,21 +1,21 @@
 :root {
-  --primary-color: #ff40ff; /* Neón rosa brillante */
-  --secondary-color: #00ffff; /* Cian neón */
-  --background-dark: #0d0d1a; /* Negro profundo para modo oscuro */
-  --background-light: #1e1e30; /* Gris oscuro metálico para modo claro */
-  --text-dark: #ffffff; /* Blanco brillante */
-  --text-light: #e0e0e0; /* Gris claro para contraste */
-  --gray-light: #2d2d44; /* Gris oscuro futurista */
-  --shadow-light: 0 2px 12px rgba(0, 255, 255, 0.3); /* Sombra con cian neón más intensa */
-  --shadow-hover: 0 8px 20px rgba(255, 64, 255, 0.5); /* Sombra con rosa neón más intensa */
-  --border-radius: 12px; /* Bordes más redondeados */
-  --glow-effect: 0 0 20px rgba(255, 64, 255, 0.7), 0 0 40px rgba(0, 255, 255, 0.5); /* Efecto de brillo más intenso con cian y rosa */
+  --primary-color: #FF00FF; /* Bright Magenta (replace with image color) */
+  --secondary-color: #00FFCC; /* Cyan/Teal Neon (replace with image color) */
+  --background-dark: #0A0A1F; /* Deep Dark Blue/Black (replace with image color) */
+  --background-light: #1F1F3A; /* Slightly Lighter Dark Blue/Grey (replace with image color) */
+  --text-dark: #FFFFFF; /* Pure White (replace with image color) */
+  --text-light: #D0D0E0; /* Light Grey with blue tint (replace with image color) */
+  --gray-light: #2A2A4A; /* Dark Grey with blue undertone (replace with image color) */
+  --shadow-light: 0 2px 12px rgba(0, 255, 204, 0.3); /* Teal/Cyan shadow (replace with image color) */
+  --shadow-hover: 0 8px 20px rgba(255, 0, 255, 0.5); /* Magenta shadow (replace with image color) */
+  --glow-effect: 0 0 20px rgba(255, 0, 255, 0.7), 0 0 40px rgba(0, 255, 204, 0.5); /* Magenta and Cyan glow (replace with image color) */
+  --border-radius: 12px; /* Keep as is */
 }
 
 [data-theme="dark"] {
-  --background-dark: #0a0a14; /* Negro más profundo para modo oscuro */
-  --background-light: #1a1a2e; /* Gris oscuro más intenso */
-  --text-dark: #ffffff; /* Blanco brillante */
-  --text-light: #b0b0c0; /* Gris más suave para contraste */
-  --gray-light: #1a1a2e; /* Gris oscuro futurista */
+  --background-dark: #080820; /* Even deeper dark blue/black (replace with image color) */
+  --background-light: #15153A; /* Slightly lighter dark blue/grey (replace with image color) */
+  --text-dark: #FFFFFF; /* Pure White (replace with image color) */
+  --text-light: #B0B0D0; /* Slightly darker grey with blue tint (replace with image color) */
+  --gray-light: #1F1F4A; /* Darker grey with blue undertone (replace with image color) */
 }
