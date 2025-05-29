@@ -64,7 +64,7 @@ const Dot = styled.span`
 `;
 
 const PageContainer = styled.div`
-  background: #00000a;
+  background: #0f141d;
   min-height: 100vh;
   width: 100%;
   margin: 0;

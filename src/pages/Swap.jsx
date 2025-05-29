@@ -34,7 +34,7 @@ const SwapSection = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #00000a;
+  background: #0f141d;
   padding: 2rem;
   box-sizing: border-box;
 `;

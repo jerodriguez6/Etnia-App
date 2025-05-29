@@ -16,6 +16,7 @@ import Launchpad from './pages/Launchpad';
 import Create from './pages/Create';
 import PoolDetail from './pages/PoolDetail';
 import Swap from './pages/Swap'; // Importamos el nuevo componente Swap
+import Agent from './pages/Agent'; // Import the new Agent component
 
 // Estilos para el contenedor principal
 const AppContainer = styled.div`
@@ -89,6 +90,7 @@ const AnimatedRoutes = () => {
             <Route path="/create" element={<Create />} />
             <Route path="/pools/:id" element={<PoolDetail />} />
             <Route path="/swap" element={<Swap />} /> {/* Nueva ruta para Swap */}
+            <Route path="/agent" element={<Agent />} /> {/* Add the new route */}
           </Routes>
         </Suspense>
       </PageTransition>

@@ -27,37 +27,51 @@ import tonLogo from '../assets/images/ton-logo.svg';
 import bitpandaLogo from '../assets/images/bitpanda-logo.svg';
 import mexcLogo from '../assets/images/mexc-logo.svg';
 
-// Componentes estilizados (sin cambios en las secciones no relacionadas)
+// Styled Components
 const HomeContainer = styled(motion.div)`
   padding: 2rem;
   background: ${props => props.theme.background};
   min-height: calc(100vh - 200px);
   position: relative;
   overflow: hidden;
+  padding-top: 30px;
 
   @media (max-width: 768px) {
     padding: 1rem;
+    padding-top: 50px;
   }
 
   @media (max-width: 480px) {
     padding: 0.5rem;
+    padding-top: 40px;
+  }
+`;
+
+const SectionWrapper = styled.div`
+  margin-bottom: ${props => props.isHeroSection ? '1rem' : '4rem'}; /* Reduced for HeroSection to bring BackedBySection closer */
+
+  @media (max-width: 768px) {
+    margin-bottom: ${props => props.isHeroSection ? '0.75rem' : '3rem'};
+  }
+
+  @media (max-width: 480px) {
+    margin-bottom: ${props => props.isHeroSection ? '0.5rem' : '2rem'};
   }
 `;
 
 const HeroSection = styled.div`
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 2rem 2rem;
   background: linear-gradient(135deg, rgba(255, 64, 255, 0.1), rgba(0, 255, 255, 0.1));
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-light);
-  margin-bottom: 2rem;
   position: relative;
   z-index: 1;
   min-height: 400px;
   overflow: hidden;
 
   @media (max-width: 768px) {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
     min-height: 300px;
   }
 
@@ -209,13 +223,12 @@ const StyledCTAButton = styled(motion.button)`
 
 const BackedBySection = styled.div`
   text-align: center;
-  padding: 2rem 0;
-  margin-bottom: 2rem;
+  padding: 1rem 0; /* Reduced from 2rem 0 to make it more compact */
 
   h3 {
     color: ${props => props.theme.text};
     font-size: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem; /* Reduced from 1.5rem */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -224,11 +237,19 @@ const BackedBySection = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding: 1rem 0;
+    padding: 0.75rem 0; /* Reduced from 1rem 0 */
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem 0;
+    padding: 0.5rem 0; /* Already minimal */
+    h3 {
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+    }
   }
 `;
 
@@ -302,7 +323,6 @@ const FeaturesSection = styled.div`
   background: ${props => props.theme.background};
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-light);
-  margin-bottom: 2rem;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -340,7 +360,7 @@ const FeatureCard = styled(motion.div)`
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Overlay oscuro para mejorar la legibilidad del texto */
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1;
     transition: background 0.3s ease;
   }
@@ -438,7 +458,6 @@ const FeaturedPools = styled.div`
   background: ${props => props.theme.background};
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-light);
-  margin-bottom: 2rem;
 
   h2 {
     color: ${props => props.theme.text};
@@ -582,7 +601,7 @@ const ChatbotToggle = styled(motion.button)`
   }
 `;
 
-// Animaciones (sin cambios)
+// Animations
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
@@ -676,7 +695,7 @@ const backedByLogos = [
   { src: awsLogo, alt: 'AWS' },
 ];
 
-// Ajustamos las configuraciones del slider para que las tarjetas ocupen más espacio en móvil
+// Slider settings
 const sliderSettings = {
   dots: true,
   infinite: true,
@@ -697,6 +716,7 @@ const sliderSettings = {
   ],
 };
 
+// Home Component
 function Home() {
   const { theme } = useTheme();
   const [timeLeft, setTimeLeft] = useState({});
@@ -734,20 +754,19 @@ function Home() {
 
   const getChatbotResponse = (message) => {
     const lowerMessage = message.toLowerCase();
-    if (lowerMessage.includes('help') || lowerMessage.includes('ayuda')) {
-      return '¡Hola! Soy el asistente de ETNIA. Puedo ayudarte a lanzar un proyecto o unirte a una preventa. ¿En qué te ayudo?';
-    } else if (lowerMessage.includes('launch') || lowerMessage.includes('lanzar')) {
-      return 'Para lanzar un proyecto, ve a "Create a Sale". Necesitarás un token y detalles de la preventa. ¿Quieres más detalles?';
-    } else if (lowerMessage.includes('presale') || lowerMessage.includes('preventa')) {
-      return 'Mira nuestras preventas destacadas arriba o visita "Launchpad List" para explorar más.';
-    } else if (lowerMessage.includes('ai') || lowerMessage.includes('inteligencia')) {
-      return 'Nuestra IA analiza mercados en tiempo real para darte insights sobre las mejores preventas. ¡Pregunta por predicciones!';
+    if (lowerMessage.includes('help')) {
+      return 'Hello! I’m ETNIA’s assistant. I can help you launch a project or join a presale. How can I assist you?';
+    } else if (lowerMessage.includes('launch')) {
+      return 'To launch a project, go to "Create a Sale". You’ll need a token and presale details. Need more info?';
+    } else if (lowerMessage.includes('presale')) {
+      return 'Check out our featured presales above or visit "Launchpad List" to explore more.';
+    } else if (lowerMessage.includes('ai')) {
+      return 'Our AI analyzes markets in real-time to provide insights on the best presales. Ask for predictions!';
     } else {
-      return 'No estoy seguro de cómo ayudarte con eso. ¿Puedes darme más contexto o preguntar algo sobre ETNIA?';
+      return 'I’m not sure how to help with that. Can you provide more context or ask something about ETNIA?';
     }
   };
 
-  // Función para redirigir al canal de Telegram
   const handleJoinNowClick = () => {
     window.open('https://t.me/EtniaLaunchpadCrypto', '_blank');
   };
@@ -759,170 +778,170 @@ function Home() {
       animate="visible"
       theme={theme}
     >
-      <HeroSection>
-        <HeroBackground>
-          <ReactPlayer
-            className="react-player"
-            url={launchpadIntroVideo}
-            playing
-            loop
-            muted
-            width="100%"
-            height="100%"
-            style={{ position: 'absolute', top: 0, left: 0, objectFit: 'cover' }}
-          />
-          <div className="background-image" />
-        </HeroBackground>
-        <VideoOverlay />
-        <Title theme={theme}>Launch Smarter with ETNIA: Blockchain Meets AI Innovation</Title>
-        <Subtitle theme={theme}>
-          Empower your token launches with cutting-edge blockchain security and AI-driven insights for maximum success
-        </Subtitle>
-        <CTAButtons>
-          <StyledCTAButton
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => window.location.href = '/launchpad'}
-          >
-            Explore
-          </StyledCTAButton>
-          <StyledCTAButton
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => window.location.href = '/create'}
-          >
-            Create Presale
-          </StyledCTAButton>
-          <StyledCTAButton
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Agent AI
-          </StyledCTAButton>
-        </CTAButtons>
-      </HeroSection>
+      <SectionWrapper isHeroSection>
+        <HeroSection>
+          <HeroBackground>
+            <ReactPlayer
+              className="react-player"
+              url={launchpadIntroVideo}
+              playing
+              loop
+              muted
+              width="100%"
+              height="100%"
+              style={{ position: 'absolute', top: 0, left: 0, objectFit: 'cover' }}
+            />
+            <div className="background-image" />
+          </HeroBackground>
+          <VideoOverlay />
+          <Title theme={theme}>Launch Smarter with ETNIA: Blockchain Meets AI Innovation</Title>
+          <Subtitle theme={theme}>
+            Empower your token launches with cutting-edge blockchain security and AI-driven insights for maximum success
+          </Subtitle>
+          <CTAButtons>
+            <StyledCTAButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.location.href = '/launchpads'}
+            >
+              Explore
+            </StyledCTAButton>
+            <StyledCTAButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.location.href = '/create'}
+            >
+              Create Presale
+            </StyledCTAButton>
+            <StyledCTAButton
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.location.href = '/agent'}
+            >
+              Agent AI
+            </StyledCTAButton>
+          </CTAButtons>
+        </HeroSection>
+      </SectionWrapper>
 
-      <BackedBySection
-        theme={theme}
-        variants={backedByVariants}
-        initial="hidden"
-        animate="visible"
+      <SectionWrapper>
+        <BackedBySection
+          theme={theme}
+          variants={backedByVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <h3>Backed by</h3>
+          <BackedByLogos>
+            <div className="logos-slide">
+              <div>
+                {backedByLogos.map((logo, index) => (
+                  <motion.div
+                    key={index}
+                    variants={logoVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <LogoImage src={logo.src} alt={logo.alt} />
+                  </motion.div>
+                ))}
+              </div>
+              <div>
+                {backedByLogos.map((logo, index) => (
+                  <motion.div
+                    key={`duplicate-${index}`}
+                    variants={logoVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <LogoImage src={logo.src} alt={logo.alt} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </BackedByLogos>
+        </BackedBySection>
+      </SectionWrapper>
+
+      <SectionWrapper>
+        <FeaturesSection>
+          <FeatureCard
+            style={{ backgroundImage: `url(${analyticsImage})` }}
+            variants={featureVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <FeatureContent>
+              <h2>AI-Powered Analytics</h2>
+              <p>Real-time market insights to optimize your launch strategy.</p>
+              <FeatureButton whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                Learn More
+              </FeatureButton>
+            </FeatureContent>
+          </FeatureCard>
+          <FeatureCard
+            style={{ backgroundImage: `url(${secureImage})` }}
+            variants={featureVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <FeatureContent>
+              <h2>Secure Transactions</h2>
+              <p>Blockchain-backed security for safe and transparent deals.</p>
+              <FeatureButton whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                Learn More
+              </FeatureButton>
+            </FeatureContent>
+          </FeatureCard>
+          <FeatureCard
+            style={{ backgroundImage: `url(${communityImage})` }}
+            variants={featureVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <FeatureContent>
+              <h2>Community Driven</h2>
+              <p>Join a thriving ecosystem of innovators and investors.</p>
+              <FeatureButton whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                Join Now
+              </FeatureButton>
+            </FeatureContent>
+          </FeatureCard>
+        </FeaturesSection>
+      </SectionWrapper>
+
+      <SectionWrapper>
+        <FeaturedPools theme={theme}>
+          <h2>Featured Presales</h2>
+          <Slider {...sliderSettings}>
+            {mockPools.map(pool => (
+              <PoolCard
+                key={pool.id}
+                pool={pool}
+                timeLeft={timeLeft[pool.id]}
+                onJoinNowClick={handleJoinNowClick}
+              />
+            ))}
+          </Slider>
+        </FeaturedPools>
+      </SectionWrapper>
+
+      <ChatbotToggle
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
       >
-        <h3>Backed by</h3>
-        <BackedByLogos>
-          <div className="logos-slide">
-            <div>
-              {backedByLogos.map((logo, index) => (
-                <motion.div
-                  key={`first-${index}`}
-                  variants={logoVariants}
-                  whileHover={{ scale: 1.1 }}
-                >
-                  <LogoImage src={logo.src} alt={logo.alt} />
-                </motion.div>
-              ))}
-            </div>
-            <div>
-              {backedByLogos.map((logo, index) => (
-                <motion.div
-                  key={`second-${index}`}
-                  variants={logoVariants}
-                  whileHover={{ scale: 1.1 }}
-                >
-                  <LogoImage src={logo.src} alt={logo.alt} />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </BackedByLogos>
-      </BackedBySection>
-
-      <FeaturesSection theme={theme}>
-        <FeatureCard
-          variants={featureVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover={{ scale: 1.05 }}
-          theme={theme}
-          style={{ backgroundImage: `url(${secureImage})` }}
-        >
-          <FeatureContent>
-            <h2>Secure Transactions</h2>
-            <p>Ensure your investments are safe with our advanced security protocols.</p>
-            <FeatureButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Learn More
-            </FeatureButton>
-          </FeatureContent>
-        </FeatureCard>
-        <FeatureCard
-          variants={featureVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover={{ scale: 1.05 }}
-          theme={theme}
-          style={{ backgroundImage: `url(${analyticsImage})` }}
-        >
-          <FeatureContent>
-            <h2>Real-Time Analytics</h2>
-            <p>Track pool performance with live data and insights.</p>
-            <FeatureButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Explore Analytics
-            </FeatureButton>
-          </FeatureContent>
-        </FeatureCard>
-        <FeatureCard
-          variants={featureVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover={{ scale: 1.05 }}
-          theme={theme}
-          style={{ backgroundImage: `url(${communityImage})` }}
-        >
-          <FeatureContent>
-            <h2>Community-Driven</h2>
-            <p>Join a vibrant community of innovators and investors.</p>
-            <FeatureButton
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleJoinNowClick} // Añadimos el evento onClick para redirigir a Telegram
-            >
-              Join Now
-            </FeatureButton>
-          </FeatureContent>
-        </FeatureCard>
-      </FeaturesSection>
-
-      <FeaturedPools theme={theme}>
-        <h2>Featured Launchpads</h2>
-        <Slider {...sliderSettings}>
-          {mockPools.map((pool, index) => (
-            <motion.div
-              key={pool.id}
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.2, duration: 0.5 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              <PoolCard pool={pool} timeLeft={timeLeft[pool.id]} />
-            </motion.div>
-          ))}
-        </Slider>
-      </FeaturedPools>
+        💬
+      </ChatbotToggle>
 
       <ChatbotContainer
         isOpen={isChatOpen}
         variants={chatbotVariants}
         initial="hidden"
-        animate={isChatOpen ? 'visible' : 'hidden'}
+        animate={isChatOpen ? "visible" : "hidden"}
       >
-        <ChatbotHeader onClick={() => setIsChatOpen(!isChatOpen)}>
-          ETNIA AI Assistant
+        <ChatbotHeader onClick={() => setIsChatOpen(false)}>
+          ETNIA Assistant
         </ChatbotHeader>
         <ChatbotBody>
           {messages.map((msg, index) => (
@@ -933,15 +952,13 @@ function Home() {
         </ChatbotBody>
         <form onSubmit={handleSendMessage}>
           <ChatbotInput
+            type="text"
+            placeholder="Ask me anything..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
           />
         </form>
       </ChatbotContainer>
-      <ChatbotToggle onClick={() => setIsChatOpen(!isChatOpen)} whileHover={{ scale: 1.1 }}>
-        💬
-      </ChatbotToggle>
     </HomeContainer>
   );
 }

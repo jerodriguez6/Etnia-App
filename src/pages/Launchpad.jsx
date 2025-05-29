@@ -8,6 +8,7 @@ import { mockPools } from '../data/mockPools'; // Importamos los datos centraliz
 
 const LaunchpadsContainer = styled(motion.div)`
   padding: 2rem;
+  background: #1a1a1a;
   background: ${(props) => props.theme.background};
   min-height: calc(100vh - 200px);
 
